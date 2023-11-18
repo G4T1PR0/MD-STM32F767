@@ -5,13 +5,20 @@
  *      Author: G4T1PR0
  */
 
-#include "app_main.h"
-#include "AA.h"
+#include <app_main.h>
+#include <Devices/Devices.hpp>
+#include <HardwareController/HardwareController.hpp>
 
-AA a;
+Devices* devices;
 
-void app_main(void) {
-	while(1) {
-
-	}
+void app_init() {
+    devices = new Devices();
+    devices->init();
+    HardwareController* hwc = new HardwareController(devices);
+    hwc->init();
+}
+void app_main() {
+    app_init();
+    while (1) {
+    }
 }
