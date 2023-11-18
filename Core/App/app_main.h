@@ -10,10 +10,10 @@
 
 #ifdef __cplusplus
 extern "C" {
-void app_main(void);
+void app_main();
 };
 #else
-void app_main(void);
+void app_main();
 #endif
 
 #endif /* APP_APP_MAIN_H_ */
