@@ -8,23 +8,21 @@
 #ifndef APP_DEVICES_DRIVER_A3921_HPP_
 #define APP_DEVICES_DRIVER_A3921_HPP_
 
-#include <Devices/Driver/stmTimerPwm.hpp>
+#include <Devices/McuAbstractionLayer/baseMcuAbstractionLayer.hpp>
 
 class A3921 {
    public:
-    A3921(stmTimerPwm* pwm, Peripheral p, GPIO_TypeDef* GPIO_PHASE_Port, uint16_t GPIO_PHASE_Pin, GPIO_TypeDef* GPIO_SR_Port, uint16_t GPIO_SR_Pin);
+    A3921(baseMcuAbstractionLayer* mcu, baseMcuAbstractionLayer::Peripheral_PWM pwm, baseMcuAbstractionLayer::Peripheral_GPIO phase, baseMcuAbstractionLayer::Peripheral_GPIO sr);
     void init();
     void setPower(float power);
 
    private:
-    stmTimerPwm* _pwm;
+    baseMcuAbstractionLayer* _mcu;
     float _previousPower;
 
-    Peripheral _p;
-    GPIO_TypeDef* _GPIO_PHASE_Port;
-    uint16_t _GPIO_PHASE_Pin;
-    GPIO_TypeDef* _GPIO_SR_Port;
-    uint16_t _GPIO_SR_Pin;
+    baseMcuAbstractionLayer::Peripheral_PWM _pwm;
+    baseMcuAbstractionLayer::Peripheral_GPIO _phase;
+    baseMcuAbstractionLayer::Peripheral_GPIO _sr;
 };
 
 #endif /* APP_DEVICES_DRIVER_A3921_HPP_ */

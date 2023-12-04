@@ -9,13 +9,12 @@
 #include <Devices/Devices.hpp>
 #include <HardwareController/HardwareController.hpp>
 
-Devices* devices;
+Devices devices;
+HardwareController hwc(&devices);
 
 void app_init() {
-    devices = new Devices();
-    devices->init();
-    HardwareController* hwc = new HardwareController(devices);
-    hwc->init();
+    devices.init();
+    hwc.init();
 }
 void app_main() {
     app_init();

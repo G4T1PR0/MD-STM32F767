@@ -7,18 +7,16 @@
 
 #include <Devices/Driver/A3921.hpp>
 
-A3921::A3921(stmTimerPwm* pwm, Peripheral p, GPIO_TypeDef* GPIO_PHASE_Port, uint16_t GPIO_PHASE_Pin, GPIO_TypeDef* GPIO_SR_Port, uint16_t GPIO_SR_Pin) {
+A3921::A3921(baseMcuAbstractionLayer* mcu, baseMcuAbstractionLayer::Peripheral_PWM pwm, baseMcuAbstractionLayer::Peripheral_GPIO phase, baseMcuAbstractionLayer::Peripheral_GPIO sr) {
+    _mcu = mcu;
     _pwm = pwm;
-    _p = p;
-    _GPIO_PHASE_Port = GPIO_PHASE_Port;
-    _GPIO_PHASE_Pin = GPIO_PHASE_Pin;
-    _GPIO_SR_Port = GPIO_SR_Port;
-    _GPIO_SR_Pin = GPIO_SR_Pin;
+    _phase = phase;
+    _sr = sr;
 }
 
 void A3921::init() {
     _previousPower = 0;
-    HAL_GPIO_WritePin(_GPIO_SR_Port, _GPIO_SR_Pin, GPIO_PIN_SET);
+    _mcu->setGpioValue(_sr, 1);
 }
 
 void A3921::setPower(float power) {
@@ -26,15 +24,15 @@ void A3921::setPower(float power) {
     } else {
         _previousPower = power;
         if (power < 0) {
-            _pwm->setPWM(_p, 0 - power);
-            HAL_GPIO_WritePin(_GPIO_PHASE_Port, _GPIO_PHASE_Pin, GPIO_PIN_RESET);
+            _mcu->setPwmValue(_pwm, 0 - power);
+            _mcu->setGpioValue(_phase, 0);
         } else if (power > 0) {
-            _pwm->setPWM(_p, power);
-            HAL_GPIO_WritePin(_GPIO_PHASE_Port, _GPIO_PHASE_Pin, GPIO_PIN_SET);
+            _mcu->setPwmValue(_pwm, power);
+            _mcu->setGpioValue(_phase, 1);
         } else {
-            _pwm->setPWM(_p, 0);
-            HAL_GPIO_WritePin(_GPIO_PHASE_Port, _GPIO_PHASE_Pin, GPIO_PIN_RESET);
+            _mcu->setPwmValue(_pwm, 0);
+            _mcu->setGpioValue(_phase, 0);
         }
-        HAL_GPIO_WritePin(_GPIO_SR_Port, _GPIO_SR_Pin, GPIO_PIN_SET);
+        _mcu->setGpioValue(_sr, 1);
     }
 }

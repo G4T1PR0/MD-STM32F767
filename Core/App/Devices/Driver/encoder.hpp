@@ -8,18 +8,16 @@
 #ifndef APP_DEVICES_DRIVER_ENCODER_H_
 #define APP_DEVICES_DRIVER_ENCODER_H_
 
-#include <Devices/Driver/stmTimerEncoder.hpp>
-#include "main.h"
+#include <Devices/McuAbstractionLayer/baseMcuAbstractionLayer.hpp>
 
 class Encoder {
    public:
-    Encoder(Peripheral p);
-    void init();
+    Encoder(baseMcuAbstractionLayer* mcu, baseMcuAbstractionLayer::Peripheral_Encoder p);
     uint32_t getCount();
 
    private:
-    stmTimerEncoder* _encoder;
-    Peripheral _p;
+    baseMcuAbstractionLayer* _mcu;
+    baseMcuAbstractionLayer::Peripheral_Encoder _p;
 };
 
 #endif /* APP_DEVICES_DRIVER_ENCODER_H_ */
