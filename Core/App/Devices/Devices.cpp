@@ -8,34 +8,30 @@
 #include <Devices/Devices.hpp>
 
 Devices::Devices() {
-    adc = new stmAdc();
-    pwm = new stmTimerPwm();
-    encoder = new stmTimerEncoder();
+    mcu = new stm32f767AbstractionLayer();
 
-    fl_current = new currentSensor(adc, Peripheral::FL_Current);
-    fr_current = new currentSensor(adc, Peripheral::FR_Current);
-    st_current = new currentSensor(adc, Peripheral::ST_Current);
-    rl_current = new currentSensor(adc, Peripheral::RL_Current);
-    rr_current = new currentSensor(adc, Peripheral::RR_Current);
+    fl_current = new currentSensor(mcu, baseMcuAbstractionLayer::Peripheral_ADC::FL_Current);
+    fr_current = new currentSensor(mcu, baseMcuAbstractionLayer::Peripheral_ADC::FR_Current);
+    st_current = new currentSensor(mcu, baseMcuAbstractionLayer::Peripheral_ADC::ST_Current);
+    rl_current = new currentSensor(mcu, baseMcuAbstractionLayer::Peripheral_ADC::RL_Current);
+    rr_current = new currentSensor(mcu, baseMcuAbstractionLayer::Peripheral_ADC::RR_Current);
 
-    batt_voltage = new batteryVoltageSensor(adc, Peripheral::Batt_Voltage);
+    batt_voltage = new batteryVoltageSensor(mcu, baseMcuAbstractionLayer::Peripheral_ADC::Batt_Voltage);
 
-    steer_angle = new steerAngleSensor(adc, Peripheral::ST_Volume);
+    steer_angle = new steerAngleSensor(mcu, baseMcuAbstractionLayer::Peripheral_ADC::ST_Volume);
 
-    fl_driver = new A3921(pwm, Peripheral::FL_PWM, Motor_FL_PHASE_GPIO_Port, Motor_FL_PHASE_Pin, Motor_FL_SR_GPIO_Port, Motor_FL_SR_Pin);
-    fr_driver = new A3921(pwm, Peripheral::FR_PWM, Motor_FR_PHASE_GPIO_Port, Motor_FR_PHASE_Pin, Motor_FR_SR_GPIO_Port, Motor_FR_SR_Pin);
-    st_driver = new A3921(pwm, Peripheral::ST_PWM, Motor_ST_PHASE_GPIO_Port, Motor_ST_PHASE_Pin, Motor_ST_SR_GPIO_Port, Motor_ST_SR_Pin);
-    rl_driver = new A3921(pwm, Peripheral::RL_PWM, Motor_RL_PHASE_GPIO_Port, Motor_RL_PHASE_Pin, Motor_RL_SR_GPIO_Port, Motor_RL_SR_Pin);
-    rr_driver = new A3921(pwm, Peripheral::RR_PWM, Motor_RR_PHASE_GPIO_Port, Motor_RR_PHASE_Pin, Motor_RR_SR_GPIO_Port, Motor_RR_SR_Pin);
+    fl_encoder = new Encoder(mcu, baseMcuAbstractionLayer::Peripheral_Encoder::FL_Encoder);
+    fr_encoder = new Encoder(mcu, baseMcuAbstractionLayer::Peripheral_Encoder::FR_Encoder);
+    rl_encoder = new Encoder(mcu, baseMcuAbstractionLayer::Peripheral_Encoder::RL_Encoder);
+    rr_encoder = new Encoder(mcu, baseMcuAbstractionLayer::Peripheral_Encoder::RR_Encoder);
 
-    fl_encoder = new Encoder(Peripheral::FL_Encoder);
-    fr_encoder = new Encoder(Peripheral::FR_Encoder);
-    rl_encoder = new Encoder(Peripheral::RL_Encoder);
-    rr_encoder = new Encoder(Peripheral::RR_Encoder);
+    fl_driver = new A3921(mcu, baseMcuAbstractionLayer::Peripheral_PWM::FL_PWM, baseMcuAbstractionLayer::Peripheral_GPIO::FL_PHASE, baseMcuAbstractionLayer::Peripheral_GPIO::FL_SR);
+    fr_driver = new A3921(mcu, baseMcuAbstractionLayer::Peripheral_PWM::FR_PWM, baseMcuAbstractionLayer::Peripheral_GPIO::FR_PHASE, baseMcuAbstractionLayer::Peripheral_GPIO::FR_SR);
+    st_driver = new A3921(mcu, baseMcuAbstractionLayer::Peripheral_PWM::ST_PWM, baseMcuAbstractionLayer::Peripheral_GPIO::ST_PHASE, baseMcuAbstractionLayer::Peripheral_GPIO::ST_SR);
+    rl_driver = new A3921(mcu, baseMcuAbstractionLayer::Peripheral_PWM::RL_PWM, baseMcuAbstractionLayer::Peripheral_GPIO::RL_PHASE, baseMcuAbstractionLayer::Peripheral_GPIO::RL_SR);
+    rr_driver = new A3921(mcu, baseMcuAbstractionLayer::Peripheral_PWM::RR_PWM, baseMcuAbstractionLayer::Peripheral_GPIO::RR_PHASE, baseMcuAbstractionLayer::Peripheral_GPIO::RR_SR);
 }
 
 void Devices::init() {
-    adc->init();
-    pwm->init();
-    encoder->init();
+    mcu->init();
 }

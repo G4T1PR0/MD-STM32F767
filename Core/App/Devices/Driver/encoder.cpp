@@ -7,13 +7,11 @@
 
 #include <Devices/Driver/encoder.hpp>
 
-Encoder::Encoder(Peripheral p) {
+Encoder::Encoder(baseMcuAbstractionLayer* mcu, baseMcuAbstractionLayer::Peripheral_Encoder p) {
+    _mcu = mcu;
     _p = p;
 }
 
-void Encoder::init() {
-}
-
 uint32_t Encoder::getCount() {
-    return _encoder->getCount(_p);
+    return _mcu->getEncoderCntValue(_p);
 }

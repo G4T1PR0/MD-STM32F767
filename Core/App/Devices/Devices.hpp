@@ -13,19 +13,14 @@
 #include <Devices/Driver/currentSensor.hpp>
 #include <Devices/Driver/encoder.hpp>
 #include <Devices/Driver/steerAngleSensor.hpp>
-#include <Devices/Driver/stmAdc.hpp>
-#include <Devices/Driver/stmTimerEncoder.hpp>
-#include <Devices/Driver/stmTimerPwm.hpp>
-#include <Devices/stmHalConfig.hpp>
+#include <Devices/McuAbstractionLayer/stm32f767AbstractionLayer.hpp>
 
 class Devices {
    public:
     Devices();
     void init();
 
-    stmAdc* adc;
-    stmTimerPwm* pwm;
-    stmTimerEncoder* encoder;
+    stm32f767AbstractionLayer* mcu;
 
     currentSensor* fl_current;
     currentSensor* fr_current;
