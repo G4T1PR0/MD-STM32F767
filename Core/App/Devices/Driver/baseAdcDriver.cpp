@@ -13,9 +13,9 @@ baseAdcDriver::baseAdcDriver(baseMcuAbstractionLayer* mcu, baseMcuAbstractionLay
 }
 
 uint16_t baseAdcDriver::getRawValue() {
-    return _mcu->getAdcValue(_p);
+    return _mcu->adcGetValue(_p);
 }
 
 float baseAdcDriver::getVoltage() {
-    return _mcu->getAdcValue(_p) * _raw2voltage;
+    return _mcu->adcGetValue(_p) * _raw2voltage;
 }

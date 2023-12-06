@@ -34,4 +34,16 @@ Devices::Devices() {
 
 void Devices::init() {
     mcu->init();
+
+    fl_encoder->init();
+    fr_encoder->init();
+    rl_encoder->init();
+    rr_encoder->init();
+}
+
+void Devices::update1ms() {
+    fl_encoder->update();
+    fr_encoder->update();
+    rl_encoder->update();
+    rr_encoder->update();
 }

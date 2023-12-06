@@ -19,6 +19,7 @@ class Devices {
    public:
     Devices();
     void init();
+    void update1ms();
 
     stm32f767AbstractionLayer* mcu;
 

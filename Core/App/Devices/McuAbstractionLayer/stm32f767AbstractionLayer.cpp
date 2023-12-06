@@ -25,7 +25,7 @@ void stm32f767AbstractionLayer::_initADC(void) {
     }
 }
 
-uint16_t stm32f767AbstractionLayer::getAdcValue(Peripheral_ADC p) {
+uint16_t stm32f767AbstractionLayer::adcGetValue(Peripheral_ADC p) {
     switch (p) {
         case Peripheral_ADC::FL_Current:
             return this->_data[0];
@@ -71,7 +71,7 @@ void stm32f767AbstractionLayer::_initEncoder() {
     HAL_TIM_Encoder_Start(&htim8, TIM_CHANNEL_ALL);
 }
 
-void stm32f767AbstractionLayer::setEncoderCntValue(Peripheral_Encoder p, uint32_t cnt) {
+void stm32f767AbstractionLayer::encoderSetValue(Peripheral_Encoder p, uint32_t cnt) {
     switch (p) {
         case Peripheral_Encoder::FL_Encoder:
             __HAL_TIM_SET_COUNTER(&htim3, cnt);
@@ -94,7 +94,7 @@ void stm32f767AbstractionLayer::setEncoderCntValue(Peripheral_Encoder p, uint32_
     }
 }
 
-uint32_t stm32f767AbstractionLayer::getEncoderCntValue(Peripheral_Encoder p) {
+uint32_t stm32f767AbstractionLayer::encoderGetValue(Peripheral_Encoder p) {
     switch (p) {
         case Peripheral_Encoder::FL_Encoder:
             return __HAL_TIM_GET_COUNTER(&htim3);
@@ -130,7 +130,7 @@ void stm32f767AbstractionLayer::_initPWM() {
     HAL_TIM_PWM_Start(&htim12, TIM_CHANNEL_1);
 }
 
-void stm32f767AbstractionLayer::setPwmValue(Peripheral_PWM p, float duty) {
+void stm32f767AbstractionLayer::pwmSetValue(Peripheral_PWM p, float duty) {
     switch (p) {
         case Peripheral_PWM::RL_PWM:
             __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, duty * __HAL_TIM_GET_AUTORELOAD(&htim1));
@@ -159,7 +159,7 @@ void stm32f767AbstractionLayer::setPwmValue(Peripheral_PWM p, float duty) {
 
 // GPIO
 
-void stm32f767AbstractionLayer::setGpioValue(Peripheral_GPIO p, bool value) {
+void stm32f767AbstractionLayer::gpioSetValue(Peripheral_GPIO p, bool value) {
     switch (p) {
         case Peripheral_GPIO::FL_PHASE:
             if (value)
@@ -236,6 +236,6 @@ void stm32f767AbstractionLayer::setGpioValue(Peripheral_GPIO p, bool value) {
     }
 }
 
-bool stm32f767AbstractionLayer::getGpioValue(Peripheral_GPIO p) {
+bool stm32f767AbstractionLayer::gpioGetValue(Peripheral_GPIO p) {
     return false;
 }

@@ -52,15 +52,15 @@ class baseMcuAbstractionLayer {
 
     virtual void init(void) = 0;
 
-    virtual uint16_t getAdcValue(Peripheral_ADC p) = 0;
+    virtual uint16_t adcGetValue(Peripheral_ADC p) = 0;
 
-    virtual void setPwmValue(Peripheral_PWM p, float duty) = 0;
+    virtual void pwmSetValue(Peripheral_PWM p, float duty) = 0;
 
-    virtual void setEncoderCntValue(Peripheral_Encoder p, uint32_t cnt) = 0;
-    virtual uint32_t getEncoderCntValue(Peripheral_Encoder p) = 0;
+    virtual void encoderSetValue(Peripheral_Encoder p, uint32_t cnt) = 0;
+    virtual uint32_t encoderGetValue(Peripheral_Encoder p) = 0;
 
-    virtual void setGpioValue(Peripheral_GPIO p, bool value) = 0;
-    virtual bool getGpioValue(Peripheral_GPIO p) = 0;
+    virtual void gpioSetValue(Peripheral_GPIO p, bool value) = 0;
+    virtual bool gpioGetValue(Peripheral_GPIO p) = 0;
 };
 
 #endif /* APP_DEVICES_BASEMCUABSTRACTIONLAYER_MCUABSTRACTIONLAYER_HPP_ */

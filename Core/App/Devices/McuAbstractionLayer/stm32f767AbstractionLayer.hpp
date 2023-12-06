@@ -14,15 +14,15 @@ class stm32f767AbstractionLayer : public baseMcuAbstractionLayer {
    public:
     virtual void init(void);
 
-    virtual uint16_t getAdcValue(Peripheral_ADC p);
+    virtual uint16_t adcGetValue(Peripheral_ADC p);
 
-    virtual void setPwmValue(Peripheral_PWM p, float duty);
+    virtual void pwmSetValue(Peripheral_PWM p, float duty);
 
-    virtual void setEncoderCntValue(Peripheral_Encoder p, uint32_t cnt);
-    virtual uint32_t getEncoderCntValue(Peripheral_Encoder p);
+    virtual void encoderSetValue(Peripheral_Encoder p, uint32_t cnt);
+    virtual uint32_t encoderGetValue(Peripheral_Encoder p);
 
-    virtual void setGpioValue(Peripheral_GPIO p, bool value);
-    virtual bool getGpioValue(Peripheral_GPIO p);
+    virtual void gpioSetValue(Peripheral_GPIO p, bool value);
+    virtual bool gpioGetValue(Peripheral_GPIO p);
 
    private:
     // ADC
