@@ -15,6 +15,7 @@ class HardwareController {
    public:
     HardwareController(Devices* devices);
     void init(void);
+    void update(void);
 
     MotorController* FL_Motor;
     MotorController* FR_Motor;

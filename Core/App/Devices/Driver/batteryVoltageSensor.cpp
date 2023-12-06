@@ -8,5 +8,5 @@
 #include <Devices/Driver/batteryVoltageSensor.hpp>
 
 float batteryVoltageSensor::getVoltage() {
-    return _mcu->getAdcValue(_p) * _raw2voltage * _voltage2batt;
+    return _mcu->adcGetValue(_p) * _raw2voltage * _voltage2batt;
 }

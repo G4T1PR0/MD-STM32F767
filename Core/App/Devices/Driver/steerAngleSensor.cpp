@@ -8,5 +8,5 @@
 #include <Devices/Driver/steerAngleSensor.hpp>
 
 float steerAngleSensor::getAngle() {
-    return _mcu->getAdcValue(_p) * _raw2angle;
+    return _mcu->adcGetValue(_p) * _raw2angle;
 }

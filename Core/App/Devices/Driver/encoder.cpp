@@ -12,6 +12,20 @@ Encoder::Encoder(baseMcuAbstractionLayer* mcu, baseMcuAbstractionLayer::Peripher
     _p = p;
 }
 
-uint32_t Encoder::getCount() {
-    return _mcu->getEncoderCntValue(_p);
+void Encoder::init() {
+    _cnt = 0;
+    _total_cnt = 0;
+    _mcu->encoderSetValue(_p, _offset);
+}
+
+void Encoder::update() {
+    _prev_cnt = _cnt;
+    _cnt = _mcu->encoderGetValue(_p) - _offset;
+    _acceleration = _cnt - _prev_cnt;
+    _total_cnt += _cnt;
+    _mcu->encoderSetValue(_p, _offset);
+}
+
+int32_t Encoder::getCount() {
+    return _cnt;
 }

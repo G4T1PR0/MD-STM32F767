@@ -17,4 +17,17 @@ HardwareController::HardwareController(Devices* devices) {
 }
 
 void HardwareController::init(void) {
+    FL_Motor->init();
+    FR_Motor->init();
+    ST_Motor->init();
+    RL_Motor->init();
+    RR_Motor->init();
+}
+
+void HardwareController::update(void) {
+    FL_Motor->update();
+    FR_Motor->update();
+    ST_Motor->update();
+    RL_Motor->update();
+    RR_Motor->update();
 }

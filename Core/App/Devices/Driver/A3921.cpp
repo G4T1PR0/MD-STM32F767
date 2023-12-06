@@ -16,7 +16,7 @@ A3921::A3921(baseMcuAbstractionLayer* mcu, baseMcuAbstractionLayer::Peripheral_P
 
 void A3921::init() {
     _previousPower = 0;
-    _mcu->setGpioValue(_sr, 1);
+    _mcu->gpioSetValue(_sr, 1);
 }
 
 void A3921::setPower(float power) {
@@ -24,15 +24,15 @@ void A3921::setPower(float power) {
     } else {
         _previousPower = power;
         if (power < 0) {
-            _mcu->setPwmValue(_pwm, 0 - power);
-            _mcu->setGpioValue(_phase, 0);
+            _mcu->pwmSetValue(_pwm, 0 - power);
+            _mcu->gpioSetValue(_phase, 0);
         } else if (power > 0) {
-            _mcu->setPwmValue(_pwm, power);
-            _mcu->setGpioValue(_phase, 1);
+            _mcu->pwmSetValue(_pwm, power);
+            _mcu->gpioSetValue(_phase, 1);
         } else {
-            _mcu->setPwmValue(_pwm, 0);
-            _mcu->setGpioValue(_phase, 0);
+            _mcu->pwmSetValue(_pwm, 0);
+            _mcu->gpioSetValue(_phase, 0);
         }
-        _mcu->setGpioValue(_sr, 1);
+        _mcu->gpioSetValue(_sr, 1);
     }
 }

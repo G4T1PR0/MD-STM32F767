@@ -8,5 +8,5 @@
 #include <Devices/Driver/currentSensor.hpp>
 
 float currentSensor::getCurrent() {
-    return (_mcu->getAdcValue(_p) * _raw2voltage - 1.65) / _voltage2current;
+    return (_mcu->adcGetValue(_p) * _raw2voltage - 1.65) / _voltage2current;
 }
