@@ -7,7 +7,7 @@
 
 #include <Devices/Driver/A3921.hpp>
 
-A3921::A3921(baseMcuAbstractionLayer* mcu, baseMcuAbstractionLayer::Peripheral_PWM pwm, baseMcuAbstractionLayer::Peripheral_GPIO phase, baseMcuAbstractionLayer::Peripheral_GPIO sr) {
+A3921::A3921(MAL* mcu, MAL::Peripheral_PWM pwm, MAL::Peripheral_GPIO phase, MAL::Peripheral_GPIO sr) {
     _mcu = mcu;
     _pwm = pwm;
     _phase = phase;
@@ -15,22 +15,22 @@ A3921::A3921(baseMcuAbstractionLayer* mcu, baseMcuAbstractionLayer::Peripheral_P
 }
 
 void A3921::init() {
-    _previousPower = 0;
+    _previousDuty = 0;
     _mcu->gpioSetValue(_sr, 1);
 }
 
-void A3921::setPower(float power) {
-    if (_previousPower == power) {
+void A3921::setDuty(float duty) {
+    if (_previousDuty == duty) {
     } else {
-        _previousPower = power;
-        if (power < 0) {
-            _mcu->pwmSetValue(_pwm, 0 - power);
+        _previousDuty = duty;
+        if (duty < 0) {
+            _mcu->pwmSetDuty(_pwm, 0 - duty);
             _mcu->gpioSetValue(_phase, 0);
-        } else if (power > 0) {
-            _mcu->pwmSetValue(_pwm, power);
+        } else if (duty > 0) {
+            _mcu->pwmSetDuty(_pwm, duty);
             _mcu->gpioSetValue(_phase, 1);
         } else {
-            _mcu->pwmSetValue(_pwm, 0);
+            _mcu->pwmSetDuty(_pwm, 0);
             _mcu->gpioSetValue(_phase, 0);
         }
         _mcu->gpioSetValue(_sr, 1);

@@ -28,31 +28,31 @@ void MotorController::init(void) {
 void MotorController::update(void) {
     switch (_mode) {
         case 0:  // Motor OFF
-            _driver->setPower(0);
+            _driver->setDuty(0);
             break;
 
         case 1:  // Motor PWM Control
             _motorInputDuty = _targetDuty;
-            _driver->setPower(_motorInputDuty);
+            _driver->setDuty(_motorInputDuty);
             break;
 
         case 2:  // Motor Current Control
             _pidTargetCurrent = _targetCurrent;
             _motorInputDuty = _current_pid.update(_pidTargetCurrent, _current->getCurrent());
-            _driver->setPower(_motorInputDuty);
+            _driver->setDuty(_motorInputDuty);
             break;
 
         case 3:  // Motor Velocity Control
             _pidTargetCurrent = _velocity_pid.update(_targetVelocity, _encoder->getCount());
             _motorInputDuty = _current_pid.update(_pidTargetCurrent, _current->getCurrent());
-            _driver->setPower(_motorInputDuty);
+            _driver->setDuty(_motorInputDuty);
 
             break;
 
         case 4:  // Motor Angle Control
             _pidTargetCurrent = _angle_pid.update(_targetAngle, _steerAngle->getAngle());
             _motorInputDuty = _current_pid.update(_pidTargetCurrent, _current->getCurrent());
-            _driver->setPower(_motorInputDuty);
+            _driver->setDuty(_motorInputDuty);
             break;
     }
 }
@@ -71,7 +71,7 @@ void MotorController::setMode(int mode) {
     }
 }
 
-void MotorController::setPWM(float duty) {
+void MotorController::setDuty(float duty) {
     _targetDuty = duty;
 }
 

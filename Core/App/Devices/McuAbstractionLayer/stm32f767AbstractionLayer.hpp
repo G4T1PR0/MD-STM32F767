@@ -10,16 +10,18 @@
 
 #include <Devices/McuAbstractionLayer/baseMcuAbstractionLayer.hpp>
 
+#define UART_RX_BUFFER_SIZE 64
+
 class stm32f767AbstractionLayer : public baseMcuAbstractionLayer {
    public:
     virtual void init(void);
 
     virtual uint16_t adcGetValue(Peripheral_ADC p);
 
-    virtual void pwmSetValue(Peripheral_PWM p, float duty);
+    virtual void pwmSetDuty(Peripheral_PWM p, float duty);
 
-    virtual void encoderSetValue(Peripheral_Encoder p, uint32_t cnt);
-    virtual uint32_t encoderGetValue(Peripheral_Encoder p);
+    virtual void encoderSetCnt(Peripheral_Encoder p, uint32_t cnt);
+    virtual uint32_t encoderGetCnt(Peripheral_Encoder p);
 
     virtual void gpioSetValue(Peripheral_GPIO p, bool value);
     virtual bool gpioGetValue(Peripheral_GPIO p);
@@ -34,6 +36,11 @@ class stm32f767AbstractionLayer : public baseMcuAbstractionLayer {
 
     // Timer PWM
     void _initPWM();
+
+    // UART
+    void __initUART();
+    static uint8_t _uart5RxBuffer[UART_RX_BUFFER_SIZE];
+    static uint8_t _usart3RxBuffer[UART_RX_BUFFER_SIZE];
 };
 
 #endif /* APP_DEVICES_STM32F767ABSTRACTIONLAYER_STM32F767ABSTRACTIONLAYER_HPP_ */

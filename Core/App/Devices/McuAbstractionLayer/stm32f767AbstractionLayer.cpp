@@ -8,6 +8,7 @@
 #include <Devices/McuAbstractionLayer/stm32f767AbstractionLayer.hpp>
 #include "adc.h"
 #include "tim.h"
+#include "usart.h"
 
 void stm32f767AbstractionLayer::init() {
     _initADC();
@@ -71,7 +72,7 @@ void stm32f767AbstractionLayer::_initEncoder() {
     HAL_TIM_Encoder_Start(&htim8, TIM_CHANNEL_ALL);
 }
 
-void stm32f767AbstractionLayer::encoderSetValue(Peripheral_Encoder p, uint32_t cnt) {
+void stm32f767AbstractionLayer::encoderSetCnt(Peripheral_Encoder p, uint32_t cnt) {
     switch (p) {
         case Peripheral_Encoder::FL_Encoder:
             __HAL_TIM_SET_COUNTER(&htim3, cnt);
@@ -94,7 +95,7 @@ void stm32f767AbstractionLayer::encoderSetValue(Peripheral_Encoder p, uint32_t c
     }
 }
 
-uint32_t stm32f767AbstractionLayer::encoderGetValue(Peripheral_Encoder p) {
+uint32_t stm32f767AbstractionLayer::encoderGetCnt(Peripheral_Encoder p) {
     switch (p) {
         case Peripheral_Encoder::FL_Encoder:
             return __HAL_TIM_GET_COUNTER(&htim3);
@@ -130,7 +131,7 @@ void stm32f767AbstractionLayer::_initPWM() {
     HAL_TIM_PWM_Start(&htim12, TIM_CHANNEL_1);
 }
 
-void stm32f767AbstractionLayer::pwmSetValue(Peripheral_PWM p, float duty) {
+void stm32f767AbstractionLayer::pwmSetDuty(Peripheral_PWM p, float duty) {
     switch (p) {
         case Peripheral_PWM::RL_PWM:
             __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, duty * __HAL_TIM_GET_AUTORELOAD(&htim1));
@@ -238,4 +239,11 @@ void stm32f767AbstractionLayer::gpioSetValue(Peripheral_GPIO p, bool value) {
 
 bool stm32f767AbstractionLayer::gpioGetValue(Peripheral_GPIO p) {
     return false;
+}
+
+// UART
+
+void stm32f767AbstractionLayer::__initUART() {
+    HAL_UART_Receive_DMA(&huart3, _usart3RxBuffer, UART_RX_BUFFER_SIZE);
+    HAL_UART_Receive_DMA(&huart5, _uart5RxBuffer, UART_RX_BUFFER_SIZE);
 }

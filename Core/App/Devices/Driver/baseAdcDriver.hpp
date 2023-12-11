@@ -11,13 +11,13 @@
 
 class baseAdcDriver {
    public:
-    baseAdcDriver(baseMcuAbstractionLayer* mcu, baseMcuAbstractionLayer::Peripheral_ADC p);
+    baseAdcDriver(MAL* mcu, MAL::Peripheral_ADC p);
     uint16_t getRawValue();
     float getVoltage();
 
    protected:
-    baseMcuAbstractionLayer* _mcu;
-    baseMcuAbstractionLayer::Peripheral_ADC _p;
+    MAL* _mcu;
+    MAL::Peripheral_ADC _p;
 
     const float _raw2voltage = 3.3f / (1 << 12);
 };

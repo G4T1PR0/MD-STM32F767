@@ -12,16 +12,17 @@
 
 class Encoder {
    public:
-    Encoder(baseMcuAbstractionLayer* mcu, baseMcuAbstractionLayer::Peripheral_Encoder p);
+    Encoder(MAL* mcu, MAL::Peripheral_Encoder p);
 
     void init();
     void update();
     int32_t getCount();
+    int32_t getTotalCnt();
     int32_t getAcceleration();
 
    private:
-    baseMcuAbstractionLayer* _mcu;
-    baseMcuAbstractionLayer::Peripheral_Encoder _p;
+    MAL* _mcu;
+    MAL::Peripheral_Encoder _p;
 
     const uint32_t _offset = 32767;
     int32_t _cnt;
