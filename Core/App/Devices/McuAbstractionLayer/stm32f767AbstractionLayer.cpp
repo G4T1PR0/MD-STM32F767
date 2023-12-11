@@ -6,6 +6,7 @@
  */
 
 #include <Devices/McuAbstractionLayer/stm32f767AbstractionLayer.hpp>
+#include <cstring>
 #include "adc.h"
 #include "tim.h"
 #include "usart.h"
@@ -14,6 +15,7 @@ void stm32f767AbstractionLayer::init() {
     _initADC();
     _initEncoder();
     _initPWM();
+    _initUART();
 }
 
 // ADC
@@ -243,7 +245,202 @@ bool stm32f767AbstractionLayer::gpioGetValue(Peripheral_GPIO p) {
 
 // UART
 
-void stm32f767AbstractionLayer::__initUART() {
-    HAL_UART_Receive_DMA(&huart3, _usart3RxBuffer, UART_RX_BUFFER_SIZE);
-    HAL_UART_Receive_DMA(&huart5, _uart5RxBuffer, UART_RX_BUFFER_SIZE);
+// uint8_t stm32f767AbstractionLayer::_uart5TxBuffer[UART_BUFFER_SIZE] = {0};
+uint8_t stm32f767AbstractionLayer::_uart5RxBuffer[UART_BUFFER_SIZE] = {0};
+
+// uint8_t stm32f767AbstractionLayer::_usart3TxBuffer[UART_BUFFER_SIZE] = {0};
+uint8_t stm32f767AbstractionLayer::_usart3RxBuffer[UART_BUFFER_SIZE] = {0};
+
+void stm32f767AbstractionLayer::_initUART() {
+    while (HAL_UART_Receive_DMA(&huart3, _usart3RxBuffer, UART_BUFFER_SIZE) != HAL_OK) {
+    }
+
+    while (HAL_UART_Receive_DMA(&huart5, _uart5RxBuffer, UART_BUFFER_SIZE) != HAL_OK) {
+    }
+}
+
+uint32_t stm32f767AbstractionLayer::_uartCheckRxBufferDmaWriteAddress(Peripheral_UART p) {
+    uint32_t size = 0;
+    switch (p) {
+        case Peripheral_UART::Controller:
+            size = (UART_BUFFER_SIZE - __HAL_DMA_GET_COUNTER(&hdma_uart5_rx)) % UART_BUFFER_SIZE;
+
+            break;
+
+        case Peripheral_UART::Debug:
+            size = (UART_BUFFER_SIZE - __HAL_DMA_GET_COUNTER(&hdma_usart3_rx)) % UART_BUFFER_SIZE;
+            break;
+
+        default:
+            break;
+    }
+    return size;
+}
+
+void stm32f767AbstractionLayer::uartPutChar(Peripheral_UART p, uint8_t data) {
+    switch (p) {
+        case Peripheral_UART::Controller:
+            while (HAL_UART_Transmit_DMA(&huart5, &data, 1) != HAL_OK) {
+            }
+
+            break;
+
+        case Peripheral_UART::Debug:
+            while (HAL_UART_Transmit_DMA(&huart3, &data, 1) != HAL_OK) {
+            }
+            break;
+
+        default:
+            break;
+    }
+}
+
+uint8_t stm32f767AbstractionLayer::uartGetChar(Peripheral_UART p) {
+    uint8_t data = 0;
+    switch (p) {
+        case Peripheral_UART::Controller:
+            if (_uartCheckRxBufferDmaWriteAddress(Peripheral_UART::Controller) != _uart5RxBufferReadAddress) {
+                data = _uart5RxBuffer[_uart5RxBufferReadAddress++];
+                _uart5RxBufferReadAddress %= UART_BUFFER_SIZE;
+            }
+            break;
+
+        case Peripheral_UART::Debug:
+            if (_uartCheckRxBufferDmaWriteAddress(Peripheral_UART::Debug) != _usart3RxBufferReadAddress) {
+                data = _usart3RxBuffer[_usart3RxBufferReadAddress++];
+                _usart3RxBufferReadAddress %= UART_BUFFER_SIZE;
+            }
+            break;
+
+        default:
+            break;
+    }
+    return data;
+}
+
+void stm32f767AbstractionLayer::uartWriteViaBuffer(Peripheral_UART p, uint8_t* data, uint32_t size) {
+    switch (p) {
+        case Peripheral_UART::Controller:
+            while (HAL_UART_Transmit_DMA(&huart5, data, size) != HAL_OK) {
+            }
+            break;
+
+        case Peripheral_UART::Debug:
+            while (HAL_UART_Transmit_DMA(&huart3, data, size) != HAL_OK) {
+            }
+            break;
+
+        default:
+            break;
+    }
+}
+
+void stm32f767AbstractionLayer::uartReadViaBuffer(Peripheral_UART p, uint8_t* data, uint32_t size) {
+    uint32_t dmaWriteAddress = _uartCheckRxBufferDmaWriteAddress(p);
+    switch (p) {
+        case Peripheral_UART::Controller:
+
+            if (dmaWriteAddress > _uart5RxBufferReadAddress) {
+                uint32_t diff_readAddress2dmaWriteAddress = dmaWriteAddress - _uart5RxBufferReadAddress;
+
+                if (diff_readAddress2dmaWriteAddress > size) {
+                    memcpy(data, &_uart5RxBuffer[_uart5RxBufferReadAddress], size);
+                    _uart5RxBufferReadAddress += size;
+                } else {
+                    memcpy(data, &_uart5RxBuffer[_uart5RxBufferReadAddress], diff_readAddress2dmaWriteAddress);
+                    _uart5RxBufferReadAddress = dmaWriteAddress;
+                }
+
+            } else if (dmaWriteAddress < _uart5RxBufferReadAddress) {
+                uint32_t diff_readAddress2BufferSize = UART_BUFFER_SIZE - _uart5RxBufferReadAddress;
+                uint32_t buff_cp_cnt = 0;
+
+                if (diff_readAddress2BufferSize > size) {
+                    memcpy(data, &_uart5RxBuffer[_uart5RxBufferReadAddress], size);
+                    _uart5RxBufferReadAddress += size;
+                } else {
+                    memcpy(data, &_uart5RxBuffer[_uart5RxBufferReadAddress], diff_readAddress2BufferSize);
+                    _uart5RxBufferReadAddress = 0;
+                    buff_cp_cnt = diff_readAddress2BufferSize;
+
+                    uint32_t diff_readAddress2dmaWriteAddress = dmaWriteAddress - _uart5RxBufferReadAddress;
+
+                    if (diff_readAddress2dmaWriteAddress + buff_cp_cnt > size) {
+                        memcpy(&data[diff_readAddress2dmaWriteAddress], &_uart5RxBuffer[_uart5RxBufferReadAddress], size - buff_cp_cnt);
+                        _uart5RxBufferReadAddress += size - buff_cp_cnt;
+                    } else {
+                        memcpy(&data[diff_readAddress2BufferSize], &_uart5RxBuffer[_uart5RxBufferReadAddress], diff_readAddress2dmaWriteAddress);
+                        _uart5RxBufferReadAddress = dmaWriteAddress;
+                    }
+                }
+            }
+            break;
+
+        case Peripheral_UART::Debug:
+            if (dmaWriteAddress > _usart3RxBufferReadAddress) {
+                uint32_t diff_readAddress2dmaWriteAddress = dmaWriteAddress - _usart3RxBufferReadAddress;
+
+                if (diff_readAddress2dmaWriteAddress > size) {
+                    memcpy(data, &_usart3RxBuffer[_usart3RxBufferReadAddress], size);
+                    _usart3RxBufferReadAddress += size;
+                } else {
+                    memcpy(data, &_usart3RxBuffer[_usart3RxBufferReadAddress], diff_readAddress2dmaWriteAddress);
+                    _usart3RxBufferReadAddress = dmaWriteAddress;
+                }
+
+            } else if (dmaWriteAddress < _usart3RxBufferReadAddress) {
+                uint32_t diff_readAddress2BufferSize = UART_BUFFER_SIZE - _usart3RxBufferReadAddress;
+                uint32_t buff_cp_cnt = 0;
+
+                if (diff_readAddress2BufferSize > size) {
+                    memcpy(data, &_usart3RxBuffer[_usart3RxBufferReadAddress], size);
+                    _usart3RxBufferReadAddress += size;
+                } else {
+                    memcpy(data, &_usart3RxBuffer[_usart3RxBufferReadAddress], diff_readAddress2BufferSize);
+                    _usart3RxBufferReadAddress = 0;
+                    buff_cp_cnt = diff_readAddress2BufferSize;
+
+                    uint32_t diff_readAddress2dmaWriteAddress = dmaWriteAddress - _usart3RxBufferReadAddress;
+
+                    if (diff_readAddress2dmaWriteAddress + buff_cp_cnt > size) {
+                        memcpy(&data[diff_readAddress2dmaWriteAddress], &_usart3RxBuffer[_usart3RxBufferReadAddress], size - buff_cp_cnt);
+                        _usart3RxBufferReadAddress += size - buff_cp_cnt;
+                    } else {
+                        memcpy(&data[diff_readAddress2BufferSize], &_usart3RxBuffer[_usart3RxBufferReadAddress], diff_readAddress2dmaWriteAddress);
+                        _usart3RxBufferReadAddress = dmaWriteAddress;
+                    }
+                }
+            }
+
+            break;
+
+        default:
+            break;
+    }
+}
+
+uint32_t stm32f767AbstractionLayer::uartGetRxBufferSize(Peripheral_UART p) {
+    uint32_t dmaWriteAddress = _uartCheckRxBufferDmaWriteAddress(p);
+    uint32_t size = 0;
+    switch (p) {
+        case Peripheral_UART::Controller:
+            if (dmaWriteAddress > _uart5RxBufferReadAddress) {
+                size = dmaWriteAddress - _uart5RxBufferReadAddress;
+            } else if (dmaWriteAddress < _uart5RxBufferReadAddress) {
+                size = UART_BUFFER_SIZE - _uart5RxBufferReadAddress + dmaWriteAddress;
+            }
+            break;
+
+        case Peripheral_UART::Debug:
+            if (dmaWriteAddress > _usart3RxBufferReadAddress) {
+                size = dmaWriteAddress - _usart3RxBufferReadAddress;
+            } else if (dmaWriteAddress < _usart3RxBufferReadAddress) {
+                size = UART_BUFFER_SIZE - _usart3RxBufferReadAddress + dmaWriteAddress;
+            }
+            break;
+
+        default:
+            break;
+    }
+    return size;
 }
