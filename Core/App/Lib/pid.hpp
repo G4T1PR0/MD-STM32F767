@@ -22,7 +22,7 @@ class PID {
     float getDerivative();
     float getOutput();
 
-    float update(float target, float error);
+    float update(float target, float feedback);
 
    private:
     unsigned long long _prev_time;

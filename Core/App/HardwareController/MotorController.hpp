@@ -20,7 +20,7 @@ class MotorController {
 
     void setMode(int mode);
 
-    void setPWM(float duty);
+    void setDuty(float duty);
 
     void setCurrent(float current);
 

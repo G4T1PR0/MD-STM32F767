@@ -71,8 +71,8 @@ float PID::getOutput() {
     return _output;
 }
 
-float PID::update(float target, float error) {
-    _error = target - error;
+float PID::update(float target, float feedback) {
+    _error = target - feedback;
     _integral += _error;
     _derivative = (_error - _prev_error) / (_prev_time) * 0.001;
     _prev_error = _error;

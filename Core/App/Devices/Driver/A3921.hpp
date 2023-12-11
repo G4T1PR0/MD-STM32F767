@@ -12,17 +12,17 @@
 
 class A3921 {
    public:
-    A3921(baseMcuAbstractionLayer* mcu, baseMcuAbstractionLayer::Peripheral_PWM pwm, baseMcuAbstractionLayer::Peripheral_GPIO phase, baseMcuAbstractionLayer::Peripheral_GPIO sr);
+    A3921(MAL* mcu, MAL::Peripheral_PWM pwm, MAL::Peripheral_GPIO phase, MAL::Peripheral_GPIO sr);
     void init();
-    void setPower(float power);
+    void setDuty(float duty);
 
    private:
-    baseMcuAbstractionLayer* _mcu;
-    float _previousPower;
+    MAL* _mcu;
+    float _previousDuty;
 
-    baseMcuAbstractionLayer::Peripheral_PWM _pwm;
-    baseMcuAbstractionLayer::Peripheral_GPIO _phase;
-    baseMcuAbstractionLayer::Peripheral_GPIO _sr;
+    MAL::Peripheral_PWM _pwm;
+    MAL::Peripheral_GPIO _phase;
+    MAL::Peripheral_GPIO _sr;
 };
 
 #endif /* APP_DEVICES_DRIVER_A3921_HPP_ */

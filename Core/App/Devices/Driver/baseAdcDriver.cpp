@@ -7,7 +7,7 @@
 
 #include <Devices/Driver/baseAdcDriver.hpp>
 
-baseAdcDriver::baseAdcDriver(baseMcuAbstractionLayer* mcu, baseMcuAbstractionLayer::Peripheral_ADC p) {
+baseAdcDriver::baseAdcDriver(MAL* mcu, MAL::Peripheral_ADC p) {
     _mcu = mcu;
     _p = p;
 }
