@@ -10,7 +10,7 @@
 
 #include <Devices/McuAbstractionLayer/baseMcuAbstractionLayer.hpp>
 
-#define UART_RX_BUFFER_SIZE 64
+#define UART_BUFFER_SIZE 64
 
 class stm32f767AbstractionLayer : public baseMcuAbstractionLayer {
    public:
@@ -26,9 +26,17 @@ class stm32f767AbstractionLayer : public baseMcuAbstractionLayer {
     virtual void gpioSetValue(Peripheral_GPIO p, bool value);
     virtual bool gpioGetValue(Peripheral_GPIO p);
 
+    virtual void uartPutChar(Peripheral_UART p, uint8_t data);
+    virtual uint8_t uartGetChar(Peripheral_UART p);
+
+    virtual void uartWriteViaBuffer(Peripheral_UART p, uint8_t* data, uint32_t size);
+    virtual void uartReadViaBuffer(Peripheral_UART p, uint8_t* data, uint32_t size);
+    virtual uint32_t uartGetRxBufferSize(Peripheral_UART p);
+
    private:
     // ADC
     void _initADC();
+
     static uint16_t _data[16];
 
     // Timer Encoder
@@ -38,9 +46,18 @@ class stm32f767AbstractionLayer : public baseMcuAbstractionLayer {
     void _initPWM();
 
     // UART
-    void __initUART();
-    static uint8_t _uart5RxBuffer[UART_RX_BUFFER_SIZE];
-    static uint8_t _usart3RxBuffer[UART_RX_BUFFER_SIZE];
+    void _initUART();
+
+    uint32_t _uartCheckRxBufferDmaWriteAddress(Peripheral_UART p);
+
+    // static uint8_t _uart5TxBuffer[UART_BUFFER_SIZE];
+    static uint8_t _uart5RxBuffer[UART_BUFFER_SIZE];
+
+    // static uint8_t _usart3TxBuffer[UART_BUFFER_SIZE];
+    static uint8_t _usart3RxBuffer[UART_BUFFER_SIZE];
+
+    uint32_t _uart5RxBufferReadAddress = 0;
+    uint32_t _usart3RxBufferReadAddress = 0;
 };
 
 #endif /* APP_DEVICES_STM32F767ABSTRACTIONLAYER_STM32F767ABSTRACTIONLAYER_HPP_ */

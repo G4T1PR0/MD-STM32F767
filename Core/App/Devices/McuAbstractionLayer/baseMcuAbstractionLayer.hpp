@@ -67,9 +67,12 @@ class baseMcuAbstractionLayer {
     virtual void gpioSetValue(Peripheral_GPIO p, bool value) = 0;
     virtual bool gpioGetValue(Peripheral_GPIO p) = 0;
 
-    virtual void uartWrite(Peripheral_UART p, uint8_t* data, uint8_t size) = 0;
-    virtual uint8_t uartRead(Peripheral_UART p, uint8_t* data, uint32_t size) = 0;
-    virtual uint32_t uartGetRxBufferSize();
+    virtual void uartPutChar(Peripheral_UART p, uint8_t data) = 0;
+    virtual uint8_t uartGetChar(Peripheral_UART p) = 0;
+
+    virtual void uartWriteViaBuffer(Peripheral_UART p, uint8_t* data, uint32_t size) = 0;
+    virtual void uartReadViaBuffer(Peripheral_UART p, uint8_t* data, uint32_t size) = 0;
+    virtual uint32_t uartGetRxBufferSize(Peripheral_UART p) = 0;
 };
 
 typedef baseMcuAbstractionLayer MAL;
