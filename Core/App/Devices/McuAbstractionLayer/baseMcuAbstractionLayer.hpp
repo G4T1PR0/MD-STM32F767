@@ -20,6 +20,7 @@ class baseMcuAbstractionLayer {
         RR_Current,
         Batt_Voltage,
         ST_Volume,
+        End_A,
     };
 
     enum Peripheral_PWM {
@@ -28,6 +29,7 @@ class baseMcuAbstractionLayer {
         ST_PWM,
         RL_PWM,
         RR_PWM,
+        End_P,
     };
 
     enum Peripheral_Encoder {
@@ -35,6 +37,7 @@ class baseMcuAbstractionLayer {
         FR_Encoder,
         RL_Encoder,
         RR_Encoder,
+        End_E,
     };
 
     enum Peripheral_GPIO {
@@ -48,11 +51,13 @@ class baseMcuAbstractionLayer {
         RL_SR,
         RR_PHASE,
         RR_SR,
+        End_G,
     };
 
     enum Peripheral_UART {
         Controller,
         Debug,
+        End_U,
     };
 
     virtual void init(void) = 0;
