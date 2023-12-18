@@ -8,14 +8,22 @@
 #ifndef APP_DEVICES_DRIVER_BATTERY_VOLTAGE_SENSOR_HPP_
 #define APP_DEVICES_DRIVER_BATTERY_VOLTAGE_SENSOR_HPP_
 
-#include <Devices/Driver/baseAdcDriver.hpp>
+#include <Devices/Driver/Interface/baseBatteryVoltageSensor.hpp>
+#include <Devices/McuAbstractionLayer/baseMcuAbstractionLayer.hpp>
 
-class batteryVoltageSensor : public baseAdcDriver {
+class batteryVoltageSensor : public baseBatteryVoltageSensor {
    public:
-    using baseAdcDriver::baseAdcDriver;
+    batteryVoltageSensor(MAL* mcu, MAL::Peripheral_ADC p);
+
+    virtual void init();
+    virtual void update();
     float getVoltage();
 
    private:
+    MAL* _mcu;
+    MAL::Peripheral_ADC _p;
+
+    const float _raw2voltage = 3.3f / (1 << 12);
     const float _voltage2batt = 16 / 3.3;
 };
 

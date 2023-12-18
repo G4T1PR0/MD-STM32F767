@@ -33,3 +33,7 @@ int32_t Encoder::getCount() {
 int32_t Encoder::getTotalCnt() {
     return _total_cnt;
 }
+
+int32_t Encoder::getAcceleration() {
+    return _acceleration;
+}

@@ -8,17 +8,18 @@
 #ifndef APP_DEVICES_DRIVER_ENCODER_H_
 #define APP_DEVICES_DRIVER_ENCODER_H_
 
+#include <Devices/Driver/Interface/baseEncoder.hpp>
 #include <Devices/McuAbstractionLayer/baseMcuAbstractionLayer.hpp>
 
-class Encoder {
+class Encoder : public baseEncoder {
    public:
     Encoder(MAL* mcu, MAL::Peripheral_Encoder p);
 
-    void init();
-    void update();
-    int32_t getCount();
-    int32_t getTotalCnt();
-    int32_t getAcceleration();
+    virtual void init();
+    virtual void update();
+    virtual int32_t getCount();
+    virtual int32_t getTotalCnt();
+    virtual int32_t getAcceleration();
 
    private:
     MAL* _mcu;

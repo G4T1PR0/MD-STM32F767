@@ -7,14 +7,21 @@
 
 #ifndef APP_DEVICES_DRIVER_current_SENSOR_HPP_
 #define APP_DEVICES_DRIVER_current_SENSOR_HPP_
-#include <Devices/Driver/baseAdcDriver.hpp>
 
-class currentSensor : public baseAdcDriver {
+#include <Devices/Driver/Interface/baseCurrentSensor.hpp>
+#include <Devices/McuAbstractionLayer/baseMcuAbstractionLayer.hpp>
+
+class currentSensor : public baseCurrentSensor {
    public:
-    using baseAdcDriver::baseAdcDriver;
-    float getCurrent();
+    currentSensor(MAL* mcu, MAL::Peripheral_ADC p);
+    virtual void init();
+    virtual void update();
+    virtual float getCurrent();
 
    private:
+    MAL* _mcu;
+    MAL::Peripheral_ADC _p;
+    const float _raw2voltage = 3.3f / (1 << 12);
     const float _voltage2current = 0.033f;
 };
 
