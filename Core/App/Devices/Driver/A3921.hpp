@@ -8,13 +8,14 @@
 #ifndef APP_DEVICES_DRIVER_A3921_HPP_
 #define APP_DEVICES_DRIVER_A3921_HPP_
 
+#include <Devices/Driver/Interface/baseMotorDriver.hpp>
 #include <Devices/McuAbstractionLayer/baseMcuAbstractionLayer.hpp>
 
-class A3921 {
+class A3921 : public baseMotorDriver {
    public:
     A3921(MAL* mcu, MAL::Peripheral_PWM pwm, MAL::Peripheral_GPIO phase, MAL::Peripheral_GPIO sr);
-    void init();
-    void setDuty(float duty);
+    virtual void init();
+    virtual void setDuty(float duty);
 
    private:
     MAL* _mcu;

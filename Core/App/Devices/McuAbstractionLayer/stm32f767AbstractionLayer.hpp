@@ -32,7 +32,7 @@ class stm32f767AbstractionLayer : public baseMcuAbstractionLayer {
 
     virtual void uartWriteViaBuffer(Peripheral_UART p, uint8_t* data, uint32_t size);
     virtual void uartReadViaBuffer(Peripheral_UART p, uint8_t* data, uint32_t size);
-    virtual uint32_t uartGetRxBufferSize(Peripheral_UART p);
+    virtual uint32_t uartGetRxDataSize(Peripheral_UART p);
 
    private:
     // ADC

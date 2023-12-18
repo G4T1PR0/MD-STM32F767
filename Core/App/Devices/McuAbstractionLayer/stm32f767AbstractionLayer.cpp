@@ -228,31 +228,33 @@ void stm32f767AbstractionLayer::uartReadViaBuffer(Peripheral_UART p, uint8_t* da
         }
 
     } else if (dmaWriteAddress < _uartRxBufferReadAddress[p]) {
-        uint32_t diff_readAddress2BufferSize = UART_BUFFER_SIZE - _uartRxBufferReadAddress[p];
+        uint32_t diff_readAddress2BufferEndAddress = UART_BUFFER_SIZE - 1 - _uartRxBufferReadAddress[p];
         uint32_t buff_cp_cnt = 0;
 
-        if (diff_readAddress2BufferSize > size) {
+        if (diff_readAddress2BufferEndAddress > size) {
             memcpy(data, &_uartRxBuffer[p][_uartRxBufferReadAddress[p]], size);
             _uartRxBufferReadAddress[p] += size;
         } else {
-            memcpy(data, &_uartRxBuffer[p][_uartRxBufferReadAddress[p]], diff_readAddress2BufferSize);
+            memcpy(data, &_uartRxBuffer[p][_uartRxBufferReadAddress[p]], diff_readAddress2BufferEndAddress);
             _uartRxBufferReadAddress[p] = 0;
-            buff_cp_cnt = diff_readAddress2BufferSize;
+            buff_cp_cnt = diff_readAddress2BufferEndAddress;
 
             uint32_t diff_readAddress2dmaWriteAddress = dmaWriteAddress - _uartRxBufferReadAddress[p];
 
-            if (diff_readAddress2dmaWriteAddress + buff_cp_cnt > size) {
-                memcpy(&data[diff_readAddress2dmaWriteAddress], &_uartRxBuffer[p][_uartRxBufferReadAddress[p]], size - buff_cp_cnt);
-                _uartRxBufferReadAddress[p] += size - buff_cp_cnt;
-            } else {
-                memcpy(&data[diff_readAddress2BufferSize], &_uartRxBuffer[p][_uartRxBufferReadAddress[p]], diff_readAddress2dmaWriteAddress);
-                _uartRxBufferReadAddress[p] = dmaWriteAddress;
+            if (diff_readAddress2dmaWriteAddress > 0) {
+                if (diff_readAddress2dmaWriteAddress + buff_cp_cnt > size) {
+                    memcpy(&data[diff_readAddress2dmaWriteAddress], &_uartRxBuffer[p][_uartRxBufferReadAddress[p]], size - buff_cp_cnt);
+                    _uartRxBufferReadAddress[p] += size - buff_cp_cnt;
+                } else {
+                    memcpy(&data[diff_readAddress2BufferEndAddress], &_uartRxBuffer[p][_uartRxBufferReadAddress[p]], diff_readAddress2dmaWriteAddress);
+                    _uartRxBufferReadAddress[p] = dmaWriteAddress;
+                }
             }
         }
     }
 }
 
-uint32_t stm32f767AbstractionLayer::uartGetRxBufferSize(Peripheral_UART p) {
+uint32_t stm32f767AbstractionLayer::uartGetRxDataSize(Peripheral_UART p) {
     uint32_t dmaWriteAddress = _uartCheckRxBufferDmaWriteAddress(p);
     uint32_t size = 0;
 

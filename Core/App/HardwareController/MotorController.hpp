@@ -9,12 +9,16 @@
 #define APP_HARDWARECONTROLLER_MOTORCONTROLLER_HPP_
 
 #include <Devices/Devices.hpp>
+#include <Devices/Driver/Interface/baseCurrentSensor.hpp>
+#include <Devices/Driver/Interface/baseEncoder.hpp>
+#include <Devices/Driver/Interface/baseMotorDriver.hpp>
+#include <Devices/Driver/Interface/baseSteerAngleSensor.hpp>
 #include <Lib/pid.hpp>
 
 class MotorController {
    public:
-    MotorController(A3921* A3921, currentSensor* currentSensor, Encoder* encoder);
-    MotorController(A3921* A3921, currentSensor* currentSensor, steerAngleSensor* steerAngleSensor);
+    MotorController(baseMotorDriver* driver, baseCurrentSensor* currentSensor, baseEncoder* encoder);
+    MotorController(baseMotorDriver* driver, baseCurrentSensor* currentSensor, baseSteerAngleSensor* steerAngleSensor);
     void init(void);
     void update(void);
 
@@ -29,10 +33,10 @@ class MotorController {
     void setAngle(float angle);
 
    private:
-    A3921* _driver;
-    currentSensor* _current;
-    Encoder* _encoder;
-    steerAngleSensor* _steerAngle;
+    baseMotorDriver* _driver;
+    baseCurrentSensor* _current;
+    baseEncoder* _encoder;
+    baseSteerAngleSensor* _steerAngle;
 
     PID _current_pid;
     PID _velocity_pid;

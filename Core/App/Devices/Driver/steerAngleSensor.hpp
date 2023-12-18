@@ -8,14 +8,20 @@
 #ifndef APP_DEVICES_DRIVER_STEERANGLESENSOR_HPP_
 #define APP_DEVICES_DRIVER_STEERANGLESENSOR_HPP_
 
-#include <Devices/Driver/baseAdcDriver.hpp>
+#include <Devices/Driver/Interface/baseSteerAngleSensor.hpp>
+#include <Devices/McuAbstractionLayer/baseMcuAbstractionLayer.hpp>
 
-class steerAngleSensor : public baseAdcDriver {
+class steerAngleSensor : public baseSteerAngleSensor {
    public:
-    using baseAdcDriver::baseAdcDriver;
-    float getAngle();
+    steerAngleSensor(MAL* mcu, MAL::Peripheral_ADC p);
+
+    virtual void init();
+    virtual void update();
+    virtual float getAngle();
 
    private:
+    MAL* _mcu;
+    MAL::Peripheral_ADC _p;
     const float _raw2angle = 0.1;
 };
 

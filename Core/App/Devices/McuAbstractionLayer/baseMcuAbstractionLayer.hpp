@@ -77,7 +77,7 @@ class baseMcuAbstractionLayer {
 
     virtual void uartWriteViaBuffer(Peripheral_UART p, uint8_t* data, uint32_t size) = 0;
     virtual void uartReadViaBuffer(Peripheral_UART p, uint8_t* data, uint32_t size) = 0;
-    virtual uint32_t uartGetRxBufferSize(Peripheral_UART p) = 0;
+    virtual uint32_t uartGetRxDataSize(Peripheral_UART p) = 0;
 };
 
 typedef baseMcuAbstractionLayer MAL;

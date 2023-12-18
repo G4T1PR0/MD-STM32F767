@@ -7,15 +7,15 @@
 
 #include <HardwareController/MotorController.hpp>
 
-MotorController::MotorController(A3921* A3921, currentSensor* currentSensor, Encoder* encoder) {
-    _driver = A3921;
+MotorController::MotorController(baseMotorDriver* driver, baseCurrentSensor* currentSensor, baseEncoder* encoder) {
+    _driver = driver;
     _current = currentSensor;
     _encoder = encoder;
     _isSteer = false;
 }
 
-MotorController::MotorController(A3921* A3921, currentSensor* currentSensor, steerAngleSensor* steerAngleSensor) {
-    _driver = A3921;
+MotorController::MotorController(baseMotorDriver* driver, baseCurrentSensor* currentSensor, baseSteerAngleSensor* steerAngleSensor) {
+    _driver = driver;
     _current = currentSensor;
     _steerAngle = steerAngleSensor;
     _isSteer = true;
