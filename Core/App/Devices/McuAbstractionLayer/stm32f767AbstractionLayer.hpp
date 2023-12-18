@@ -14,6 +14,7 @@
 
 class stm32f767AbstractionLayer : public baseMcuAbstractionLayer {
    public:
+    stm32f767AbstractionLayer();
     virtual void init(void);
 
     virtual uint16_t adcGetValue(Peripheral_ADC p);
@@ -50,14 +51,10 @@ class stm32f767AbstractionLayer : public baseMcuAbstractionLayer {
 
     uint32_t _uartCheckRxBufferDmaWriteAddress(Peripheral_UART p);
 
-    // static uint8_t _uart5TxBuffer[UART_BUFFER_SIZE];
-    static uint8_t _uart5RxBuffer[UART_BUFFER_SIZE];
+    // static uint8_t _uartTxBuffer[UART_BUFFER_SIZE];
+    static uint8_t _uartRxBuffer[Peripheral_UART::End_U - 1][UART_BUFFER_SIZE];
 
-    // static uint8_t _usart3TxBuffer[UART_BUFFER_SIZE];
-    static uint8_t _usart3RxBuffer[UART_BUFFER_SIZE];
-
-    uint32_t _uart5RxBufferReadAddress = 0;
-    uint32_t _usart3RxBufferReadAddress = 0;
+    uint32_t _uartRxBufferReadAddress[Peripheral_UART::End_U - 1] = {0};
 };
 
 #endif /* APP_DEVICES_STM32F767ABSTRACTIONLAYER_STM32F767ABSTRACTIONLAYER_HPP_ */
