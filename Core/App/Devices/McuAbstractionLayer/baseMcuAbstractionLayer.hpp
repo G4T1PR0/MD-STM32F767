@@ -60,24 +60,36 @@ class baseMcuAbstractionLayer {
         End_U,
     };
 
+    enum Peripheral_TimerInterrupt {
+        T100us,
+        End_T
+    };
+
     virtual void init(void) = 0;
 
+    // ADC
     virtual uint16_t adcGetValue(Peripheral_ADC p) = 0;
 
+    // PWM
     virtual void pwmSetDuty(Peripheral_PWM p, float duty) = 0;
 
+    // Encoder
     virtual void encoderSetCnt(Peripheral_Encoder p, uint32_t cnt) = 0;
     virtual uint32_t encoderGetCnt(Peripheral_Encoder p) = 0;
 
+    // GPIO
     virtual void gpioSetValue(Peripheral_GPIO p, bool value) = 0;
     virtual bool gpioGetValue(Peripheral_GPIO p) = 0;
 
+    // UART
     virtual void uartPutChar(Peripheral_UART p, uint8_t data) = 0;
     virtual uint8_t uartGetChar(Peripheral_UART p) = 0;
-
     virtual void uartWriteViaBuffer(Peripheral_UART p, uint8_t* data, uint32_t size) = 0;
     virtual void uartReadViaBuffer(Peripheral_UART p, uint8_t* data, uint32_t size) = 0;
     virtual uint32_t uartGetRxDataSize(Peripheral_UART p) = 0;
+
+    // Timer Interrupt
+    virtual void timerInterruptSetCallback(Peripheral_TimerInterrupt p, void (*callback)(void)) = 0;
 };
 
 typedef baseMcuAbstractionLayer MAL;

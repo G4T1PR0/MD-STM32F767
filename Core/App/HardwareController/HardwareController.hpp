@@ -16,6 +16,7 @@ class HardwareController {
     HardwareController(Devices* devices);
     void init(void);
     void update(void);
+    static void update100us(void);
 
     MotorController* FL_Motor;
     MotorController* FR_Motor;

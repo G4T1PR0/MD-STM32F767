@@ -20,11 +20,13 @@ struct PeripheralAllocation {
     uint16_t GPIO_PIN[MAL::Peripheral_GPIO::End_G - 1];
     UART_HandleTypeDef* UART[MAL::Peripheral_UART::End_U - 1];
     DMA_HandleTypeDef* UART_DMA[MAL::Peripheral_UART::End_U - 1];
+    TIM_HandleTypeDef* TimerInterrupt_TIM[MAL::Peripheral_TimerInterrupt::End_T - 1];
 };
 
 static PeripheralAllocation PAL;
 
 stm32f767AbstractionLayer::stm32f767AbstractionLayer() {
+    // ADC
     PAL.ADC_RANK[MAL::Peripheral_ADC::FL_Current] = 0;
     PAL.ADC_RANK[MAL::Peripheral_ADC::FR_Current] = 1;
     PAL.ADC_RANK[MAL::Peripheral_ADC::ST_Current] = 2;
@@ -33,6 +35,7 @@ stm32f767AbstractionLayer::stm32f767AbstractionLayer() {
     PAL.ADC_RANK[MAL::Peripheral_ADC::Batt_Voltage] = 5;
     PAL.ADC_RANK[MAL::Peripheral_ADC::ST_Volume] = 6;
 
+    // PWM
     PAL.PWM_TIM[MAL::Peripheral_PWM::FL_PWM] = &htim1;
     PAL.PWM_CH[MAL::Peripheral_PWM::FL_PWM] = TIM_CHANNEL_1;
 
@@ -48,11 +51,13 @@ stm32f767AbstractionLayer::stm32f767AbstractionLayer() {
     PAL.PWM_TIM[MAL::Peripheral_PWM::RR_PWM] = &htim12;
     PAL.PWM_CH[MAL::Peripheral_PWM::RR_PWM] = TIM_CHANNEL_1;
 
+    // Encoder
     PAL.Encoder_TIM[MAL::Peripheral_Encoder::FL_Encoder] = &htim3;
     PAL.Encoder_TIM[MAL::Peripheral_Encoder::FR_Encoder] = &htim2;
     PAL.Encoder_TIM[MAL::Peripheral_Encoder::RL_Encoder] = &htim8;
     PAL.Encoder_TIM[MAL::Peripheral_Encoder::RR_Encoder] = &htim4;
 
+    // GPIO
     PAL.GPIO_PORT[MAL::Peripheral_GPIO::FL_PHASE] = Motor_FL_PHASE_GPIO_Port;
     PAL.GPIO_PIN[MAL::Peripheral_GPIO::FL_PHASE] = Motor_FL_PHASE_Pin;
 
@@ -83,11 +88,15 @@ stm32f767AbstractionLayer::stm32f767AbstractionLayer() {
     PAL.GPIO_PORT[MAL::Peripheral_GPIO::RR_SR] = Motor_RR_SR_GPIO_Port;
     PAL.GPIO_PIN[MAL::Peripheral_GPIO::RR_SR] = Motor_RR_SR_Pin;
 
+    // UART
     PAL.UART[MAL::Peripheral_UART::Controller] = &huart5;
     PAL.UART_DMA[MAL::Peripheral_UART::Controller] = &hdma_uart5_rx;
 
     PAL.UART[MAL::Peripheral_UART::Debug] = &huart3;
     PAL.UART_DMA[MAL::Peripheral_UART::Debug] = &hdma_usart3_rx;
+
+    // Timer Interrupt
+    PAL.TimerInterrupt_TIM[MAL::Peripheral_TimerInterrupt::T100us] = &htim14;
 }
 
 void stm32f767AbstractionLayer::init() {
@@ -95,6 +104,7 @@ void stm32f767AbstractionLayer::init() {
     _initEncoder();
     _initPWM();
     _initUART();
+    _initTimerInterrupt();
 }
 
 // ADC
@@ -265,4 +275,24 @@ uint32_t stm32f767AbstractionLayer::uartGetRxDataSize(Peripheral_UART p) {
     }
 
     return size;
+}
+
+// Timer Interrupt
+
+void (*stm32f767AbstractionLayer::_timerInterruptCallback[Peripheral_TimerInterrupt::End_T - 1])(void);
+
+void stm32f767AbstractionLayer::_initTimerInterrupt() {
+    HAL_TIM_Base_Start(PAL.TimerInterrupt_TIM[MAL::Peripheral_TimerInterrupt::T100us]);
+}
+
+void stm32f767AbstractionLayer::timerInterruptSetCallback(Peripheral_TimerInterrupt p, void (*callback)(void)) {
+    if (p != Peripheral_TimerInterrupt::End_T) {
+        _timerInterruptCallback[p] = callback;
+    }
+}
+
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim) {
+    if (htim == PAL.TimerInterrupt_TIM[MAL::Peripheral_TimerInterrupt::T100us]) {
+        stm32f767AbstractionLayer::_timerInterruptCallback[MAL::Peripheral_TimerInterrupt::T100us]();
+    }
 }
