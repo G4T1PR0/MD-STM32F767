@@ -22,6 +22,8 @@ void HardwareController::init(void) {
     ST_Motor->init();
     RL_Motor->init();
     RR_Motor->init();
+
+    _devices->mcu->timerInterruptSetCallback(MAL::Peripheral_TimerInterrupt::T100us, &this->update100us);
 }
 
 void HardwareController::update(void) {
@@ -30,4 +32,12 @@ void HardwareController::update(void) {
     ST_Motor->update();
     RL_Motor->update();
     RR_Motor->update();
+}
+
+void HardwareController::update100us(void) {
+    MotorController::is100usElapsed[0] = true;
+    MotorController::is100usElapsed[1] = true;
+    MotorController::is100usElapsed[2] = true;
+    MotorController::is100usElapsed[3] = true;
+    MotorController::is100usElapsed[4] = true;
 }

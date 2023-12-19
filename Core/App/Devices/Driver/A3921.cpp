@@ -24,15 +24,20 @@ void A3921::setDuty(float duty) {
     } else {
         _previousDuty = duty;
         if (duty < 0) {
-            _mcu->pwmSetDuty(_pwm, 0 - duty);
             _mcu->gpioSetValue(_phase, 0);
         } else if (duty > 0) {
-            _mcu->pwmSetDuty(_pwm, duty);
             _mcu->gpioSetValue(_phase, 1);
         } else {
-            _mcu->pwmSetDuty(_pwm, 0);
             _mcu->gpioSetValue(_phase, 0);
         }
+
+        if (duty > 1) {
+            duty = 1;
+        } else if (duty < -1) {
+            duty = 1;
+        }
+
+        _mcu->pwmSetDuty(_pwm, duty);
         _mcu->gpioSetValue(_sr, 1);
     }
 }

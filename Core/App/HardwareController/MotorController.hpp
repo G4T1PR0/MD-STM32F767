@@ -32,11 +32,16 @@ class MotorController {
 
     void setAngle(float angle);
 
+    static bool is100usElapsed[5];
+
    private:
     baseMotorDriver* _driver;
     baseCurrentSensor* _current;
     baseEncoder* _encoder;
     baseSteerAngleSensor* _steerAngle;
+
+    static int _instance_count;
+    int _id;
 
     PID _current_pid;
     PID _velocity_pid;
