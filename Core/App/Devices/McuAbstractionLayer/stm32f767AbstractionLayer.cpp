@@ -12,15 +12,23 @@
 #include "usart.h"
 
 struct PeripheralAllocation {
-    uint8_t ADC_RANK[MAL::Peripheral_ADC::End_A - 1];
-    TIM_HandleTypeDef* PWM_TIM[MAL::Peripheral_PWM::End_P - 1];
-    uint32_t PWM_CH[MAL::Peripheral_PWM::End_P - 1];
-    TIM_HandleTypeDef* Encoder_TIM[MAL::Peripheral_Encoder::End_E - 1];
-    GPIO_TypeDef* GPIO_PORT[MAL::Peripheral_GPIO::End_G - 1];
-    uint16_t GPIO_PIN[MAL::Peripheral_GPIO::End_G - 1];
-    UART_HandleTypeDef* UART[MAL::Peripheral_UART::End_U - 1];
-    DMA_HandleTypeDef* UART_DMA[MAL::Peripheral_UART::End_U - 1];
-    TIM_HandleTypeDef* TimerInterrupt_TIM[MAL::Peripheral_TimerInterrupt::End_T - 1];
+    uint8_t ADC_RANK[MAL::Peripheral_ADC::End_A];
+
+    TIM_HandleTypeDef* PWM_TIM[MAL::Peripheral_PWM::End_P];
+
+    uint32_t PWM_CH[MAL::Peripheral_PWM::End_P];
+
+    TIM_HandleTypeDef* Encoder_TIM[MAL::Peripheral_Encoder::End_E];
+
+    GPIO_TypeDef* GPIO_PORT[MAL::Peripheral_GPIO::End_G];
+
+    uint16_t GPIO_PIN[MAL::Peripheral_GPIO::End_G];
+
+    UART_HandleTypeDef* UART[MAL::Peripheral_UART::End_U];
+
+    DMA_HandleTypeDef* UART_DMA[MAL::Peripheral_UART::End_U];
+
+    TIM_HandleTypeDef* TimerInterrupt_TIM[MAL::Peripheral_TimerInterrupt::End_T];
 };
 
 static PeripheralAllocation PAL;
