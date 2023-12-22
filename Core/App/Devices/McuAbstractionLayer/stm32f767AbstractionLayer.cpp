@@ -183,12 +183,14 @@ void stm32f767AbstractionLayer::gpioSetValue(Peripheral_GPIO p, bool value) {
 }
 
 bool stm32f767AbstractionLayer::gpioGetValue(Peripheral_GPIO p) {
+    if (p != Peripheral_GPIO::End_G) {
+        return HAL_GPIO_ReadPin(PAL.GPIO_PORT[p], PAL.GPIO_PIN[p]) == GPIO_PIN_SET;
+    }
     return false;
 }
 
 // UART
 
-// uint8_t stm32f767AbstractionLayer::_uart5TxBuffer[UART_BUFFER_SIZE] = {0};
 uint8_t stm32f767AbstractionLayer::_uartRxBuffer[Peripheral_UART::End_U - 1][UART_BUFFER_SIZE] = {0};
 
 void stm32f767AbstractionLayer::_initUART() {
