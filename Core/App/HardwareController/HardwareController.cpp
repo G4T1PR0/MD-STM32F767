@@ -7,6 +7,12 @@
 
 #include <HardwareController/HardwareController.hpp>
 
+MotorController* HardwareController::FL_Motor;
+MotorController* HardwareController::FR_Motor;
+MotorController* HardwareController::ST_Motor;
+MotorController* HardwareController::RL_Motor;
+MotorController* HardwareController::RR_Motor;
+
 HardwareController::HardwareController(Devices* devices) {
     _devices = devices;
     FL_Motor = new MotorController(_devices->fl_driver, _devices->fl_current, _devices->fl_encoder);
@@ -27,17 +33,12 @@ void HardwareController::init(void) {
 }
 
 void HardwareController::update(void) {
-    FL_Motor->update();
-    FR_Motor->update();
-    ST_Motor->update();
-    RL_Motor->update();
-    RR_Motor->update();
 }
 
 void HardwareController::update100us(void) {
-    MotorController::is100usElapsed[0] = true;
-    MotorController::is100usElapsed[1] = true;
-    MotorController::is100usElapsed[2] = true;
-    MotorController::is100usElapsed[3] = true;
-    MotorController::is100usElapsed[4] = true;
+    MotorController::update(FL_Motor);
+    MotorController::update(FR_Motor);
+    MotorController::update(ST_Motor);
+    MotorController::update(RL_Motor);
+    MotorController::update(RR_Motor);
 }
