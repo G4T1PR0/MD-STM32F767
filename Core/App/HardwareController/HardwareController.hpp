@@ -18,11 +18,11 @@ class HardwareController {
     void update(void);
     static void update100us(void);
 
-    MotorController* FL_Motor;
-    MotorController* FR_Motor;
-    MotorController* ST_Motor;
-    MotorController* RL_Motor;
-    MotorController* RR_Motor;
+    static MotorController* FL_Motor;
+    static MotorController* FR_Motor;
+    static MotorController* ST_Motor;
+    static MotorController* RL_Motor;
+    static MotorController* RR_Motor;
 
    private:
     Devices* _devices;

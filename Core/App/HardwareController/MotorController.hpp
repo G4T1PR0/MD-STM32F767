@@ -20,7 +20,8 @@ class MotorController {
     MotorController(baseMotorDriver* driver, baseCurrentSensor* currentSensor, baseEncoder* encoder);
     MotorController(baseMotorDriver* driver, baseCurrentSensor* currentSensor, baseSteerAngleSensor* steerAngleSensor);
     void init(void);
-    void update(void);
+
+    static void update(MotorController* instance);
 
     void setMode(int mode);
 
@@ -32,20 +33,17 @@ class MotorController {
 
     void setAngle(float angle);
 
-    static bool is100usElapsed[5];
-
    private:
     baseMotorDriver* _driver;
     baseCurrentSensor* _current;
     baseEncoder* _encoder;
     baseSteerAngleSensor* _steerAngle;
 
-    static int _instance_count;
-    int _id;
-
     PID _current_pid;
     PID _velocity_pid;
     PID _angle_pid;
+
+    void _update(void);
 
     bool _isSteer;
     int _mode;
