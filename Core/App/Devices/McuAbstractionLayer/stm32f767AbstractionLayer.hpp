@@ -38,9 +38,9 @@ class stm32f767AbstractionLayer : public baseMcuAbstractionLayer {
     virtual void uartReadViaBuffer(Peripheral_UART p, uint8_t* data, uint32_t size);
     virtual uint32_t uartGetRxDataSize(Peripheral_UART p);
 
-    // Timer Interrupt
-    virtual void timerInterruptSetCallback(Peripheral_TimerInterrupt p, void (*callback)(void));
-    static void (*_timerInterruptCallback[Peripheral_TimerInterrupt::End_T - 1])(void);
+    // Interrupt
+    virtual void interruptSetCallback(Peripheral_Interrupt p, void (*callback)(void));
+    static void (*_timerInterruptCallback[Peripheral_Interrupt::End_T])(void);
 
    private:
     // ADC
@@ -57,10 +57,10 @@ class stm32f767AbstractionLayer : public baseMcuAbstractionLayer {
     // UART
     void _initUART();
     uint32_t _uartCheckRxBufferDmaWriteAddress(Peripheral_UART p);
-    static uint8_t _uartRxBuffer[Peripheral_UART::End_U - 1][UART_BUFFER_SIZE];
-    uint32_t _uartRxBufferReadAddress[Peripheral_UART::End_U - 1] = {0};
+    static uint8_t _uartRxBuffer[Peripheral_UART::End_U][UART_BUFFER_SIZE];
+    uint32_t _uartRxBufferReadAddress[Peripheral_UART::End_U] = {0};
 
-    // Timer Interrupt
+    // Interrupt
     void _initTimerInterrupt();
 };
 

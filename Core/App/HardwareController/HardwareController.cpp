@@ -29,7 +29,7 @@ void HardwareController::init(void) {
     RL_Motor->init();
     RR_Motor->init();
 
-    _devices->mcu->timerInterruptSetCallback(MAL::Peripheral_TimerInterrupt::T100us, &this->update100us);
+    _devices->mcu->interruptSetCallback(MAL::Peripheral_Interrupt::T100us, &this->update100us);
 }
 
 void HardwareController::update(void) {

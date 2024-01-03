@@ -28,7 +28,7 @@ struct PeripheralAllocation {
 
     DMA_HandleTypeDef* UART_DMA[MAL::Peripheral_UART::End_U];
 
-    TIM_HandleTypeDef* TimerInterrupt_TIM[MAL::Peripheral_TimerInterrupt::End_T];
+    TIM_HandleTypeDef* TimerInterrupt_TIM[MAL::Peripheral_Interrupt::End_T];
 };
 
 static PeripheralAllocation PAL;
@@ -104,7 +104,7 @@ stm32f767AbstractionLayer::stm32f767AbstractionLayer() {
     PAL.UART_DMA[MAL::Peripheral_UART::Debug] = &hdma_usart3_rx;
 
     // Timer Interrupt
-    PAL.TimerInterrupt_TIM[MAL::Peripheral_TimerInterrupt::T100us] = &htim14;
+    PAL.TimerInterrupt_TIM[MAL::Peripheral_Interrupt::T100us] = &htim14;
 }
 
 void stm32f767AbstractionLayer::init() {
@@ -191,7 +191,7 @@ bool stm32f767AbstractionLayer::gpioGetValue(Peripheral_GPIO p) {
 
 // UART
 
-uint8_t stm32f767AbstractionLayer::_uartRxBuffer[Peripheral_UART::End_U - 1][UART_BUFFER_SIZE] = {0};
+uint8_t stm32f767AbstractionLayer::_uartRxBuffer[Peripheral_UART::End_U][UART_BUFFER_SIZE] = {0};
 
 void stm32f767AbstractionLayer::_initUART() {
     while (HAL_UART_Receive_DMA(PAL.UART[MAL::Peripheral_UART::Controller], _uartRxBuffer[MAL::Peripheral_UART::Controller], UART_BUFFER_SIZE) != HAL_OK) {
@@ -287,22 +287,22 @@ uint32_t stm32f767AbstractionLayer::uartGetRxDataSize(Peripheral_UART p) {
     return size;
 }
 
-// Timer Interrupt
+// Interrupt
 
-void (*stm32f767AbstractionLayer::_timerInterruptCallback[Peripheral_TimerInterrupt::End_T - 1])(void);
+void (*stm32f767AbstractionLayer::_timerInterruptCallback[Peripheral_Interrupt::End_T])(void);
 
 void stm32f767AbstractionLayer::_initTimerInterrupt() {
-    HAL_TIM_Base_Start(PAL.TimerInterrupt_TIM[MAL::Peripheral_TimerInterrupt::T100us]);
+    HAL_TIM_Base_Start(PAL.TimerInterrupt_TIM[MAL::Peripheral_Interrupt::T100us]);
 }
 
-void stm32f767AbstractionLayer::timerInterruptSetCallback(Peripheral_TimerInterrupt p, void (*callback)(void)) {
-    if (p != Peripheral_TimerInterrupt::End_T) {
+void stm32f767AbstractionLayer::interruptSetCallback(Peripheral_Interrupt p, void (*callback)(void)) {
+    if (p != Peripheral_Interrupt::End_T) {
         _timerInterruptCallback[p] = callback;
     }
 }
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim) {
-    if (htim == PAL.TimerInterrupt_TIM[MAL::Peripheral_TimerInterrupt::T100us]) {
-        stm32f767AbstractionLayer::_timerInterruptCallback[MAL::Peripheral_TimerInterrupt::T100us]();
+    if (htim == PAL.TimerInterrupt_TIM[MAL::Peripheral_Interrupt::T100us]) {
+        stm32f767AbstractionLayer::_timerInterruptCallback[MAL::Peripheral_Interrupt::T100us]();
     }
 }

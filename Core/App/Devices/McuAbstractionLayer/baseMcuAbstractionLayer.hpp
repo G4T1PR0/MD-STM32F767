@@ -60,7 +60,7 @@ class baseMcuAbstractionLayer {
         End_U,
     };
 
-    enum Peripheral_TimerInterrupt {
+    enum Peripheral_Interrupt {
         T100us,
         End_T
     };
@@ -88,8 +88,8 @@ class baseMcuAbstractionLayer {
     virtual void uartReadViaBuffer(Peripheral_UART p, uint8_t* data, uint32_t size) = 0;
     virtual uint32_t uartGetRxDataSize(Peripheral_UART p) = 0;
 
-    // Timer Interrupt
-    virtual void timerInterruptSetCallback(Peripheral_TimerInterrupt p, void (*callback)(void)) = 0;
+    // Interrupt
+    virtual void interruptSetCallback(Peripheral_Interrupt p, void (*callback)(void)) = 0;
 };
 
 typedef baseMcuAbstractionLayer MAL;
