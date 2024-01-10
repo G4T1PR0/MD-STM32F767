@@ -33,7 +33,7 @@ void app_main() {
     app_init();
     while (1) {
         FL_Motor.setMode(1);
-        FL_Motor.setDuty(0)
+        FL_Motor.setDuty(0);
     }
 }
 
