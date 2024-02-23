@@ -65,10 +65,15 @@ void MotorController::setMode(int mode) {
         _mode = 0;
         return;
     }
+
     if (_isSteer) {
         if (mode == 3) {
             _mode = 0;
+        } else {
+            _mode = mode;
         }
+    } else if (mode == 4) {
+        _mode = 0;
     } else {
         _mode = mode;
     }

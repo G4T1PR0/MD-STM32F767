@@ -39,9 +39,9 @@ class MotorController {
     baseEncoder* _encoder;
     baseSteerAngleSensor* _steerAngle;
 
-    PID _current_pid;
-    PID _velocity_pid;
-    PID _angle_pid;
+    PID<float> _current_pid;
+    PID<float> _velocity_pid;
+    PID<float> _angle_pid;
 
     void _update(void);
 
