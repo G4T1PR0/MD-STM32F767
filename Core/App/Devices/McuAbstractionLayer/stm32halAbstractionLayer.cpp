@@ -112,10 +112,10 @@ void stm32halAbstractionLayer::init() {
 }
 
 // ADC
-uint16_t stm32halAbstractionLayer::_data[16] = {0};
+uint16_t stm32halAbstractionLayer::_data[MAL::Peripheral_ADC::End_A] = {0};
 
 void stm32halAbstractionLayer::_initADC(void) {
-    if (HAL_ADC_Start_DMA(&hadc1, (uint32_t*)this->_data, sizeof(uint16_t)) * hadc1.Init.NbrOfConversion !=
+    if (HAL_ADC_Start_DMA(&hadc1, (uint32_t*)this->_data, hadc1.Init.NbrOfConversion) !=
         HAL_OK) {
         Error_Handler();
     }

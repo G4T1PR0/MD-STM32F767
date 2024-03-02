@@ -48,7 +48,7 @@ class stm32halAbstractionLayer : public baseMcuAbstractionLayer {
     // ADC
     void _initADC();
 
-    static uint16_t _data[16];
+    static uint16_t _data[MAL::Peripheral_ADC::End_A];
 
     // Timer Encoder
     void _initEncoder();
