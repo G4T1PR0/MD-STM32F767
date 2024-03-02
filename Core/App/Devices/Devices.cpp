@@ -8,7 +8,7 @@
 #include <Devices/Devices.hpp>
 
 Devices::Devices() {
-    mcu = new stm32f767AbstractionLayer();
+    mcu = new stm32halAbstractionLayer();
 
     fl_current = new currentSensor(mcu, MAL::Peripheral_ADC::FL_Current);
     fr_current = new currentSensor(mcu, MAL::Peripheral_ADC::FR_Current);

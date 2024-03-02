@@ -1,20 +1,20 @@
 /*
- * stm32f767AbstractionLayer.hpp
+ * stm32halAbstractionLayer.hpp
  *
  *  Created on: Dec 4, 2023
  *      Author: G4T1PR0
  */
 
-#ifndef APP_DEVICES_STM32F767ABSTRACTIONLAYER_STM32F767ABSTRACTIONLAYER_HPP_
-#define APP_DEVICES_STM32F767ABSTRACTIONLAYER_STM32F767ABSTRACTIONLAYER_HPP_
+#ifndef APP_DEVICES_STM32HALABSTRACTIONLAYER_STM32HALABSTRACTIONLAYER_HPP_
+#define APP_DEVICES_STM32HALABSTRACTIONLAYER_STM32HALABSTRACTIONLAYER_HPP_
 
 #include <Devices/McuAbstractionLayer/baseMcuAbstractionLayer.hpp>
 
 #define UART_BUFFER_SIZE 64
 
-class stm32f767AbstractionLayer : public baseMcuAbstractionLayer {
+class stm32halAbstractionLayer : public baseMcuAbstractionLayer {
    public:
-    stm32f767AbstractionLayer();
+    stm32halAbstractionLayer();
     virtual void init(void);
 
     // ADC
@@ -64,4 +64,4 @@ class stm32f767AbstractionLayer : public baseMcuAbstractionLayer {
     void _initTimerInterrupt();
 };
 
-#endif /* APP_DEVICES_STM32F767ABSTRACTIONLAYER_STM32F767ABSTRACTIONLAYER_HPP_ */
+#endif /* APP_DEVICES_STM32HALABSTRACTIONLAYER_STM32HALABSTRACTIONLAYER_HPP_ */

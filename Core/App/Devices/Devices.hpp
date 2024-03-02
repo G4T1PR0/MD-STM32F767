@@ -13,7 +13,7 @@
 #include <Devices/Driver/currentSensor.hpp>
 #include <Devices/Driver/encoder.hpp>
 #include <Devices/Driver/steerAngleSensor.hpp>
-#include <Devices/McuAbstractionLayer/stm32f767AbstractionLayer.hpp>
+#include <Devices/McuAbstractionLayer/stm32halAbstractionLayer.hpp>
 
 class Devices {
    public:
@@ -21,7 +21,7 @@ class Devices {
     void init();
     void update1ms();
 
-    stm32f767AbstractionLayer* mcu;
+    stm32halAbstractionLayer* mcu;
 
     currentSensor* fl_current;
     currentSensor* fr_current;
