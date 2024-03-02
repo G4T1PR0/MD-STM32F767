@@ -8,6 +8,7 @@
 #ifndef APP_DEVICES_STM32HALABSTRACTIONLAYER_STM32HALABSTRACTIONLAYER_HPP_
 #define APP_DEVICES_STM32HALABSTRACTIONLAYER_STM32HALABSTRACTIONLAYER_HPP_
 
+#include <Devices/McuAbstractionLayer/RingBuffer.hpp>
 #include <Devices/McuAbstractionLayer/baseMcuAbstractionLayer.hpp>
 
 #define UART_BUFFER_SIZE 64
@@ -34,6 +35,7 @@ class stm32halAbstractionLayer : public baseMcuAbstractionLayer {
     // UART
     virtual void uartPutChar(Peripheral_UART p, uint8_t data);
     virtual uint8_t uartGetChar(Peripheral_UART p);
+
     virtual void uartWriteViaBuffer(Peripheral_UART p, uint8_t* data, uint32_t size);
     virtual void uartReadViaBuffer(Peripheral_UART p, uint8_t* data, uint32_t size);
     virtual uint32_t uartGetRxDataSize(Peripheral_UART p);
@@ -56,8 +58,8 @@ class stm32halAbstractionLayer : public baseMcuAbstractionLayer {
 
     // UART
     void _initUART();
-    uint32_t _uartCheckRxBufferDmaWriteAddress(Peripheral_UART p);
-    static uint8_t _uartRxBuffer[Peripheral_UART::End_U][UART_BUFFER_SIZE];
+    uint32_t _uartGetRxBufferDmaWriteAddress(Peripheral_UART p);
+    static RingBuffer<uint8_t, UART_BUFFER_SIZE> _uartRxBuffer[Peripheral_UART::End_U];
     uint32_t _uartRxBufferReadAddress[Peripheral_UART::End_U] = {0};
 
     // Interrupt
