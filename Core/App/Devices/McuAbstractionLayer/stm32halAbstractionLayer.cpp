@@ -12,16 +12,21 @@
 #include "usart.h"
 
 struct PeripheralAllocation {
+    enum STM_ADC {
+        ADC_1,
+        ADC_END
+    };
+
+    ADC_HandleTypeDef* ADC_Ins[ADC_END];
+    STM_ADC ADC_Connected[MAL::Peripheral_ADC::End_A];
     uint8_t ADC_RANK[MAL::Peripheral_ADC::End_A];
 
     TIM_HandleTypeDef* PWM_TIM[MAL::Peripheral_PWM::End_P];
-
     uint32_t PWM_CH[MAL::Peripheral_PWM::End_P];
 
     TIM_HandleTypeDef* Encoder_TIM[MAL::Peripheral_Encoder::End_E];
 
     GPIO_TypeDef* GPIO_PORT[MAL::Peripheral_GPIO::End_G];
-
     uint16_t GPIO_PIN[MAL::Peripheral_GPIO::End_G];
 
     UART_HandleTypeDef* UART[MAL::Peripheral_UART::End_U];
@@ -33,6 +38,16 @@ static PeripheralAllocation PAL;
 
 stm32halAbstractionLayer::stm32halAbstractionLayer() {
     // ADC
+    PAL.ADC_Ins[PeripheralAllocation::STM_ADC::ADC_1] = &hadc1;
+
+    PAL.ADC_Connected[MAL::Peripheral_ADC::FL_Current] = PeripheralAllocation::STM_ADC::ADC_1;
+    PAL.ADC_Connected[MAL::Peripheral_ADC::FR_Current] = PeripheralAllocation::STM_ADC::ADC_1;
+    PAL.ADC_Connected[MAL::Peripheral_ADC::ST_Current] = PeripheralAllocation::STM_ADC::ADC_1;
+    PAL.ADC_Connected[MAL::Peripheral_ADC::RL_Current] = PeripheralAllocation::STM_ADC::ADC_1;
+    PAL.ADC_Connected[MAL::Peripheral_ADC::RR_Current] = PeripheralAllocation::STM_ADC::ADC_1;
+    PAL.ADC_Connected[MAL::Peripheral_ADC::Batt_Voltage] = PeripheralAllocation::STM_ADC::ADC_1;
+    PAL.ADC_Connected[MAL::Peripheral_ADC::ST_Volume] = PeripheralAllocation::STM_ADC::ADC_1;
+
     PAL.ADC_RANK[MAL::Peripheral_ADC::FL_Current] = 0;
     PAL.ADC_RANK[MAL::Peripheral_ADC::FR_Current] = 1;
     PAL.ADC_RANK[MAL::Peripheral_ADC::ST_Current] = 2;
@@ -115,10 +130,11 @@ void stm32halAbstractionLayer::init() {
 uint16_t stm32halAbstractionLayer::_data[MAL::Peripheral_ADC::End_A] = {0};
 
 void stm32halAbstractionLayer::_initADC(void) {
-    if (HAL_ADC_Start_DMA(&hadc1, (uint32_t*)this->_data, hadc1.Init.NbrOfConversion) !=
+    if (HAL_ADC_Start_DMA(PAL.ADC_Ins[PeripheralAllocation::STM_ADC::ADC_1], (uint32_t*)this->_data, hadc1.Init.NbrOfConversion) !=
         HAL_OK) {
         Error_Handler();
     }
+    __HAL_DMA_DISABLE_IT(PAL.ADC_Ins[PeripheralAllocation::STM_ADC::ADC_1]->DMA_Handle, DMA_IT_TC | DMA_IT_HT);
 }
 
 uint16_t stm32halAbstractionLayer::adcGetValue(Peripheral_ADC p) {
