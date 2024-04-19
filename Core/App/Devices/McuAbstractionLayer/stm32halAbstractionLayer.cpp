@@ -157,10 +157,10 @@ void stm32halAbstractionLayer::init() {
 }
 
 // ADC
-uint16_t stm32halAbstractionLayer::_data[MAL::Peripheral_ADC::End_A] = {0};
+uint16_t stm32halAbstractionLayer::_data[MAL::Peripheral_ADC::End_A * ADC_BUFFER_SIZE] = {0};
 
 void stm32halAbstractionLayer::_initADC(void) {
-    if (HAL_ADC_Start_DMA(PAL.ADC_Ins[PeripheralAllocation::STM_ADC::ADC_1], (uint32_t*)this->_data, hadc1.Init.NbrOfConversion) !=
+    if (HAL_ADC_Start_DMA(PAL.ADC_Ins[PeripheralAllocation::STM_ADC::ADC_1], (uint32_t*)this->_data, sizeof(this->_data) / sizeof(uint16_t)) !=
         HAL_OK) {
         Error_Handler();
     }
@@ -171,12 +171,20 @@ void stm32halAbstractionLayer::_initADC(void) {
 
 uint16_t stm32halAbstractionLayer::adcGetValue(Peripheral_ADC p) {
     if (p != Peripheral_ADC::End_A) {
-        if (p == Peripheral_ADC::FR_Current) {
-            return HAL_ADCEx_InjectedGetValue(PAL.ADC_Ins[PeripheralAllocation::STM_ADC::ADC_1], 1);
-        }
+        // if (p == Peripheral_ADC::FR_Current) {
+        //     return HAL_ADCEx_InjectedGetValue(PAL.ADC_Ins[PeripheralAllocation::STM_ADC::ADC_1], 1);
+        // }
         return this->_data[PAL.ADC_RANK[p]];
     }
     return 0;
+}
+
+void stm32halAbstractionLayer::adcGetBufferValue(Peripheral_ADC p, uint16_t* buffer, uint16_t size) {
+    if (p != Peripheral_ADC::End_A) {
+        for (int i = 0; i < size; i++) {
+            buffer[i] = this->_data[i * 7 + PAL.ADC_RANK[p]];
+        }
+    }
 }
 
 // Encoder

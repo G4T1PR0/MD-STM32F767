@@ -12,6 +12,7 @@
 #include <Devices/McuAbstractionLayer/baseMcuAbstractionLayer.hpp>
 
 #define UART_BUFFER_SIZE 64
+#define ADC_BUFFER_SIZE 50
 
 class stm32halAbstractionLayer : public baseMcuAbstractionLayer {
    public:
@@ -20,6 +21,7 @@ class stm32halAbstractionLayer : public baseMcuAbstractionLayer {
 
     // ADC
     virtual uint16_t adcGetValue(Peripheral_ADC p);
+    virtual void adcGetBufferValue(Peripheral_ADC p, uint16_t* buffer, uint16_t size);
 
     // PWM
     virtual void pwmSetDuty(Peripheral_PWM p, float duty);
@@ -49,7 +51,7 @@ class stm32halAbstractionLayer : public baseMcuAbstractionLayer {
     // ADC
     void _initADC();
 
-    static uint16_t _data[MAL::Peripheral_ADC::End_A];
+    static uint16_t _data[MAL::Peripheral_ADC::End_A * ADC_BUFFER_SIZE];
 
     // Timer Encoder
     void _initEncoder();

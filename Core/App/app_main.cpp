@@ -61,7 +61,7 @@ void app_main() {
 
     unsigned int motor_mode = 0;
 
-    devices.mcu->pwmSetFrequency(MAL::Peripheral_PWM::FR_PWM, 40000);
+    devices.mcu->pwmSetFrequency(MAL::Peripheral_PWM::FR_PWM, 50000);
     while (1) {
         float d = FR_Motor.getDuty();
         if (d < 0) {
@@ -83,7 +83,7 @@ void app_main() {
         switch (motor_mode) {
             case 0:
 
-                FR_Motor.setCurrent(-0.1);
+                FR_Motor.setCurrent(0.1);
                 // FR_Motor.setDuty(0.2);
                 if (motor_debug_cnt > 10 * 1000) {
                     motor_debug_cnt = 0;
@@ -92,7 +92,7 @@ void app_main() {
                 break;
 
             case 1:
-                FR_Motor.setCurrent(-0.6);
+                FR_Motor.setCurrent(0.5);
                 // FR_Motor.setCurrent(-0.1);
                 //  FR_Motor.setDuty(-0.2);
                 if (motor_debug_cnt > 10 * 1000) {
@@ -131,10 +131,10 @@ void app_main() {
         //     }
         // }
 
-        // if (debug_cnt > 100 * 10) {
-        //     debug_cnt = 0;
-        //     printf("duty: %f t_current: %f o_current: %f t_velocity: %f o_velocity: %f\r\n", FR_Motor.getDuty(), FR_Motor.getTargetCurrent(), FR_Motor.getCurrent(), FR_Motor.getTargetVelocity(), FR_Motor.getVelocity());
-        // }
+        if (debug_cnt > 100 * 10) {
+            debug_cnt = 0;
+            printf("duty: %f t_current: %f o_current: %f t_velocity: %f o_velocity: %f\r\n", FR_Motor.getDuty(), FR_Motor.getTargetCurrent(), FR_Motor.getCurrent(), FR_Motor.getTargetVelocity(), FR_Motor.getVelocity());
+        }
     }
 }
 
@@ -146,11 +146,11 @@ void app_interrupt_100us() {
         update1ms_cnt = 0;
         devices.update1ms();
     }
-    // MotorController::update(&FL_Motor);
+    MotorController::update(&FL_Motor);
     MotorController::update(&FR_Motor);
-    // MotorController::update(&ST_Motor);
-    // MotorController::update(&RL_Motor);
-    // MotorController::update(&RR_Motor);
+    MotorController::update(&ST_Motor);
+    MotorController::update(&RL_Motor);
+    MotorController::update(&RR_Motor);
     debug_cnt++;
     motor_debug_cnt++;
 }

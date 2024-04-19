@@ -17,8 +17,19 @@ void currentSensor::init() {
 void currentSensor::update() {
 }
 
+#define ADC_BUFFER_SIZE 50
 float currentSensor::getCurrent() {
-    _filter.push((_mcu->adcGetValue(_p) * _raw2voltage - 1.65) / _voltage2current);
-    return _filter.get();
+    // _filter.push((_mcu->adcGetValue(_p) * _raw2voltage - 1.65) / _voltage2current);
+    // return _filter.get();
     // return (_mcu->adcGetValue(_p) * _raw2voltage - 1.65) / _voltage2current;
+    uint16_t buffer[ADC_BUFFER_SIZE];
+    _mcu->adcGetBufferValue(_p, buffer, ADC_BUFFER_SIZE);
+    unsigned long long sum = 0;
+    for (int i = 0; i < ADC_BUFFER_SIZE; i++) {
+        sum += buffer[i];
+    }
+
+    float avg = sum / ADC_BUFFER_SIZE;
+
+    return (avg * _raw2voltage - 1.65) / _voltage2current;
 }
