@@ -16,7 +16,7 @@ A3921::A3921(MAL* mcu, MAL::Peripheral_PWM pwm, MAL::Peripheral_GPIO phase, MAL:
 
 void A3921::init() {
     _previousDuty = 0;
-    _mcu->gpioSetValue(_sr, 1);
+    _mcu->gpioSetValue(_sr, 0);
 }
 
 void A3921::setDuty(float duty) {
@@ -25,7 +25,7 @@ void A3921::setDuty(float duty) {
         _previousDuty = duty;
         if (duty < 0) {
             _mcu->gpioSetValue(_phase, 0);
-        } else {
+        } else if (duty > 0) {
             _mcu->gpioSetValue(_phase, 1);
         }
 

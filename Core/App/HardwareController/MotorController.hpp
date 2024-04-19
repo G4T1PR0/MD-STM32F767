@@ -30,12 +30,15 @@ class MotorController {
 
     void setCurrent(float current);
     float getCurrent();
+    float getTargetCurrent();
 
     void setVelocity(float velocity);
     float getVelocity();
+    float getTargetVelocity();
 
     void setAngle(float angle);
     float getAngle();
+    float getTargetAngle();
 
    private:
     baseMotorDriver* _driver;

@@ -23,8 +23,8 @@ MotorController::MotorController(baseMotorDriver* driver, baseCurrentSensor* cur
 
 void MotorController::init(void) {
     _mode = 0;
-    _current_pid.setPID(0.8, 0, 0);
-    _velocity_pid.setPID(0.004, 0, 0);
+    _current_pid.setPID(1.6, 0, 0);
+    _velocity_pid.setPID(0.00009, 0, 0);
 }
 
 void MotorController::update(MotorController* instance) {
@@ -60,11 +60,16 @@ void MotorController::_update(void) {
                 if (_motorInputDuty > 0)
                     _motorInputDuty = 0;
             }
+            // if (_pidTargetCurrent < 0.001 && _pidTargetCurrent > -0.001) {
+            //     _motorInputDuty = 0;
+            // }
+
             _driver->setDuty(_motorInputDuty);
             break;
 
         case 3:  // Motor Velocity Control
             _pidTargetCurrent = -_velocity_pid.update(_targetVelocity, _observedVelocity);
+
             _motorInputDuty = _current_pid.update(_pidTargetCurrent, _observedCurrent);
             if (_pidTargetCurrent > 0) {
                 if (_motorInputDuty < 0)
@@ -72,6 +77,10 @@ void MotorController::_update(void) {
             } else if (_pidTargetCurrent < 0) {
                 if (_motorInputDuty > 0)
                     _motorInputDuty = 0;
+            }
+
+            if (_pidTargetCurrent < 0.001 && _pidTargetCurrent > -0.001) {
+                _motorInputDuty = 0;
             }
             _driver->setDuty(_motorInputDuty);
             break;
@@ -119,6 +128,10 @@ float MotorController::getCurrent() {
     return _observedCurrent;
 }
 
+float MotorController::getTargetCurrent() {
+    return _pidTargetCurrent;
+}
+
 void MotorController::setVelocity(float velocity) {
     _targetVelocity = velocity;
 }
@@ -127,10 +140,18 @@ float MotorController::getVelocity() {
     return _observedVelocity;
 }
 
+float MotorController::getTargetVelocity() {
+    return _targetVelocity;
+}
+
 void MotorController::setAngle(float angle) {
     _targetAngle = angle;
 }
 
 float MotorController::getAngle() {
     return _observedAngle;
+}
+
+float MotorController::getTargetAngle() {
+    return _targetAngle;
 }

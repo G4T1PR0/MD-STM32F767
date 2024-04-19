@@ -165,10 +165,15 @@ void stm32halAbstractionLayer::_initADC(void) {
         Error_Handler();
     }
     __HAL_DMA_DISABLE_IT(PAL.ADC_Ins[PeripheralAllocation::STM_ADC::ADC_1]->DMA_Handle, DMA_IT_TC | DMA_IT_HT);
+
+    HAL_ADCEx_InjectedStart(PAL.ADC_Ins[PeripheralAllocation::STM_ADC::ADC_1]);
 }
 
 uint16_t stm32halAbstractionLayer::adcGetValue(Peripheral_ADC p) {
     if (p != Peripheral_ADC::End_A) {
+        if (p == Peripheral_ADC::FR_Current) {
+            return HAL_ADCEx_InjectedGetValue(PAL.ADC_Ins[PeripheralAllocation::STM_ADC::ADC_1], 1);
+        }
         return this->_data[PAL.ADC_RANK[p]];
     }
     return 0;
@@ -251,15 +256,15 @@ void stm32halAbstractionLayer::pwmSetFrequency(Peripheral_PWM p, uint32_t freque
                         }
                         __HAL_TIM_SET_CLOCKDIVISION(PAL.PWM_TIM[p], TIM_CLOCKDIVISION_DIV1);
                         return;
-                    } else if ((timer_clock / ((prescaler + 1) * (period + 1))) > frequency) {
-                        __HAL_TIM_SET_PRESCALER(PAL.PWM_TIM[p], prescaler);
-                        __HAL_TIM_SET_AUTORELOAD(PAL.PWM_TIM[p], period);
-                        if (__HAL_TIM_GET_COUNTER(PAL.PWM_TIM[p]) >= __HAL_TIM_GET_AUTORELOAD(PAL.PWM_TIM[p])) {
-                            PAL.PWM_TIM[p]->Instance->EGR |= TIM_EGR_UG;
-                        }
-                        __HAL_TIM_SET_CLOCKDIVISION(PAL.PWM_TIM[p], TIM_CLOCKDIVISION_DIV1);
-                        return;
-                    }
+                    }  // else if ((timer_clock / ((prescaler + 1) * (period + 1))) > frequency) {
+                    //     __HAL_TIM_SET_PRESCALER(PAL.PWM_TIM[p], prescaler);
+                    //     __HAL_TIM_SET_AUTORELOAD(PAL.PWM_TIM[p], period);
+                    //     if (__HAL_TIM_GET_COUNTER(PAL.PWM_TIM[p]) >= __HAL_TIM_GET_AUTORELOAD(PAL.PWM_TIM[p])) {
+                    //         PAL.PWM_TIM[p]->Instance->EGR |= TIM_EGR_UG;
+                    //     }
+                    //     __HAL_TIM_SET_CLOCKDIVISION(PAL.PWM_TIM[p], TIM_CLOCKDIVISION_DIV1);
+                    //     return;
+                    // }
                 }
             }
         }
