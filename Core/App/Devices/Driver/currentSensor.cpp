@@ -18,5 +18,7 @@ void currentSensor::update() {
 }
 
 float currentSensor::getCurrent() {
-    return (_mcu->adcGetValue(_p) * _raw2voltage - 1.65) / _voltage2current;
+    _filter.push((_mcu->adcGetValue(_p) * _raw2voltage - 1.65) / _voltage2current);
+    return _filter.get();
+    // return (_mcu->adcGetValue(_p) * _raw2voltage - 1.65) / _voltage2current;
 }

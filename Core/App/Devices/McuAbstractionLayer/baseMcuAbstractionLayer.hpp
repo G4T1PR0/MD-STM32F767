@@ -51,6 +51,16 @@ class baseMcuAbstractionLayer {
         RL_SR,
         RR_PHASE,
         RR_SR,
+        LED_1,
+        LED_2,
+        LED_3,
+        LED_4,
+        LED_5,
+        LED_6,
+        LED_7,
+        LED_8,
+        LED_9,
+        LED_10,
         End_G,
     };
 
@@ -72,6 +82,7 @@ class baseMcuAbstractionLayer {
 
     // PWM
     virtual void pwmSetDuty(Peripheral_PWM p, float duty) = 0;
+    virtual void pwmSetFrequency(Peripheral_PWM p, uint32_t frequency) = 0;
 
     // Encoder
     virtual void encoderSetCnt(Peripheral_Encoder p, uint32_t cnt) = 0;

@@ -23,6 +23,8 @@ MotorController::MotorController(baseMotorDriver* driver, baseCurrentSensor* cur
 
 void MotorController::init(void) {
     _mode = 0;
+    _current_pid.setPID(0.8, 0, 0);
+    _velocity_pid.setPID(0.004, 0, 0);
 }
 
 void MotorController::update(MotorController* instance) {
@@ -30,6 +32,12 @@ void MotorController::update(MotorController* instance) {
 }
 
 void MotorController::_update(void) {
+    _observedCurrent = _current->getCurrent();
+    if (_isSteer) {
+        _observedAngle = _steerAngle->getAngle();
+    } else {
+        _observedVelocity = _encoder->getCount();
+    }
     switch (_mode) {
         case 0:  // Motor OFF
             _driver->setDuty(0);
@@ -37,24 +45,40 @@ void MotorController::_update(void) {
 
         case 1:  // Motor PWM Control
             _motorInputDuty = _targetDuty;
+
             _driver->setDuty(_motorInputDuty);
             break;
 
         case 2:  // Motor Current Control
             _pidTargetCurrent = _targetCurrent;
-            _motorInputDuty = _current_pid.update(_pidTargetCurrent, _current->getCurrent());
+
+            _motorInputDuty = _current_pid.update(_pidTargetCurrent, _observedCurrent);
+            if (_pidTargetCurrent > 0) {
+                if (_motorInputDuty < 0)
+                    _motorInputDuty = 0;
+            } else if (_pidTargetCurrent < 0) {
+                if (_motorInputDuty > 0)
+                    _motorInputDuty = 0;
+            }
             _driver->setDuty(_motorInputDuty);
             break;
 
         case 3:  // Motor Velocity Control
-            _pidTargetCurrent = _velocity_pid.update(_targetVelocity, _encoder->getCount());
-            _motorInputDuty = _current_pid.update(_pidTargetCurrent, _current->getCurrent());
+            _pidTargetCurrent = -_velocity_pid.update(_targetVelocity, _observedVelocity);
+            _motorInputDuty = _current_pid.update(_pidTargetCurrent, _observedCurrent);
+            if (_pidTargetCurrent > 0) {
+                if (_motorInputDuty < 0)
+                    _motorInputDuty = 0;
+            } else if (_pidTargetCurrent < 0) {
+                if (_motorInputDuty > 0)
+                    _motorInputDuty = 0;
+            }
             _driver->setDuty(_motorInputDuty);
             break;
 
         case 4:  // Motor Angle Control
-            _pidTargetCurrent = _angle_pid.update(_targetAngle, _steerAngle->getAngle());
-            _motorInputDuty = _current_pid.update(_pidTargetCurrent, _current->getCurrent());
+            _pidTargetCurrent = _angle_pid.update(_targetAngle, _observedAngle);
+            _motorInputDuty = _current_pid.update(_pidTargetCurrent, _observedCurrent);
             _driver->setDuty(_motorInputDuty);
             break;
     }
@@ -83,14 +107,30 @@ void MotorController::setDuty(float duty) {
     _targetDuty = duty;
 }
 
+float MotorController::getDuty() {
+    return _motorInputDuty;
+}
+
 void MotorController::setCurrent(float current) {
     _targetCurrent = current;
+}
+
+float MotorController::getCurrent() {
+    return _observedCurrent;
 }
 
 void MotorController::setVelocity(float velocity) {
     _targetVelocity = velocity;
 }
 
+float MotorController::getVelocity() {
+    return _observedVelocity;
+}
+
 void MotorController::setAngle(float angle) {
     _targetAngle = angle;
+}
+
+float MotorController::getAngle() {
+    return _observedAngle;
 }

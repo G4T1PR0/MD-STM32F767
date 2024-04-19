@@ -18,6 +18,11 @@ MotorController RR_Motor(devices.rr_driver, devices.rr_current, devices.rr_encod
 
 void app_interrupt_100us();
 
+unsigned int led_cnt = 0;
+unsigned int led_index = 0;
+
+unsigned int debug_cnt = 0;
+
 void app_init() {
     devices.init();
 
@@ -29,18 +34,90 @@ void app_init() {
 
     devices.mcu->interruptSetCallback(MAL::Peripheral_Interrupt::T100us, &app_interrupt_100us);
 }
+
+MAL::Peripheral_GPIO led[]{
+    MAL::Peripheral_GPIO::LED_1,
+    MAL::Peripheral_GPIO::LED_2,
+    MAL::Peripheral_GPIO::LED_3,
+    MAL::Peripheral_GPIO::LED_4,
+    MAL::Peripheral_GPIO::LED_5,
+    MAL::Peripheral_GPIO::LED_6,
+    MAL::Peripheral_GPIO::LED_7,
+    MAL::Peripheral_GPIO::LED_8,
+    MAL::Peripheral_GPIO::LED_9,
+    MAL::Peripheral_GPIO::LED_10,
+};
+
 void app_main() {
     app_init();
+
+    for (unsigned int i = 0; i < 10; i++) {
+        devices.mcu->gpioSetValue(led[i], 1);
+    }
+
+    unsigned int led_mode = 0;
+
+    // devices.mcu->pwmSetFrequency(MAL::Peripheral_PWM::FR_PWM, 120000);
     while (1) {
-        FL_Motor.setMode(1);
-        FL_Motor.setDuty(0);
+        // FL_Motor.setMode(1);
+        // FL_Motor.setDuty(0);
+        // FR_Motor.setMode(1);
+        // FR_Motor.setDuty(0.2);
+
+        // devices.mcu->pwmSetDuty(MAL::Peripheral_PWM::FR_PWM, 0.2);
+        // devices.mcu->gpioSetValue(MAL::Peripheral_GPIO::FR_PHASE, 0);
+
+        FR_Motor.setMode(2);
+        FR_Motor.setCurrent(0.9);
+
+        // FR_Motor.setMode(3);
+        // FR_Motor.setVelocity(1300);
+
+        led_cnt++;
+        if (led_cnt > 6000) {
+            led_cnt = 0;
+            if (led_mode == 0) {
+                led_index++;
+                if (led_index >= 10) {
+                    led_index = 9;
+                    led_mode = 1;
+                }
+            } else {
+                led_index--;
+                if (led_index <= 0) {
+                    led_index = 0;
+                    led_mode = 0;
+                }
+            }
+        }
+
+        devices.mcu->gpioSetValue(led[led_index], 0);
+
+        for (unsigned int i = 0; i < 10; i++) {
+            if (devices.mcu->gpioGetValue(led[i]) == 0 && i != led_index) {
+                devices.mcu->gpioSetValue(led[i], 1);
+            }
+        }
+
+        if (debug_cnt > 100 * 10) {
+            debug_cnt = 0;
+            printf("duty: %f current: %f velocity: %f\r\n", FR_Motor.getDuty(), FR_Motor.getCurrent(), FR_Motor.getVelocity());
+        }
     }
 }
 
+unsigned int update1ms_cnt = 0;
+
 void app_interrupt_100us() {
-    MotorController::update(&FL_Motor);
+    update1ms_cnt++;
+    if (update1ms_cnt > 10) {
+        update1ms_cnt = 0;
+        devices.update1ms();
+    }
+    // MotorController::update(&FL_Motor);
     MotorController::update(&FR_Motor);
-    MotorController::update(&ST_Motor);
-    MotorController::update(&RL_Motor);
-    MotorController::update(&RR_Motor);
+    // MotorController::update(&ST_Motor);
+    // MotorController::update(&RL_Motor);
+    // MotorController::update(&RR_Motor);
+    debug_cnt++;
 }

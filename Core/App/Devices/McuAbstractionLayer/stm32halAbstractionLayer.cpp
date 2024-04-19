@@ -109,6 +109,36 @@ stm32halAbstractionLayer::stm32halAbstractionLayer() {
     PAL.GPIO_PORT[MAL::Peripheral_GPIO::RR_SR] = Motor_RR_SR_GPIO_Port;
     PAL.GPIO_PIN[MAL::Peripheral_GPIO::RR_SR] = Motor_RR_SR_Pin;
 
+    PAL.GPIO_PORT[MAL::Peripheral_GPIO::LED_1] = LED1_GPIO_Port;
+    PAL.GPIO_PIN[MAL::Peripheral_GPIO::LED_1] = LED1_Pin;
+
+    PAL.GPIO_PORT[MAL::Peripheral_GPIO::LED_2] = LED2_GPIO_Port;
+    PAL.GPIO_PIN[MAL::Peripheral_GPIO::LED_2] = LED2_Pin;
+
+    PAL.GPIO_PORT[MAL::Peripheral_GPIO::LED_3] = LED3_GPIO_Port;
+    PAL.GPIO_PIN[MAL::Peripheral_GPIO::LED_3] = LED3_Pin;
+
+    PAL.GPIO_PORT[MAL::Peripheral_GPIO::LED_4] = LED4_GPIO_Port;
+    PAL.GPIO_PIN[MAL::Peripheral_GPIO::LED_4] = LED4_Pin;
+
+    PAL.GPIO_PORT[MAL::Peripheral_GPIO::LED_5] = LED5_GPIO_Port;
+    PAL.GPIO_PIN[MAL::Peripheral_GPIO::LED_5] = LED5_Pin;
+
+    PAL.GPIO_PORT[MAL::Peripheral_GPIO::LED_6] = LED6_GPIO_Port;
+    PAL.GPIO_PIN[MAL::Peripheral_GPIO::LED_6] = LED6_Pin;
+
+    PAL.GPIO_PORT[MAL::Peripheral_GPIO::LED_7] = LED7_GPIO_Port;
+    PAL.GPIO_PIN[MAL::Peripheral_GPIO::LED_7] = LED7_Pin;
+
+    PAL.GPIO_PORT[MAL::Peripheral_GPIO::LED_8] = LED8_GPIO_Port;
+    PAL.GPIO_PIN[MAL::Peripheral_GPIO::LED_8] = LED8_Pin;
+
+    PAL.GPIO_PORT[MAL::Peripheral_GPIO::LED_9] = LED9_GPIO_Port;
+    PAL.GPIO_PIN[MAL::Peripheral_GPIO::LED_9] = LED9_Pin;
+
+    PAL.GPIO_PORT[MAL::Peripheral_GPIO::LED_10] = LED10_GPIO_Port;
+    PAL.GPIO_PIN[MAL::Peripheral_GPIO::LED_10] = LED10_Pin;
+
     // UART
     PAL.UART[MAL::Peripheral_UART::Controller] = &huart5;
 
@@ -179,6 +209,60 @@ void stm32halAbstractionLayer::_initPWM() {
 void stm32halAbstractionLayer::pwmSetDuty(Peripheral_PWM p, float duty) {
     if (p != Peripheral_PWM::End_P) {
         __HAL_TIM_SET_COMPARE(PAL.PWM_TIM[p], PAL.PWM_CH[p], duty * __HAL_TIM_GET_AUTORELOAD(PAL.PWM_TIM[p]));
+    }
+}
+
+void stm32halAbstractionLayer::pwmSetFrequency(Peripheral_PWM p, uint32_t frequency) {
+    if (p != Peripheral_PWM::End_P) {
+        if (_current_pwm_hz[p] != frequency) {
+            _current_pwm_hz[p] = frequency;
+            uint32_t apb1_timer_clocks;
+            uint32_t apb2_timer_clocks;
+            uint32_t timer_clock = 0;
+
+            RCC_ClkInitTypeDef RCC_ClkInitStruct;
+            uint32_t pFLatency;
+            HAL_RCC_GetClockConfig(&RCC_ClkInitStruct, &pFLatency);
+            apb1_timer_clocks = HAL_RCC_GetPCLK1Freq();
+            apb2_timer_clocks = HAL_RCC_GetPCLK2Freq();
+            apb1_timer_clocks *= (RCC_ClkInitStruct.APB1CLKDivider == RCC_HCLK_DIV1) ? 1 : 2;
+            apb2_timer_clocks *= (RCC_ClkInitStruct.APB2CLKDivider == RCC_HCLK_DIV1) ? 1 : 2;
+
+            // printf("apb1_timer_clocks: %u\r\n", apb1_timer_clocks);
+            // printf("apb2_timer_clocks: %u\r\n", apb2_timer_clocks);
+
+            if ((uint32_t)PAL.PWM_TIM[p]->Instance >= APB2PERIPH_BASE) {
+                timer_clock = apb2_timer_clocks;
+            } else if ((uint32_t)PAL.PWM_TIM[p]->Instance >= APB1PERIPH_BASE) {
+                timer_clock = apb1_timer_clocks;
+            }
+
+            for (uint32_t prescaler = 0; prescaler < 65536; prescaler++) {
+                for (uint32_t period = 0; period < 65536; period++) {
+                    if ((timer_clock / ((prescaler + 1) * (period + 1))) == frequency) {
+                        // printf("frequency: %u\r\n", (timer_clock / ((prescaler + 1) * (period + 1))));
+                        // printf("timer_clock: %u\r\n", timer_clock);
+                        // printf("prescaler: %u\r\n", prescaler + 1);
+                        // printf("period: %u\r\n", period + 1);
+                        __HAL_TIM_SET_PRESCALER(PAL.PWM_TIM[p], prescaler);
+                        __HAL_TIM_SET_AUTORELOAD(PAL.PWM_TIM[p], period);
+                        if (__HAL_TIM_GET_COUNTER(PAL.PWM_TIM[p]) >= __HAL_TIM_GET_AUTORELOAD(PAL.PWM_TIM[p])) {
+                            PAL.PWM_TIM[p]->Instance->EGR |= TIM_EGR_UG;
+                        }
+                        __HAL_TIM_SET_CLOCKDIVISION(PAL.PWM_TIM[p], TIM_CLOCKDIVISION_DIV1);
+                        return;
+                    } else if ((timer_clock / ((prescaler + 1) * (period + 1))) > frequency) {
+                        __HAL_TIM_SET_PRESCALER(PAL.PWM_TIM[p], prescaler);
+                        __HAL_TIM_SET_AUTORELOAD(PAL.PWM_TIM[p], period);
+                        if (__HAL_TIM_GET_COUNTER(PAL.PWM_TIM[p]) >= __HAL_TIM_GET_AUTORELOAD(PAL.PWM_TIM[p])) {
+                            PAL.PWM_TIM[p]->Instance->EGR |= TIM_EGR_UG;
+                        }
+                        __HAL_TIM_SET_CLOCKDIVISION(PAL.PWM_TIM[p], TIM_CLOCKDIVISION_DIV1);
+                        return;
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -264,7 +348,7 @@ uint32_t stm32halAbstractionLayer::uartGetRxDataSize(Peripheral_UART p) {
 void (*stm32halAbstractionLayer::_timerInterruptCallback[Peripheral_Interrupt::End_T])(void);
 
 void stm32halAbstractionLayer::_initTimerInterrupt() {
-    HAL_TIM_Base_Start(PAL.TimerInterrupt_TIM[MAL::Peripheral_Interrupt::T100us]);
+    HAL_TIM_Base_Start_IT(PAL.TimerInterrupt_TIM[MAL::Peripheral_Interrupt::T100us]);
 }
 
 void stm32halAbstractionLayer::interruptSetCallback(Peripheral_Interrupt p, void (*callback)(void)) {

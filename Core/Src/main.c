@@ -59,7 +59,11 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+#ifdef __GNUC__
+#define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
+#else
+#define PUTCHAR_PROTOTYPE int fputc(int ch, FILE* f)
+#endif /*__GNUC__*/
 /* USER CODE END 0 */
 
 /**
@@ -68,10 +72,12 @@ void SystemClock_Config(void);
   */
 int main(void)
 {
+
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
-/* Enable the CPU Cache */
+
+  /* Enable the CPU Cache */
 
   /* Enable I-Cache---------------------------------------------------------*/
   SCB_EnableICache();
@@ -179,7 +185,10 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-
+PUTCHAR_PROTOTYPE {
+    HAL_UART_Transmit(&huart3, (uint8_t*)&ch, 1, 0xFFFF);
+    return ch;
+}
 /* USER CODE END 4 */
 
 /**

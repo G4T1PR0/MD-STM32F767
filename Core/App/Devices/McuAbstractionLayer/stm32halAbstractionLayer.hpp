@@ -23,6 +23,7 @@ class stm32halAbstractionLayer : public baseMcuAbstractionLayer {
 
     // PWM
     virtual void pwmSetDuty(Peripheral_PWM p, float duty);
+    virtual void pwmSetFrequency(Peripheral_PWM p, uint32_t frequency);
 
     // Encoder
     virtual void encoderSetCnt(Peripheral_Encoder p, uint32_t cnt);
@@ -55,6 +56,7 @@ class stm32halAbstractionLayer : public baseMcuAbstractionLayer {
 
     // Timer PWM
     void _initPWM();
+    unsigned int _current_pwm_hz[Peripheral_PWM::End_P] = {0};
 
     // UART
     void _initUART();

@@ -26,12 +26,16 @@ class MotorController {
     void setMode(int mode);
 
     void setDuty(float duty);
+    float getDuty();
 
     void setCurrent(float current);
+    float getCurrent();
 
     void setVelocity(float velocity);
+    float getVelocity();
 
     void setAngle(float angle);
+    float getAngle();
 
    private:
     baseMotorDriver* _driver;
@@ -50,6 +54,10 @@ class MotorController {
 
     float _motorInputDuty;
     float _pidTargetCurrent;
+
+    float _observedCurrent = 0;
+    float _observedVelocity = 0;
+    float _observedAngle = 0;
 
     float _targetDuty;
     float _targetCurrent;

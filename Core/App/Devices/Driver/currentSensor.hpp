@@ -10,6 +10,7 @@
 
 #include <Devices/Driver/Interface/baseCurrentSensor.hpp>
 #include <Devices/McuAbstractionLayer/baseMcuAbstractionLayer.hpp>
+#include <Lib/MovingAverageFilter.hpp>
 
 class currentSensor : public baseCurrentSensor {
    public:
@@ -21,6 +22,8 @@ class currentSensor : public baseCurrentSensor {
    private:
     MAL* _mcu;
     MAL::Peripheral_ADC _p;
+    MovingAverageFilter<float, 60> _filter;
+
     const float _raw2voltage = 3.3f / (1 << 12);
     const float _voltage2current = 0.033f;
 };

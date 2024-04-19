@@ -8,6 +8,8 @@
 #ifndef APP_APP_MAIN_H_
 #define APP_APP_MAIN_H_
 
+#include "stdio.h"
+
 #ifdef __cplusplus
 extern "C" {
 void app_main();
