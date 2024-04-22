@@ -14,12 +14,14 @@
 struct PeripheralAllocation {
     enum STM_ADC {
         ADC_1,
+        ADC_2,
+        ADC_3,
         ADC_END
     };
 
     ADC_HandleTypeDef* ADC_Ins[ADC_END];
     STM_ADC ADC_Connected[MAL::Peripheral_ADC::End_A];
-    uint8_t ADC_RANK[MAL::Peripheral_ADC::End_A];
+    uint8_t ADC_RANK[ADC_END][MAL::Peripheral_ADC::End_A];
 
     TIM_HandleTypeDef* PWM_TIM[MAL::Peripheral_PWM::End_P];
     uint32_t PWM_CH[MAL::Peripheral_PWM::End_P];
@@ -39,22 +41,24 @@ static PeripheralAllocation PAL;
 stm32halAbstractionLayer::stm32halAbstractionLayer() {
     // ADC
     PAL.ADC_Ins[PeripheralAllocation::STM_ADC::ADC_1] = &hadc1;
+    PAL.ADC_Ins[PeripheralAllocation::STM_ADC::ADC_2] = &hadc2;
+    PAL.ADC_Ins[PeripheralAllocation::STM_ADC::ADC_3] = &hadc3;
 
-    PAL.ADC_Connected[MAL::Peripheral_ADC::FL_Current] = PeripheralAllocation::STM_ADC::ADC_1;
-    PAL.ADC_Connected[MAL::Peripheral_ADC::FR_Current] = PeripheralAllocation::STM_ADC::ADC_1;
-    PAL.ADC_Connected[MAL::Peripheral_ADC::ST_Current] = PeripheralAllocation::STM_ADC::ADC_1;
-    PAL.ADC_Connected[MAL::Peripheral_ADC::RL_Current] = PeripheralAllocation::STM_ADC::ADC_1;
-    PAL.ADC_Connected[MAL::Peripheral_ADC::RR_Current] = PeripheralAllocation::STM_ADC::ADC_1;
+    PAL.ADC_Connected[MAL::Peripheral_ADC::FL_Current] = PeripheralAllocation::STM_ADC::ADC_3;
+    PAL.ADC_Connected[MAL::Peripheral_ADC::FR_Current] = PeripheralAllocation::STM_ADC::ADC_3;
+    PAL.ADC_Connected[MAL::Peripheral_ADC::ST_Current] = PeripheralAllocation::STM_ADC::ADC_2;
+    PAL.ADC_Connected[MAL::Peripheral_ADC::RL_Current] = PeripheralAllocation::STM_ADC::ADC_2;
+    PAL.ADC_Connected[MAL::Peripheral_ADC::RR_Current] = PeripheralAllocation::STM_ADC::ADC_2;
     PAL.ADC_Connected[MAL::Peripheral_ADC::Batt_Voltage] = PeripheralAllocation::STM_ADC::ADC_1;
     PAL.ADC_Connected[MAL::Peripheral_ADC::ST_Volume] = PeripheralAllocation::STM_ADC::ADC_1;
 
-    PAL.ADC_RANK[MAL::Peripheral_ADC::FL_Current] = 0;
-    PAL.ADC_RANK[MAL::Peripheral_ADC::FR_Current] = 1;
-    PAL.ADC_RANK[MAL::Peripheral_ADC::ST_Current] = 2;
-    PAL.ADC_RANK[MAL::Peripheral_ADC::RL_Current] = 3;
-    PAL.ADC_RANK[MAL::Peripheral_ADC::RR_Current] = 4;
-    PAL.ADC_RANK[MAL::Peripheral_ADC::Batt_Voltage] = 5;
-    PAL.ADC_RANK[MAL::Peripheral_ADC::ST_Volume] = 6;
+    PAL.ADC_RANK[PAL.ADC_Connected[MAL::Peripheral_ADC::FL_Current]][MAL::Peripheral_ADC::FL_Current] = 0;
+    PAL.ADC_RANK[PAL.ADC_Connected[MAL::Peripheral_ADC::FR_Current]][MAL::Peripheral_ADC::FR_Current] = 1;
+    PAL.ADC_RANK[PAL.ADC_Connected[MAL::Peripheral_ADC::ST_Current]][MAL::Peripheral_ADC::ST_Current] = 4;
+    PAL.ADC_RANK[PAL.ADC_Connected[MAL::Peripheral_ADC::RL_Current]][MAL::Peripheral_ADC::RL_Current] = 5;
+    PAL.ADC_RANK[PAL.ADC_Connected[MAL::Peripheral_ADC::RR_Current]][MAL::Peripheral_ADC::RR_Current] = 6;
+    PAL.ADC_RANK[PAL.ADC_Connected[MAL::Peripheral_ADC::Batt_Voltage]][MAL::Peripheral_ADC::Batt_Voltage] = 0;
+    PAL.ADC_RANK[PAL.ADC_Connected[MAL::Peripheral_ADC::ST_Volume]][MAL::Peripheral_ADC::ST_Volume] = 1;
 
     // PWM
     PAL.PWM_TIM[MAL::Peripheral_PWM::FL_PWM] = &htim1;
@@ -157,32 +161,58 @@ void stm32halAbstractionLayer::init() {
 }
 
 // ADC
-uint16_t stm32halAbstractionLayer::_data[MAL::Peripheral_ADC::End_A * ADC_BUFFER_SIZE] = {0};
+uint16_t stm32halAbstractionLayer::_data[PAL.STM_ADC::ADC_END][3 * ADC_BUFFER_SIZE] = {0};
 
 void stm32halAbstractionLayer::_initADC(void) {
-    if (HAL_ADC_Start_DMA(PAL.ADC_Ins[PeripheralAllocation::STM_ADC::ADC_1], (uint32_t*)this->_data, sizeof(this->_data) / sizeof(uint16_t)) !=
+    if (HAL_ADC_Start_DMA(PAL.ADC_Ins[PeripheralAllocation::STM_ADC::ADC_1], (uint32_t*)this->_data[PeripheralAllocation::STM_ADC::ADC_1], 2 * ADC_BUFFER_SIZE) !=
         HAL_OK) {
         Error_Handler();
     }
     __HAL_DMA_DISABLE_IT(PAL.ADC_Ins[PeripheralAllocation::STM_ADC::ADC_1]->DMA_Handle, DMA_IT_TC | DMA_IT_HT);
 
-    HAL_ADCEx_InjectedStart(PAL.ADC_Ins[PeripheralAllocation::STM_ADC::ADC_1]);
+    if (HAL_ADC_Start_DMA(PAL.ADC_Ins[PeripheralAllocation::STM_ADC::ADC_2], (uint32_t*)this->_data[PeripheralAllocation::STM_ADC::ADC_2], 3 * ADC_BUFFER_SIZE) !=
+        HAL_OK) {
+        Error_Handler();
+    }
+    __HAL_DMA_DISABLE_IT(PAL.ADC_Ins[PeripheralAllocation::STM_ADC::ADC_2]->DMA_Handle, DMA_IT_TC | DMA_IT_HT);
+
+    if (HAL_ADC_Start_DMA(PAL.ADC_Ins[PeripheralAllocation::STM_ADC::ADC_3], (uint32_t*)this->_data[PeripheralAllocation::STM_ADC::ADC_3], 2 * ADC_BUFFER_SIZE) !=
+        HAL_OK) {
+        Error_Handler();
+    }
+    __HAL_DMA_DISABLE_IT(PAL.ADC_Ins[PeripheralAllocation::STM_ADC::ADC_3]->DMA_Handle, DMA_IT_TC | DMA_IT_HT);
 }
 
 uint16_t stm32halAbstractionLayer::adcGetValue(Peripheral_ADC p) {
     if (p != Peripheral_ADC::End_A) {
-        // if (p == Peripheral_ADC::FR_Current) {
-        //     return HAL_ADCEx_InjectedGetValue(PAL.ADC_Ins[PeripheralAllocation::STM_ADC::ADC_1], 1);
-        // }
-        return this->_data[PAL.ADC_RANK[p]];
+        return this->_data[PAL.ADC_Connected[p]][PAL.ADC_RANK[PAL.ADC_Connected[p]][p]];
     }
     return 0;
 }
 
 void stm32halAbstractionLayer::adcGetBufferValue(Peripheral_ADC p, uint16_t* buffer, uint16_t size) {
     if (p != Peripheral_ADC::End_A) {
-        for (int i = 0; i < size; i++) {
-            buffer[i] = this->_data[i * 7 + PAL.ADC_RANK[p]];
+        switch (PAL.ADC_Connected[p]) {
+            case PeripheralAllocation::STM_ADC::ADC_1:
+                for (int i = 0; i < size; i++) {
+                    buffer[i] = this->_data[PAL.ADC_Connected[p]][i * 2 + PAL.ADC_RANK[PAL.ADC_Connected[p]][p]];
+                }
+                break;
+
+            case PeripheralAllocation::STM_ADC::ADC_2:
+                for (int i = 0; i < size; i++) {
+                    buffer[i] = this->_data[PAL.ADC_Connected[p]][i * 3 + PAL.ADC_RANK[PAL.ADC_Connected[p]][p]];
+                }
+                break;
+
+            case PeripheralAllocation::STM_ADC::ADC_3:
+                for (int i = 0; i < size; i++) {
+                    buffer[i] = this->_data[PAL.ADC_Connected[p]][i * 2 + PAL.ADC_RANK[PAL.ADC_Connected[p]][p]];
+                }
+                break;
+
+            default:
+                break;
         }
     }
 }

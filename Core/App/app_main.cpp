@@ -83,7 +83,7 @@ void app_main() {
         switch (motor_mode) {
             case 0:
 
-                FR_Motor.setCurrent(0.1);
+                FR_Motor.setCurrent(0.2);
                 // FR_Motor.setDuty(0.2);
                 if (motor_debug_cnt > 10 * 1000) {
                     motor_debug_cnt = 0;
@@ -92,7 +92,7 @@ void app_main() {
                 break;
 
             case 1:
-                FR_Motor.setCurrent(0.5);
+                FR_Motor.setCurrent(1);
                 // FR_Motor.setCurrent(-0.1);
                 //  FR_Motor.setDuty(-0.2);
                 if (motor_debug_cnt > 10 * 1000) {
