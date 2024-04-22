@@ -23,8 +23,8 @@ MotorController::MotorController(baseMotorDriver* driver, baseCurrentSensor* cur
 
 void MotorController::init(void) {
     _mode = 0;
-    _current_pid.setPID(1.6, 0, 0);
-    _velocity_pid.setPID(0.00009, 0, 0);
+    _current_pid.setPID(3.2, 0, 0);
+    _velocity_pid.setPID(0.01, 0, 0);
 }
 
 void MotorController::update(MotorController* instance) {
@@ -59,6 +59,8 @@ void MotorController::_update(void) {
             } else if (_pidTargetCurrent < 0) {
                 if (_motorInputDuty > 0)
                     _motorInputDuty = 0;
+            } else if (_pidTargetCurrent == 0) {
+                _motorInputDuty = 0;
             }
             // if (_pidTargetCurrent < 0.001 && _pidTargetCurrent > -0.001) {
             //     _motorInputDuty = 0;
@@ -69,6 +71,15 @@ void MotorController::_update(void) {
 
         case 3:  // Motor Velocity Control
             _pidTargetCurrent = -_velocity_pid.update(_targetVelocity, _observedVelocity);
+            if (_targetVelocity > 0) {
+                if (_pidTargetCurrent > 0)
+                    _pidTargetCurrent = 0;
+            } else if (_targetVelocity < 0) {
+                if (_pidTargetCurrent < 0)
+                    _pidTargetCurrent = 0;
+            } else if (_targetVelocity == 0) {
+                _pidTargetCurrent = 0;
+            }
 
             _motorInputDuty = _current_pid.update(_pidTargetCurrent, _observedCurrent);
             if (_pidTargetCurrent > 0) {
@@ -77,11 +88,13 @@ void MotorController::_update(void) {
             } else if (_pidTargetCurrent < 0) {
                 if (_motorInputDuty > 0)
                     _motorInputDuty = 0;
-            }
-
-            if (_pidTargetCurrent < 0.001 && _pidTargetCurrent > -0.001) {
+            } else if (_pidTargetCurrent == 0) {
                 _motorInputDuty = 0;
             }
+            // if (_pidTargetCurrent < 0.001 && _pidTargetCurrent > -0.001) {
+            //     _motorInputDuty = 0;
+            // }
+
             _driver->setDuty(_motorInputDuty);
             break;
 
