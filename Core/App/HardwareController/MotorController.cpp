@@ -36,7 +36,11 @@ void MotorController::_update(void) {
     if (_isSteer) {
         _observedAngle = _steerAngle->getAngle();
     } else {
-        _observedVelocity = _encoder->getCount();
+        if (_isMotorConnectionReversed) {
+            _observedVelocity = -_encoder->getCount();
+        } else {
+            _observedVelocity = _encoder->getCount();
+        }
     }
     switch (_mode) {
         case 0:  // Motor OFF
@@ -70,12 +74,12 @@ void MotorController::_update(void) {
             break;
 
         case 3:  // Motor Velocity Control
-            _pidTargetCurrent = -_velocity_pid.update(_targetVelocity, _observedVelocity);
+            _pidTargetCurrent = _velocity_pid.update(_targetVelocity, _observedVelocity);
             if (_targetVelocity > 0) {
-                if (_pidTargetCurrent > 0)
+                if (_pidTargetCurrent < 0)
                     _pidTargetCurrent = 0;
             } else if (_targetVelocity < 0) {
-                if (_pidTargetCurrent < 0)
+                if (_pidTargetCurrent > 0)
                     _pidTargetCurrent = 0;
             } else if (_targetVelocity == 0) {
                 _pidTargetCurrent = 0;
@@ -126,35 +130,67 @@ void MotorController::setMode(int mode) {
 }
 
 void MotorController::setDuty(float duty) {
-    _targetDuty = duty;
+    if (_isMotorDirectionReversed) {
+        _targetDuty = -duty;
+    } else {
+        _targetDuty = duty;
+    }
 }
 
 float MotorController::getDuty() {
-    return _motorInputDuty;
+    if (_isMotorDirectionReversed) {
+        return -_motorInputDuty;
+    } else {
+        return _motorInputDuty;
+    }
 }
 
 void MotorController::setCurrent(float current) {
-    _targetCurrent = current;
+    if (_isMotorDirectionReversed) {
+        _targetCurrent = -current;
+    } else {
+        _targetCurrent = current;
+    }
 }
 
 float MotorController::getCurrent() {
-    return _observedCurrent;
+    if (_isMotorDirectionReversed) {
+        return -_observedCurrent;
+    } else {
+        return _observedCurrent;
+    }
 }
 
 float MotorController::getTargetCurrent() {
-    return _pidTargetCurrent;
+    if (_isMotorDirectionReversed) {
+        return -_pidTargetCurrent;
+    } else {
+        return _pidTargetCurrent;
+    }
 }
 
 void MotorController::setVelocity(float velocity) {
-    _targetVelocity = velocity;
+    if (_isMotorDirectionReversed) {
+        _targetVelocity = -velocity;
+    } else {
+        _targetVelocity = velocity;
+    }
 }
 
 float MotorController::getVelocity() {
-    return _observedVelocity;
+    if (_isMotorDirectionReversed) {
+        return -_observedVelocity;
+    } else {
+        return _observedVelocity;
+    }
 }
 
 float MotorController::getTargetVelocity() {
-    return _targetVelocity;
+    if (_isMotorDirectionReversed) {
+        return -_targetVelocity;
+    } else {
+        return _targetVelocity;
+    }
 }
 
 void MotorController::setAngle(float angle) {
@@ -167,4 +203,12 @@ float MotorController::getAngle() {
 
 float MotorController::getTargetAngle() {
     return _targetAngle;
+}
+
+void MotorController::setMotorConnectionReversed(bool isReversed) {
+    _isMotorConnectionReversed = isReversed;
+}
+
+void MotorController::setMotorDirection(bool d) {
+    _isMotorDirectionReversed = d;
 }

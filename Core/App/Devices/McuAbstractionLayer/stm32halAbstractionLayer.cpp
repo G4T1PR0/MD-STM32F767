@@ -54,15 +54,15 @@ stm32halAbstractionLayer::stm32halAbstractionLayer() {
 
     PAL.ADC_RANK[PAL.ADC_Connected[MAL::Peripheral_ADC::FL_Current]][MAL::Peripheral_ADC::FL_Current] = 0;
     PAL.ADC_RANK[PAL.ADC_Connected[MAL::Peripheral_ADC::FR_Current]][MAL::Peripheral_ADC::FR_Current] = 1;
-    PAL.ADC_RANK[PAL.ADC_Connected[MAL::Peripheral_ADC::ST_Current]][MAL::Peripheral_ADC::ST_Current] = 4;
-    PAL.ADC_RANK[PAL.ADC_Connected[MAL::Peripheral_ADC::RL_Current]][MAL::Peripheral_ADC::RL_Current] = 5;
-    PAL.ADC_RANK[PAL.ADC_Connected[MAL::Peripheral_ADC::RR_Current]][MAL::Peripheral_ADC::RR_Current] = 6;
+    PAL.ADC_RANK[PAL.ADC_Connected[MAL::Peripheral_ADC::ST_Current]][MAL::Peripheral_ADC::ST_Current] = 0;
+    PAL.ADC_RANK[PAL.ADC_Connected[MAL::Peripheral_ADC::RL_Current]][MAL::Peripheral_ADC::RL_Current] = 1;
+    PAL.ADC_RANK[PAL.ADC_Connected[MAL::Peripheral_ADC::RR_Current]][MAL::Peripheral_ADC::RR_Current] = 2;
     PAL.ADC_RANK[PAL.ADC_Connected[MAL::Peripheral_ADC::Batt_Voltage]][MAL::Peripheral_ADC::Batt_Voltage] = 0;
     PAL.ADC_RANK[PAL.ADC_Connected[MAL::Peripheral_ADC::ST_Volume]][MAL::Peripheral_ADC::ST_Volume] = 1;
 
     // PWM
     PAL.PWM_TIM[MAL::Peripheral_PWM::FL_PWM] = &htim1;
-    PAL.PWM_CH[MAL::Peripheral_PWM::FL_PWM] = TIM_CHANNEL_1;
+    PAL.PWM_CH[MAL::Peripheral_PWM::FL_PWM] = TIM_CHANNEL_4;
 
     PAL.PWM_TIM[MAL::Peripheral_PWM::FR_PWM] = &htim1;
     PAL.PWM_CH[MAL::Peripheral_PWM::FR_PWM] = TIM_CHANNEL_2;
@@ -71,7 +71,7 @@ stm32halAbstractionLayer::stm32halAbstractionLayer() {
     PAL.PWM_CH[MAL::Peripheral_PWM::ST_PWM] = TIM_CHANNEL_3;
 
     PAL.PWM_TIM[MAL::Peripheral_PWM::RL_PWM] = &htim1;
-    PAL.PWM_CH[MAL::Peripheral_PWM::RL_PWM] = TIM_CHANNEL_4;
+    PAL.PWM_CH[MAL::Peripheral_PWM::RL_PWM] = TIM_CHANNEL_1;
 
     PAL.PWM_TIM[MAL::Peripheral_PWM::RR_PWM] = &htim12;
     PAL.PWM_CH[MAL::Peripheral_PWM::RR_PWM] = TIM_CHANNEL_1;

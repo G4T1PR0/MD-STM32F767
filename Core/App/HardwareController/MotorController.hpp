@@ -40,6 +40,9 @@ class MotorController {
     float getAngle();
     float getTargetAngle();
 
+    void setMotorConnectionReversed(bool isReversed);
+    void setMotorDirection(bool d);
+
    private:
     baseMotorDriver* _driver;
     baseCurrentSensor* _current;
@@ -66,6 +69,9 @@ class MotorController {
     float _targetCurrent;
     float _targetVelocity;
     float _targetAngle;
+
+    bool _isMotorConnectionReversed = 0;
+    bool _isMotorDirectionReversed = 0;
 };
 
 #endif /* APP_HARDWARECONTROLLER_MOTORCONTROLLER_HPP_ */

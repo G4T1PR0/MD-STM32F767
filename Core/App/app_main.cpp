@@ -25,6 +25,12 @@ unsigned int debug_cnt = 0;
 
 unsigned int motor_debug_cnt = 0;
 
+#define DEBUG_LOG_NUM 10000
+
+static volatile float debug_log[DEBUG_LOG_NUM][5] = {0};
+unsigned int log_mode = 0;
+unsigned int log_cnt = 0;
+
 void app_init() {
     devices.init();
 
@@ -59,11 +65,17 @@ void app_main() {
 
     unsigned int led_mode = 0;
 
-    unsigned int motor_mode = 0;
+    unsigned int motor_mode = 1;
 
     devices.mcu->pwmSetFrequency(MAL::Peripheral_PWM::FR_PWM, 50000);
+    devices.mcu->pwmSetFrequency(MAL::Peripheral_PWM::RR_PWM, 50000);
+
+    log_mode = 1;
+    RL_Motor.setMotorConnectionReversed(true);
+    RL_Motor.setMode(3);
+
     while (1) {
-        float d = FR_Motor.getDuty();
+        float d = RL_Motor.getDuty();
         if (d < 0) {
             d = -d;
         }
@@ -78,27 +90,42 @@ void app_main() {
             }
         }
 
-        FR_Motor.setMode(3);
+        if (log_mode == 0) {
+            motor_mode = 0;
+            log_mode = 2;
+        }
 
         switch (motor_mode) {
             case 0:
-                FR_Motor.setVelocity(500);
-                // FR_Motor.setCurrent(0.1);
-                //   FR_Motor.setDuty(0.2);
+                RL_Motor.setMode(0);
+                printf("DEBUG_LOG\r\n\r\n\r\n\r\n");
+                for (int i = 0; i < DEBUG_LOG_NUM; i++) {
+                    printf("%f, %f, %f, %f, %f\r\n", debug_log[i][0], debug_log[i][1], debug_log[i][2], debug_log[i][3], debug_log[i][4]);
+                }
+                motor_mode = 10;
+
+                break;
+            case 1:
+                RL_Motor.setVelocity(500);
+                // RL_Motor.setCurrent(0.1);
+                //  RL_Motor.setDuty(0.01);
+                if (motor_debug_cnt > 10 * 2000) {
+                    motor_debug_cnt = 0;
+                    motor_mode = 2;
+                }
+                break;
+
+            case 2:
+                RL_Motor.setVelocity(300);
+                // RL_Motor.setCurrent(-0.1);
+                //  RL_Motor.setDuty(-0.01);
                 if (motor_debug_cnt > 10 * 2000) {
                     motor_debug_cnt = 0;
                     motor_mode = 1;
                 }
                 break;
 
-            case 1:
-                FR_Motor.setVelocity(-500);
-                // FR_Motor.setCurrent(-0.1);
-                //   FR_Motor.setDuty(-0.2);
-                if (motor_debug_cnt > 10 * 2000) {
-                    motor_debug_cnt = 0;
-                    motor_mode = 0;
-                }
+            case 10:
                 break;
 
             default:
@@ -131,9 +158,22 @@ void app_main() {
         //     }
         // }
 
+        // if (log_mode == 1) {
+        //     debug_log[log_cnt][0] = RL_Motor.getDuty();
+        //     debug_log[log_cnt][1] = RL_Motor.getTargetCurrent();
+        //     debug_log[log_cnt][2] = RL_Motor.getCurrent();
+        //     debug_log[log_cnt][3] = RL_Motor.getTargetVelocity();
+        //     debug_log[log_cnt][4] = RL_Motor.getVelocity();
+        //     log_cnt++;
+        //     if (log_cnt >= DEBUG_LOG_NUM) {
+        //         log_mode = 0;
+        //     }
+        // }
+
         if (debug_cnt > 100 * 10) {
             debug_cnt = 0;
-            printf("duty: %f t_current: %f o_current: %f t_velocity: %f o_velocity: %f\r\n", FR_Motor.getDuty(), FR_Motor.getTargetCurrent(), FR_Motor.getCurrent(), FR_Motor.getTargetVelocity(), FR_Motor.getVelocity());
+            printf("cnt: %d duty: %f t_current: %f o_current: %f t_velocity: %f o_velocity: %f\r\n", log_cnt, RL_Motor.getDuty(), RL_Motor.getTargetCurrent(), RL_Motor.getCurrent(), RL_Motor.getTargetVelocity(), RL_Motor.getVelocity());
+            // printf("duty: %f t_current: %f o_current: %f t_velocity: %f o_velocity: %f\r\n", debug_log[log_cnt][0], debug_log[log_cnt][1], debug_log[log_cnt][2], debug_log[log_cnt][3], debug_log[log_cnt][4]);
         }
     }
 }
@@ -151,6 +191,19 @@ void app_interrupt_100us() {
     MotorController::update(&ST_Motor);
     MotorController::update(&RL_Motor);
     MotorController::update(&RR_Motor);
+
+    // if (log_mode == 1) {
+    //     debug_log[log_cnt][0] = FR_Motor.getDuty();
+    //     debug_log[log_cnt][1] = FR_Motor.getTargetCurrent();
+    //     debug_log[log_cnt][2] = FR_Motor.getCurrent();
+    //     debug_log[log_cnt][3] = FR_Motor.getTargetVelocity();
+    //     debug_log[log_cnt][4] = FR_Motor.getVelocity();
+    //     log_cnt++;
+    //     if (log_cnt >= DEBUG_LOG_NUM) {
+    //         log_mode = 0;
+    //     }
+    // }
+
     debug_cnt++;
     motor_debug_cnt++;
 }
