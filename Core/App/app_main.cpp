@@ -71,8 +71,16 @@ void app_main() {
     devices.mcu->pwmSetFrequency(MAL::Peripheral_PWM::RR_PWM, 50000);
 
     log_mode = 1;
+    FL_Motor.setMotorConnectionReversed(true);
+    FL_Motor.setMode(3);
+    ST_Motor.setMotorConnectionReversed(true);
+    ST_Motor.setMode(2);
+    FR_Motor.setMotorConnectionReversed(true);
+    FR_Motor.setMode(3);
     RL_Motor.setMotorConnectionReversed(true);
     RL_Motor.setMode(3);
+    RR_Motor.setMotorConnectionReversed(true);
+    RR_Motor.setMode(3);
 
     while (1) {
         float d = RL_Motor.getDuty();
@@ -81,7 +89,7 @@ void app_main() {
         }
 
         float dd = 0;
-        for (unsigned int i = 9; 0 < i; i--) {
+        for (int i = 9; -1 < i; i--) {
             dd += 0.1;
             if (dd > d) {
                 devices.mcu->gpioSetValue(led[i], 1);
@@ -133,7 +141,7 @@ void app_main() {
         }
 
         // led_cnt++;
-        // if (led_cnt > 6000) {
+        // if (led_cnt > 1000) {
         //     led_cnt = 0;
         //     if (led_mode == 0) {
         //         led_index++;
@@ -155,18 +163,6 @@ void app_main() {
         // for (unsigned int i = 0; i < 10; i++) {
         //     if (devices.mcu->gpioGetValue(led[i]) == 0 && i != led_index) {
         //         devices.mcu->gpioSetValue(led[i], 1);
-        //     }
-        // }
-
-        // if (log_mode == 1) {
-        //     debug_log[log_cnt][0] = RL_Motor.getDuty();
-        //     debug_log[log_cnt][1] = RL_Motor.getTargetCurrent();
-        //     debug_log[log_cnt][2] = RL_Motor.getCurrent();
-        //     debug_log[log_cnt][3] = RL_Motor.getTargetVelocity();
-        //     debug_log[log_cnt][4] = RL_Motor.getVelocity();
-        //     log_cnt++;
-        //     if (log_cnt >= DEBUG_LOG_NUM) {
-        //         log_mode = 0;
         //     }
         // }
 
