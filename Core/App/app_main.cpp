@@ -6,9 +6,15 @@
  */
 
 #include <app_main.h>
-#include <HardwareController/MotorController.hpp>
 
-Devices devices;
+#include <Devices/Driver/A3921.hpp>
+#include <Devices/Driver/batteryVoltageSensor.hpp>
+#include <Devices/Driver/currentSensor.hpp>
+#include <Devices/Driver/encoder.hpp>
+#include <Devices/Driver/steerAngleSensor.hpp>
+#include <Devices/McuAbstractionLayer/stm32halAbstractionLayer.hpp>
+
+#include <HardwareController/MotorController.hpp>
 
 stm32halAbstractionLayer mcu;
 

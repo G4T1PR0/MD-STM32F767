@@ -8,7 +8,6 @@
 #ifndef APP_HARDWARECONTROLLER_MOTORCONTROLLER_HPP_
 #define APP_HARDWARECONTROLLER_MOTORCONTROLLER_HPP_
 
-#include <Devices/Devices.hpp>
 #include <Devices/Driver/Interface/baseCurrentSensor.hpp>
 #include <Devices/Driver/Interface/baseEncoder.hpp>
 #include <Devices/Driver/Interface/baseMotorDriver.hpp>
