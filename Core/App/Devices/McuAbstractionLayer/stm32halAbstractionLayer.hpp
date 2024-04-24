@@ -20,32 +20,32 @@ class stm32halAbstractionLayer : public baseMcuAbstractionLayer {
     virtual void init(void);
 
     // ADC
-    virtual uint16_t adcGetValue(Peripheral_ADC p);
-    virtual void adcGetBufferValue(Peripheral_ADC p, uint16_t* buffer, uint16_t size);
+    virtual uint16_t adcGetValue(P_ADC p);
+    virtual void adcGetBufferValue(P_ADC p, uint16_t* buffer, uint16_t size);
 
     // PWM
-    virtual void pwmSetDuty(Peripheral_PWM p, float duty);
-    virtual void pwmSetFrequency(Peripheral_PWM p, uint32_t frequency);
+    virtual void pwmSetDuty(P_PWM p, float duty);
+    virtual void pwmSetFrequency(P_PWM p, uint32_t frequency);
 
     // Encoder
-    virtual void encoderSetCnt(Peripheral_Encoder p, uint32_t cnt);
-    virtual uint32_t encoderGetCnt(Peripheral_Encoder p);
+    virtual void encoderSetCnt(P_Encoder p, uint32_t cnt);
+    virtual uint32_t encoderGetCnt(P_Encoder p);
 
     // GPIO
-    virtual void gpioSetValue(Peripheral_GPIO p, bool value);
-    virtual bool gpioGetValue(Peripheral_GPIO p);
+    virtual void gpioSetValue(P_GPIO p, bool value);
+    virtual bool gpioGetValue(P_GPIO p);
 
     // UART
-    virtual void uartPutChar(Peripheral_UART p, uint8_t data);
-    virtual uint8_t uartGetChar(Peripheral_UART p);
+    virtual void uartPutChar(P_UART p, uint8_t data);
+    virtual uint8_t uartGetChar(P_UART p);
 
-    virtual void uartWriteViaBuffer(Peripheral_UART p, uint8_t* data, uint32_t size);
-    virtual void uartReadViaBuffer(Peripheral_UART p, uint8_t* data, uint32_t size);
-    virtual uint32_t uartGetRxDataSize(Peripheral_UART p);
+    virtual void uartWriteViaBuffer(P_UART p, uint8_t* data, uint32_t size);
+    virtual void uartReadViaBuffer(P_UART p, uint8_t* data, uint32_t size);
+    virtual uint32_t uartGetRxDataSize(P_UART p);
 
     // Interrupt
-    virtual void interruptSetCallback(Peripheral_Interrupt p, void (*callback)(void));
-    static void (*_timerInterruptCallback[Peripheral_Interrupt::End_T])(void);
+    virtual void interruptSetCallback(P_Interrupt p, void (*callback)(void));
+    static void (*_timerInterruptCallback[P_Interrupt::End_T])(void);
 
    private:
     // ADC
@@ -58,13 +58,13 @@ class stm32halAbstractionLayer : public baseMcuAbstractionLayer {
 
     // Timer PWM
     void _initPWM();
-    unsigned int _current_pwm_hz[Peripheral_PWM::End_P] = {0};
+    unsigned int _current_pwm_hz[P_PWM::End_P] = {0};
 
     // UART
     void _initUART();
-    uint32_t _uartGetRxBufferDmaWriteAddress(Peripheral_UART p);
-    static RingBuffer<uint8_t, UART_BUFFER_SIZE> _uartRxBuffer[Peripheral_UART::End_U];
-    uint32_t _uartRxBufferReadAddress[Peripheral_UART::End_U] = {0};
+    uint32_t _uartGetRxBufferDmaWriteAddress(P_UART p);
+    static RingBuffer<uint8_t, UART_BUFFER_SIZE> _uartRxBuffer[P_UART::End_U];
+    uint32_t _uartRxBufferReadAddress[P_UART::End_U] = {0};
 
     // Interrupt
     void _initTimerInterrupt();

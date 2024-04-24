@@ -13,7 +13,7 @@
 
 class steerAngleSensor : public baseSteerAngleSensor {
    public:
-    steerAngleSensor(MAL* mcu, MAL::Peripheral_ADC p);
+    steerAngleSensor(MAL* mcu, MAL::P_ADC p);
 
     virtual void init();
     virtual void update();
@@ -21,7 +21,7 @@ class steerAngleSensor : public baseSteerAngleSensor {
 
    private:
     MAL* _mcu;
-    MAL::Peripheral_ADC _p;
+    MAL::P_ADC _p;
     const float _raw2angle = 0.1;
 };
 

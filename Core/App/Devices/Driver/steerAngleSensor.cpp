@@ -7,7 +7,7 @@
 
 #include <Devices/Driver/steerAngleSensor.hpp>
 
-steerAngleSensor::steerAngleSensor(MAL* mcu, MAL::Peripheral_ADC p) {
+steerAngleSensor::steerAngleSensor(MAL* mcu, MAL::P_ADC p) {
     _mcu = mcu;
     _p = p;
 }

@@ -7,7 +7,7 @@
 
 #include <Devices/Driver/batteryVoltageSensor.hpp>
 
-batteryVoltageSensor::batteryVoltageSensor(MAL* mcu, MAL::Peripheral_ADC p) {
+batteryVoltageSensor::batteryVoltageSensor(MAL* mcu, MAL::P_ADC p) {
     _mcu = mcu;
     _p = p;
 }

@@ -14,14 +14,14 @@
 
 class currentSensor : public baseCurrentSensor {
    public:
-    currentSensor(MAL* mcu, MAL::Peripheral_ADC p);
+    currentSensor(MAL* mcu, MAL::P_ADC p);
     virtual void init();
     virtual void update();
     virtual float getCurrent();
 
    private:
     MAL* _mcu;
-    MAL::Peripheral_ADC _p;
+    MAL::P_ADC _p;
     MovingAverageFilter<float, 10> _filter;
 
     const float _raw2voltage = 3.3f / (1 << 12);

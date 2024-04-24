@@ -7,7 +7,7 @@
 
 #include <Devices/Driver/A3921.hpp>
 
-A3921::A3921(MAL* mcu, MAL::Peripheral_PWM pwm, MAL::Peripheral_GPIO phase, MAL::Peripheral_GPIO sr) {
+A3921::A3921(MAL* mcu, MAL::P_PWM pwm, MAL::P_GPIO phase, MAL::P_GPIO sr) {
     _mcu = mcu;
     _pwm = pwm;
     _phase = phase;

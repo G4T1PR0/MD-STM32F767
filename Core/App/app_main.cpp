@@ -18,25 +18,25 @@
 
 stm32halAbstractionLayer mcu;
 
-currentSensor fl_current(&mcu, MAL::Peripheral_ADC::FL_Current);
-currentSensor fr_current(&mcu, MAL::Peripheral_ADC::FR_Current);
-currentSensor st_current(&mcu, MAL::Peripheral_ADC::ST_Current);
-currentSensor rl_current(&mcu, MAL::Peripheral_ADC::RL_Current);
-currentSensor rr_current(&mcu, MAL::Peripheral_ADC::RR_Current);
+currentSensor fl_current(&mcu, MAL::P_ADC::FL_Current);
+currentSensor fr_current(&mcu, MAL::P_ADC::FR_Current);
+currentSensor st_current(&mcu, MAL::P_ADC::ST_Current);
+currentSensor rl_current(&mcu, MAL::P_ADC::RL_Current);
+currentSensor rr_current(&mcu, MAL::P_ADC::RR_Current);
 
-batteryVoltageSensor batt_voltage(&mcu, MAL::Peripheral_ADC::Batt_Voltage);
-steerAngleSensor steer_angle(&mcu, MAL::Peripheral_ADC::ST_Volume);
+batteryVoltageSensor batt_voltage(&mcu, MAL::P_ADC::Batt_Voltage);
+steerAngleSensor steer_angle(&mcu, MAL::P_ADC::ST_Volume);
 
-Encoder fl_encoder(&mcu, MAL::Peripheral_Encoder::FL_Encoder);
-Encoder fr_encoder(&mcu, MAL::Peripheral_Encoder::FR_Encoder);
-Encoder rl_encoder(&mcu, MAL::Peripheral_Encoder::RL_Encoder);
-Encoder rr_encoder(&mcu, MAL::Peripheral_Encoder::RR_Encoder);
+Encoder fl_encoder(&mcu, MAL::P_Encoder::FL_Encoder);
+Encoder fr_encoder(&mcu, MAL::P_Encoder::FR_Encoder);
+Encoder rl_encoder(&mcu, MAL::P_Encoder::RL_Encoder);
+Encoder rr_encoder(&mcu, MAL::P_Encoder::RR_Encoder);
 
-A3921 fl_driver(&mcu, MAL::Peripheral_PWM::FL_PWM, MAL::Peripheral_GPIO::FL_PHASE, MAL::Peripheral_GPIO::FL_SR);
-A3921 fr_driver(&mcu, MAL::Peripheral_PWM::FR_PWM, MAL::Peripheral_GPIO::FR_PHASE, MAL::Peripheral_GPIO::FR_SR);
-A3921 st_driver(&mcu, MAL::Peripheral_PWM::ST_PWM, MAL::Peripheral_GPIO::ST_PHASE, MAL::Peripheral_GPIO::ST_SR);
-A3921 rl_driver(&mcu, MAL::Peripheral_PWM::RL_PWM, MAL::Peripheral_GPIO::RL_PHASE, MAL::Peripheral_GPIO::RL_SR);
-A3921 rr_driver(&mcu, MAL::Peripheral_PWM::RR_PWM, MAL::Peripheral_GPIO::RR_PHASE, MAL::Peripheral_GPIO::RR_SR);
+A3921 fl_driver(&mcu, MAL::P_PWM::FL_PWM, MAL::P_GPIO::FL_PHASE, MAL::P_GPIO::FL_SR);
+A3921 fr_driver(&mcu, MAL::P_PWM::FR_PWM, MAL::P_GPIO::FR_PHASE, MAL::P_GPIO::FR_SR);
+A3921 st_driver(&mcu, MAL::P_PWM::ST_PWM, MAL::P_GPIO::ST_PHASE, MAL::P_GPIO::ST_SR);
+A3921 rl_driver(&mcu, MAL::P_PWM::RL_PWM, MAL::P_GPIO::RL_PHASE, MAL::P_GPIO::RL_SR);
+A3921 rr_driver(&mcu, MAL::P_PWM::RR_PWM, MAL::P_GPIO::RR_PHASE, MAL::P_GPIO::RR_SR);
 
 MotorController FL_Motor(&fl_driver, &fl_current, &fl_encoder);
 MotorController FR_Motor(&fr_driver, &fr_current, &fr_encoder);
@@ -79,20 +79,20 @@ void app_init() {
     RL_Motor.init();
     RR_Motor.init();
 
-    mcu.interruptSetCallback(MAL::Peripheral_Interrupt::T100us, &app_interrupt_100us);
+    mcu.interruptSetCallback(MAL::P_Interrupt::T100us, &app_interrupt_100us);
 }
 
-MAL::Peripheral_GPIO led[]{
-    MAL::Peripheral_GPIO::LED_1,
-    MAL::Peripheral_GPIO::LED_2,
-    MAL::Peripheral_GPIO::LED_3,
-    MAL::Peripheral_GPIO::LED_4,
-    MAL::Peripheral_GPIO::LED_5,
-    MAL::Peripheral_GPIO::LED_6,
-    MAL::Peripheral_GPIO::LED_7,
-    MAL::Peripheral_GPIO::LED_8,
-    MAL::Peripheral_GPIO::LED_9,
-    MAL::Peripheral_GPIO::LED_10,
+MAL::P_GPIO led[]{
+    MAL::P_GPIO::LED_1,
+    MAL::P_GPIO::LED_2,
+    MAL::P_GPIO::LED_3,
+    MAL::P_GPIO::LED_4,
+    MAL::P_GPIO::LED_5,
+    MAL::P_GPIO::LED_6,
+    MAL::P_GPIO::LED_7,
+    MAL::P_GPIO::LED_8,
+    MAL::P_GPIO::LED_9,
+    MAL::P_GPIO::LED_10,
 };
 
 void app_main() {
@@ -106,8 +106,8 @@ void app_main() {
 
     unsigned int motor_mode = 1;
 
-    mcu.pwmSetFrequency(MAL::Peripheral_PWM::FR_PWM, 50000);
-    mcu.pwmSetFrequency(MAL::Peripheral_PWM::RR_PWM, 50000);
+    mcu.pwmSetFrequency(MAL::P_PWM::FR_PWM, 50000);
+    mcu.pwmSetFrequency(MAL::P_PWM::RR_PWM, 50000);
 
     log_mode = 1;
     FL_Motor.setMotorConnectionReversed(true);

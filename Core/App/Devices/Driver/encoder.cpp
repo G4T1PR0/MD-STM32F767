@@ -7,7 +7,7 @@
 
 #include <Devices/Driver/encoder.hpp>
 
-Encoder::Encoder(MAL* mcu, MAL::Peripheral_Encoder p) {
+Encoder::Encoder(MAL* mcu, MAL::P_Encoder p) {
     _mcu = mcu;
     _p = p;
 }

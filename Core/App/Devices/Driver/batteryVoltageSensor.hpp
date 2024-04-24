@@ -13,7 +13,7 @@
 
 class batteryVoltageSensor : public baseBatteryVoltageSensor {
    public:
-    batteryVoltageSensor(MAL* mcu, MAL::Peripheral_ADC p);
+    batteryVoltageSensor(MAL* mcu, MAL::P_ADC p);
 
     virtual void init();
     virtual void update();
@@ -21,7 +21,7 @@ class batteryVoltageSensor : public baseBatteryVoltageSensor {
 
    private:
     MAL* _mcu;
-    MAL::Peripheral_ADC _p;
+    MAL::P_ADC _p;
 
     const float _raw2voltage = 3.3f / (1 << 12);
     const float _voltage2batt = 16 / 3.3;

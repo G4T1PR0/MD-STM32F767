@@ -13,7 +13,7 @@
 
 class Encoder : public baseEncoder {
    public:
-    Encoder(MAL* mcu, MAL::Peripheral_Encoder p);
+    Encoder(MAL* mcu, MAL::P_Encoder p);
 
     virtual void init();
     virtual void update();
@@ -23,7 +23,7 @@ class Encoder : public baseEncoder {
 
    private:
     MAL* _mcu;
-    MAL::Peripheral_Encoder _p;
+    MAL::P_Encoder _p;
 
     const uint32_t _offset = 32767;
     int32_t _cnt;

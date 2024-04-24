@@ -7,7 +7,7 @@
 
 #include <Devices/Driver/currentSensor.hpp>
 
-currentSensor::currentSensor(MAL* mcu, MAL::Peripheral_ADC p) {
+currentSensor::currentSensor(MAL* mcu, MAL::P_ADC p) {
     _mcu = mcu;
     _p = p;
 }

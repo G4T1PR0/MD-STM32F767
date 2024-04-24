@@ -12,7 +12,7 @@
 
 class baseMcuAbstractionLayer {
    public:
-    enum Peripheral_ADC {
+    enum P_ADC {
         FL_Current,
         FR_Current,
         ST_Current,
@@ -23,7 +23,7 @@ class baseMcuAbstractionLayer {
         End_A,
     };
 
-    enum Peripheral_PWM {
+    enum P_PWM {
         FL_PWM,
         FR_PWM,
         ST_PWM,
@@ -32,7 +32,7 @@ class baseMcuAbstractionLayer {
         End_P,
     };
 
-    enum Peripheral_Encoder {
+    enum P_Encoder {
         FL_Encoder,
         FR_Encoder,
         RL_Encoder,
@@ -40,7 +40,7 @@ class baseMcuAbstractionLayer {
         End_E,
     };
 
-    enum Peripheral_GPIO {
+    enum P_GPIO {
         FL_PHASE,
         FL_SR,
         FR_PHASE,
@@ -64,13 +64,13 @@ class baseMcuAbstractionLayer {
         End_G,
     };
 
-    enum Peripheral_UART {
+    enum P_UART {
         Controller,
         Debug,
         End_U,
     };
 
-    enum Peripheral_Interrupt {
+    enum P_Interrupt {
         T100us,
         End_T
     };
@@ -78,30 +78,30 @@ class baseMcuAbstractionLayer {
     virtual void init(void) = 0;
 
     // ADC
-    virtual uint16_t adcGetValue(Peripheral_ADC p) = 0;
-    virtual void adcGetBufferValue(Peripheral_ADC p, uint16_t* buffer, uint16_t size) = 0;
+    virtual uint16_t adcGetValue(P_ADC p) = 0;
+    virtual void adcGetBufferValue(P_ADC p, uint16_t* buffer, uint16_t size) = 0;
 
     // PWM
-    virtual void pwmSetDuty(Peripheral_PWM p, float duty) = 0;
-    virtual void pwmSetFrequency(Peripheral_PWM p, uint32_t frequency) = 0;
+    virtual void pwmSetDuty(P_PWM p, float duty) = 0;
+    virtual void pwmSetFrequency(P_PWM p, uint32_t frequency) = 0;
 
     // Encoder
-    virtual void encoderSetCnt(Peripheral_Encoder p, uint32_t cnt) = 0;
-    virtual uint32_t encoderGetCnt(Peripheral_Encoder p) = 0;
+    virtual void encoderSetCnt(P_Encoder p, uint32_t cnt) = 0;
+    virtual uint32_t encoderGetCnt(P_Encoder p) = 0;
 
     // GPIO
-    virtual void gpioSetValue(Peripheral_GPIO p, bool value) = 0;
-    virtual bool gpioGetValue(Peripheral_GPIO p) = 0;
+    virtual void gpioSetValue(P_GPIO p, bool value) = 0;
+    virtual bool gpioGetValue(P_GPIO p) = 0;
 
     // UART
-    virtual void uartPutChar(Peripheral_UART p, uint8_t data) = 0;
-    virtual uint8_t uartGetChar(Peripheral_UART p) = 0;
-    virtual void uartWriteViaBuffer(Peripheral_UART p, uint8_t* data, uint32_t size) = 0;
-    virtual void uartReadViaBuffer(Peripheral_UART p, uint8_t* data, uint32_t size) = 0;
-    virtual uint32_t uartGetRxDataSize(Peripheral_UART p) = 0;
+    virtual void uartPutChar(P_UART p, uint8_t data) = 0;
+    virtual uint8_t uartGetChar(P_UART p) = 0;
+    virtual void uartWriteViaBuffer(P_UART p, uint8_t* data, uint32_t size) = 0;
+    virtual void uartReadViaBuffer(P_UART p, uint8_t* data, uint32_t size) = 0;
+    virtual uint32_t uartGetRxDataSize(P_UART p) = 0;
 
     // Interrupt
-    virtual void interruptSetCallback(Peripheral_Interrupt p, void (*callback)(void)) = 0;
+    virtual void interruptSetCallback(P_Interrupt p, void (*callback)(void)) = 0;
 };
 
 typedef baseMcuAbstractionLayer MAL;
