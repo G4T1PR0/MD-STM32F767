@@ -31,7 +31,7 @@ void MotorController::update(MotorController* instance) {
     instance->_update();
 }
 
-void MotorController::_update(void) {
+void inline MotorController::_update(void) {
     _observedCurrent = _current->getCurrent();
     if (_isSteer) {
         _observedAngle = _steerAngle->getAngle();
