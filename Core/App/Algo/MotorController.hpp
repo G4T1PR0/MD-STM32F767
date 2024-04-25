@@ -5,8 +5,8 @@
  *      Author: G4T1PR0
  */
 
-#ifndef APP_HARDWARECONTROLLER_MOTORCONTROLLER_HPP_
-#define APP_HARDWARECONTROLLER_MOTORCONTROLLER_HPP_
+#ifndef APP_ALGO_MOTORCONTROLLER_HPP_
+#define APP_ALGO_MOTORCONTROLLER_HPP_
 
 #include <Devices/Driver/Interface/baseCurrentSensor.hpp>
 #include <Devices/Driver/Interface/baseEncoder.hpp>
@@ -23,6 +23,7 @@ class MotorController {
     static void update(MotorController* instance);
 
     void setMode(int mode);
+    int getMode();
 
     void setDuty(float duty);
     float getDuty();
@@ -73,4 +74,4 @@ class MotorController {
     bool _isMotorDirectionReversed = 0;
 };
 
-#endif /* APP_HARDWARECONTROLLER_MOTORCONTROLLER_HPP_ */
+#endif /* APP_ALGO_MOTORCONTROLLER_HPP_ */

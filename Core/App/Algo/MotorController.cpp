@@ -5,7 +5,7 @@
  *      Author: G4T1PR0
  */
 
-#include <HardwareController/MotorController.hpp>
+#include <Algo/MotorController.hpp>
 
 MotorController::MotorController(baseMotorDriver* driver, baseCurrentSensor* currentSensor, baseEncoder* encoder) {
     _driver = driver;
@@ -127,6 +127,10 @@ void MotorController::setMode(int mode) {
     } else {
         _mode = mode;
     }
+}
+
+int MotorController::getMode() {
+    return _mode;
 }
 
 void MotorController::setDuty(float duty) {
