@@ -9,6 +9,7 @@
 #include <cstring>
 
 CommandReciever::CommandReciever(baseMcuAbstractionLayer* mcu, std::vector<MotorController*> mcs) {
+    _mcu = mcu;
     _mcs = mcs;
 }
 
@@ -81,4 +82,6 @@ void CommandReciever::update() {
         };
         i++;
     }
+
+    _mcu->uartReadViaBuffer(MAL::P_UART::Controller, _rx_buffer, CMD_BUFFER_SIZE);
 }

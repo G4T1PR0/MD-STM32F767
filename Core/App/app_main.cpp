@@ -52,7 +52,7 @@ CommandReciever cmd(&mcu, mcs);
 void app_interrupt_100us();
 
 unsigned int led_cnt = 0;
-unsigned int led_index = 0;
+int led_index = 0;
 
 unsigned int debug_cnt = 0;
 
@@ -117,32 +117,44 @@ void app_main() {
     mcu.pwmSetFrequency(MAL::P_PWM::RR_PWM, 50000);
 
     log_mode = 1;
-    FL_Motor.setMotorConnectionReversed(true);
+    FL_Motor.setMotorDirection(false);
     FL_Motor.setMode(0);
-    ST_Motor.setMotorConnectionReversed(true);
+    // FL_Motor.setMode(2);
+    // FL_Motor.setCurrent(0.6);
+    //  FL_Motor.setDuty(0.01);
+
+    ST_Motor.setMotorDirection(true);
     ST_Motor.setMode(0);
-    FR_Motor.setMotorConnectionReversed(true);
+
+    FR_Motor.setMotorDirection(true);
     FR_Motor.setMode(0);
-    RL_Motor.setMotorConnectionReversed(true);
-    RL_Motor.setMode(0);
-    RR_Motor.setMotorConnectionReversed(true);
+    // FR_Motor.setDuty(0.01);
+
+    RL_Motor.setMotorDirection(true);
+    RL_Motor.setMode(2);
+    // RL_Motor.setDuty(0.01);
+
+    RR_Motor.setMotorDirection(false);
     RR_Motor.setMode(0);
+    // RR_Motor.setDuty(0.01);
 
     while (1) {
-        // float d = RL_Motor.getDuty();
-        // if (d < 0) {
-        //     d = -d;
-        // }
+        float d = RL_Motor.getDuty();
+        if (d < 0) {
+            d = -d;
+        }
 
-        // float dd = 0;
-        // for (int i = 9; -1 < i; i--) {
-        //     dd += 0.1;
-        //     if (dd > d) {
-        //         mcu.gpioSetValue(led[i], 1);
-        //     } else {
-        //         mcu.gpioSetValue(led[i], 0);
-        //     }
-        // }
+        float dd = 0;
+        for (int i = 9; -1 < i; i--) {
+            dd += 0.1;
+            if (dd > d) {
+                mcu.gpioSetValue(led[i], 1);
+            } else {
+                mcu.gpioSetValue(led[i], 0);
+            }
+        }
+
+        // cmd.update();
 
         if (log_mode == 0) {
             motor_mode = 0;
@@ -151,7 +163,7 @@ void app_main() {
 
         switch (motor_mode) {
             case 0:
-                RL_Motor.setMode(0);
+                // RL_Motor.setMode(0);
                 printf("DEBUG_LOG\r\n\r\n\r\n\r\n");
                 for (int i = 0; i < DEBUG_LOG_NUM; i++) {
                     printf("%f, %f, %f, %f, %f\r\n", debug_log[i][0], debug_log[i][1], debug_log[i][2], debug_log[i][3], debug_log[i][4]);
@@ -160,8 +172,8 @@ void app_main() {
 
                 break;
             case 1:
-                RL_Motor.setVelocity(500);
-                // RL_Motor.setCurrent(0.1);
+                // RL_Motor.setVelocity(500);
+                RL_Motor.setCurrent(0.1);
                 //  RL_Motor.setDuty(0.01);
                 if (motor_debug_cnt > 10 * 2000) {
                     motor_debug_cnt = 0;
@@ -170,8 +182,8 @@ void app_main() {
                 break;
 
             case 2:
-                RL_Motor.setVelocity(300);
-                // RL_Motor.setCurrent(-0.1);
+                // RL_Motor.setVelocity(300);
+                RL_Motor.setCurrent(-0.1);
                 //  RL_Motor.setDuty(-0.01);
                 if (motor_debug_cnt > 10 * 2000) {
                     motor_debug_cnt = 0;
@@ -186,35 +198,34 @@ void app_main() {
                 break;
         }
 
-        led_cnt++;
-        if (led_cnt > 17000) {
-            led_cnt = 0;
-            if (led_mode == 0) {
-                led_index++;
-                if (led_index >= 10) {
-                    led_index = 9;
-                    led_mode = 1;
-                }
-            } else {
-                led_index--;
-                if (led_index <= 0) {
-                    led_index = 0;
-                    led_mode = 0;
-                }
-            }
-        }
+        // if (led_cnt > 70 * 10) {
+        //     led_cnt = 0;
+        //     if (led_mode == 0) {
+        //         led_index++;
+        //         if (led_index >= 10) {
+        //             led_index = 9;
+        //             led_mode = 1;
+        //         }
+        //     } else {
+        //         led_index--;
+        //         if (led_index <= -1) {
+        //             led_index = 0;
+        //             led_mode = 0;
+        //         }
+        //     }
+        // }
 
-        mcu.gpioSetValue(led[led_index], 0);
+        // mcu.gpioSetValue(led[led_index], 0);
 
-        for (unsigned int i = 0; i < 10; i++) {
-            if (mcu.gpioGetValue(led[i]) == 0 && i != led_index) {
-                mcu.gpioSetValue(led[i], 1);
-            }
-        }
+        // for (unsigned int i = 0; i < 10; i++) {
+        //     if (mcu.gpioGetValue(led[i]) == 0 && i != led_index) {
+        //         mcu.gpioSetValue(led[i], 1);
+        //     }
+        // }
 
         if (debug_cnt > 100 * 10) {
             debug_cnt = 0;
-            printf("bus_voltage: %f duty: %f t_current: %f o_current: %f t_velocity: %f o_velocity: %f\r\n", batt_voltage.getVoltage(), RL_Motor.getDuty(), RL_Motor.getTargetCurrent(), RL_Motor.getCurrent(), RL_Motor.getTargetVelocity(), RL_Motor.getVelocity());
+            printf("mode: %d bus_voltage: %f duty: %f t_current: %f o_current: %f t_velocity: %f o_velocity: %f\r\n", motor_mode, batt_voltage.getVoltage(), RL_Motor.getDuty(), RL_Motor.getTargetCurrent(), RL_Motor.getCurrent(), RL_Motor.getTargetVelocity(), RL_Motor.getVelocity());
             // printf("duty: %f t_current: %f o_current: %f t_velocity: %f o_velocity: %f\r\n", debug_log[log_cnt][0], debug_log[log_cnt][1], debug_log[log_cnt][2], debug_log[log_cnt][3], debug_log[log_cnt][4]);
         }
     }
@@ -251,4 +262,5 @@ void app_interrupt_100us() {
 
     debug_cnt++;
     motor_debug_cnt++;
+    led_cnt++;
 }

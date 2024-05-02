@@ -12,6 +12,8 @@
 #include <Devices/McuAbstractionLayer/baseMcuAbstractionLayer.hpp>
 #include <vector>
 
+#define CMD_BUFFER_SIZE 256
+
 class CommandReciever {
    public:
     CommandReciever(baseMcuAbstractionLayer* mcu, std::vector<MotorController*> mcs);
@@ -20,6 +22,7 @@ class CommandReciever {
     void update();
 
    private:
+    baseMcuAbstractionLayer* _mcu;
     std::vector<MotorController*> _mcs;
 
     struct mode0_feedback_data_t {
@@ -69,8 +72,11 @@ class CommandReciever {
 
     std::vector<feedback_data_t> _feedback_data;
 
-    uint8_t _tx_buffer[256] = {0};
+    uint8_t _tx_buffer[CMD_BUFFER_SIZE] = {0};
     unsigned int _tx_buffer_index = 0;
+
+    uint8_t _rx_buffer[CMD_BUFFER_SIZE] = {0};
+    unsigned int _rx_buffer_index = 0;
 };
 
 #endif /* APP_ALGO_COMMANDRECIEVER_HPP_ */
