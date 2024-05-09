@@ -23,7 +23,7 @@ MotorController::MotorController(baseMotorDriver* driver, baseCurrentSensor* cur
 
 void MotorController::init(void) {
     _mode = 0;
-    _current_pid.setPID(3.2, 0, 0);
+    _current_pid.setPID(2, 0, 0);
     _velocity_pid.setPID(0.01, 0, 0);
 }
 

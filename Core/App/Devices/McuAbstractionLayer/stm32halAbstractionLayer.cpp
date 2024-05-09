@@ -25,6 +25,7 @@ struct PeripheralAllocation {
 
     TIM_HandleTypeDef* PWM_TIM[MAL::P_PWM::End_P];
     uint32_t PWM_CH[MAL::P_PWM::End_P];
+    TIM_HandleTypeDef* MASTER_TIM;
 
     TIM_HandleTypeDef* Encoder_TIM[MAL::P_Encoder::End_E];
 
@@ -46,7 +47,7 @@ stm32halAbstractionLayer::stm32halAbstractionLayer() {
 
     PAL.ADC_Connected[MAL::P_ADC::FL_Current] = PeripheralAllocation::STM_ADC::ADC_3;
     PAL.ADC_Connected[MAL::P_ADC::FR_Current] = PeripheralAllocation::STM_ADC::ADC_3;
-    PAL.ADC_Connected[MAL::P_ADC::ST_Current] = PeripheralAllocation::STM_ADC::ADC_2;
+    PAL.ADC_Connected[MAL::P_ADC::ST_Current] = PeripheralAllocation::STM_ADC::ADC_1;
     PAL.ADC_Connected[MAL::P_ADC::RL_Current] = PeripheralAllocation::STM_ADC::ADC_2;
     PAL.ADC_Connected[MAL::P_ADC::RR_Current] = PeripheralAllocation::STM_ADC::ADC_2;
     PAL.ADC_Connected[MAL::P_ADC::Batt_Voltage] = PeripheralAllocation::STM_ADC::ADC_1;
@@ -54,7 +55,7 @@ stm32halAbstractionLayer::stm32halAbstractionLayer() {
 
     PAL.ADC_RANK[PAL.ADC_Connected[MAL::P_ADC::FL_Current]][MAL::P_ADC::FL_Current] = 0;
     PAL.ADC_RANK[PAL.ADC_Connected[MAL::P_ADC::FR_Current]][MAL::P_ADC::FR_Current] = 1;
-    PAL.ADC_RANK[PAL.ADC_Connected[MAL::P_ADC::ST_Current]][MAL::P_ADC::ST_Current] = 0;
+    PAL.ADC_RANK[PAL.ADC_Connected[MAL::P_ADC::ST_Current]][MAL::P_ADC::ST_Current] = 2;
     PAL.ADC_RANK[PAL.ADC_Connected[MAL::P_ADC::RL_Current]][MAL::P_ADC::RL_Current] = 1;
     PAL.ADC_RANK[PAL.ADC_Connected[MAL::P_ADC::RR_Current]][MAL::P_ADC::RR_Current] = 2;
     PAL.ADC_RANK[PAL.ADC_Connected[MAL::P_ADC::Batt_Voltage]][MAL::P_ADC::Batt_Voltage] = 0;
@@ -75,6 +76,8 @@ stm32halAbstractionLayer::stm32halAbstractionLayer() {
 
     PAL.PWM_TIM[MAL::P_PWM::RR_PWM] = &htim12;
     PAL.PWM_CH[MAL::P_PWM::RR_PWM] = TIM_CHANNEL_1;
+
+    PAL.MASTER_TIM = &htim5;
 
     // Encoder
     PAL.Encoder_TIM[MAL::P_Encoder::FL_Encoder] = &htim3;
@@ -149,7 +152,7 @@ stm32halAbstractionLayer::stm32halAbstractionLayer() {
     PAL.UART[MAL::P_UART::Debug] = &huart3;
 
     // Timer Interrupt
-    PAL.TimerInterrupt_TIM[MAL::P_Interrupt::T100us] = &htim14;
+    PAL.TimerInterrupt_TIM[MAL::P_Interrupt::T50us] = &htim14;
 }
 
 void stm32halAbstractionLayer::init() {
@@ -181,10 +184,33 @@ void stm32halAbstractionLayer::_initADC(void) {
         Error_Handler();
     }
     __HAL_DMA_DISABLE_IT(PAL.ADC_Ins[PeripheralAllocation::STM_ADC::ADC_3]->DMA_Handle, DMA_IT_TC | DMA_IT_HT);
+
+    HAL_ADCEx_InjectedStart(PAL.ADC_Ins[PeripheralAllocation::STM_ADC::ADC_1]);
+    HAL_ADCEx_InjectedStart(PAL.ADC_Ins[PeripheralAllocation::STM_ADC::ADC_2]);
+    HAL_ADCEx_InjectedStart(PAL.ADC_Ins[PeripheralAllocation::STM_ADC::ADC_3]);
 }
 
 uint16_t stm32halAbstractionLayer::adcGetValue(P_ADC p) {
     if (p != P_ADC::End_A) {
+        if (p == P_ADC::FL_Current) {
+            return HAL_ADCEx_InjectedGetValue(PAL.ADC_Ins[PeripheralAllocation::STM_ADC::ADC_3], 1);
+        }
+        if (p == P_ADC::FR_Current) {
+            return HAL_ADCEx_InjectedGetValue(PAL.ADC_Ins[PeripheralAllocation::STM_ADC::ADC_3], 2);
+        }
+
+        if (p == P_ADC::ST_Current) {
+            return HAL_ADCEx_InjectedGetValue(PAL.ADC_Ins[PeripheralAllocation::STM_ADC::ADC_2], 1);
+        }
+
+        if (p == P_ADC::RL_Current) {
+            return HAL_ADCEx_InjectedGetValue(PAL.ADC_Ins[PeripheralAllocation::STM_ADC::ADC_2], 2);
+        }
+
+        if (p == P_ADC::RR_Current) {
+            return HAL_ADCEx_InjectedGetValue(PAL.ADC_Ins[PeripheralAllocation::STM_ADC::ADC_1], 1);
+        }
+
         return this->_data[PAL.ADC_Connected[p]][PAL.ADC_RANK[PAL.ADC_Connected[p]][p]];
     }
     return 0;
@@ -247,6 +273,8 @@ void stm32halAbstractionLayer::_initPWM() {
     HAL_TIM_PWM_Start(PAL.PWM_TIM[MAL::P_PWM::ST_PWM], PAL.PWM_CH[MAL::P_PWM::ST_PWM]);
     HAL_TIM_PWM_Start(PAL.PWM_TIM[MAL::P_PWM::RL_PWM], PAL.PWM_CH[MAL::P_PWM::RL_PWM]);
     HAL_TIM_PWM_Start(PAL.PWM_TIM[MAL::P_PWM::RR_PWM], PAL.PWM_CH[MAL::P_PWM::RR_PWM]);
+
+    HAL_TIM_PWM_Start(PAL.MASTER_TIM, TIM_CHANNEL_1);
 }
 
 void stm32halAbstractionLayer::pwmSetDuty(P_PWM p, float duty) {
@@ -391,7 +419,7 @@ uint32_t stm32halAbstractionLayer::uartGetRxDataSize(P_UART p) {
 void (*stm32halAbstractionLayer::_timerInterruptCallback[P_Interrupt::End_T])(void);
 
 void stm32halAbstractionLayer::_initTimerInterrupt() {
-    HAL_TIM_Base_Start_IT(PAL.TimerInterrupt_TIM[MAL::P_Interrupt::T100us]);
+    HAL_TIM_Base_Start_IT(PAL.TimerInterrupt_TIM[MAL::P_Interrupt::T50us]);
 }
 
 void stm32halAbstractionLayer::interruptSetCallback(P_Interrupt p, void (*callback)(void)) {
@@ -401,9 +429,15 @@ void stm32halAbstractionLayer::interruptSetCallback(P_Interrupt p, void (*callba
 }
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim) {
-    if (htim == PAL.TimerInterrupt_TIM[MAL::P_Interrupt::T100us]) {
-        if (stm32halAbstractionLayer::_timerInterruptCallback[MAL::P_Interrupt::T100us] != NULL) {
-            stm32halAbstractionLayer::_timerInterruptCallback[MAL::P_Interrupt::T100us]();
+    if (htim == PAL.TimerInterrupt_TIM[MAL::P_Interrupt::T50us]) {
+        if (stm32halAbstractionLayer::_timerInterruptCallback[MAL::P_Interrupt::T50us] != NULL) {
+            stm32halAbstractionLayer::_timerInterruptCallback[MAL::P_Interrupt::T50us]();
         }
     }
+}
+
+// Wait
+
+void stm32halAbstractionLayer::waitMs(uint32_t ms) {
+    HAL_Delay(ms);
 }

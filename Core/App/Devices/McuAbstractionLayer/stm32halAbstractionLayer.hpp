@@ -47,6 +47,9 @@ class stm32halAbstractionLayer : public baseMcuAbstractionLayer {
     virtual void interruptSetCallback(P_Interrupt p, void (*callback)(void));
     static void (*_timerInterruptCallback[P_Interrupt::End_T])(void);
 
+    // Wait
+    virtual void waitMs(uint32_t ms);
+
    private:
     // ADC
     void _initADC();

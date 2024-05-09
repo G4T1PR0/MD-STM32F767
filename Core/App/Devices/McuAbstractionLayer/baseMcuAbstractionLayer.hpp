@@ -71,7 +71,7 @@ class baseMcuAbstractionLayer {
     };
 
     enum P_Interrupt {
-        T100us,
+        T50us,
         End_T
     };
 
@@ -102,6 +102,9 @@ class baseMcuAbstractionLayer {
 
     // Interrupt
     virtual void interruptSetCallback(P_Interrupt p, void (*callback)(void)) = 0;
+
+    // Wait
+    virtual void waitMs(uint32_t ms) = 0;
 };
 
 typedef baseMcuAbstractionLayer MAL;

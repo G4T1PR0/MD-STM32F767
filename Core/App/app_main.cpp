@@ -49,7 +49,7 @@ MotorController RR_Motor(&rr_driver, &rr_current, &rr_encoder);
 std::vector<MotorController*> mcs = {&FL_Motor, &FR_Motor, &ST_Motor, &RL_Motor, &RR_Motor};
 CommandReciever cmd(&mcu, mcs);
 
-void app_interrupt_100us();
+void app_interrupt_50us();
 
 unsigned int led_cnt = 0;
 int led_index = 0;
@@ -57,6 +57,8 @@ int led_index = 0;
 unsigned int debug_cnt = 0;
 
 unsigned int motor_debug_cnt = 0;
+
+unsigned int cmd_update_cnt = 0;
 
 #define DEBUG_LOG_NUM 10000
 
@@ -86,7 +88,18 @@ void app_init() {
 
     cmd.init();
 
-    mcu.interruptSetCallback(MAL::P_Interrupt::T100us, &app_interrupt_100us);
+    mcu.interruptSetCallback(MAL::P_Interrupt::T50us, &app_interrupt_50us);
+
+    mcu.waitMs(500);
+    printf("\033[H");
+    printf("\033[2J");
+    printf(R"EOF(
+ __  __  ____ ____    __  __ ____       ____ _____ __  __ 
+|  \/  |/ ___|  _ \  |  \/  |  _ \     / ___|_   _|  \/  |
+| |\/| | |   | |_) | | |\/| | | | |____\___ \ | | | |\/| |
+| |  | | |___|  _ <  | |  | | |_| |_____|__) || | | |  | |
+|_|  |_|\____|_| \_\ |_|  |_|____/     |____/ |_| |_|  |_|
+)EOF");
 }
 
 MAL::P_GPIO led[]{
@@ -113,48 +126,49 @@ void app_main() {
 
     unsigned int motor_mode = 1;
 
-    mcu.pwmSetFrequency(MAL::P_PWM::FR_PWM, 50000);
-    mcu.pwmSetFrequency(MAL::P_PWM::RR_PWM, 50000);
+    // mcu.pwmSetFrequency(MAL::P_PWM::FR_PWM, 100000);
+    // mcu.pwmSetFrequency(MAL::P_PWM::RR_PWM, 100000);
 
     log_mode = 1;
     FL_Motor.setMotorDirection(false);
-    FL_Motor.setMode(0);
-    // FL_Motor.setMode(2);
-    // FL_Motor.setCurrent(0.6);
-    //  FL_Motor.setDuty(0.01);
+    FL_Motor.setMode(2);
+    FL_Motor.setDuty(0.01);
 
     ST_Motor.setMotorDirection(true);
     ST_Motor.setMode(0);
 
     FR_Motor.setMotorDirection(true);
-    FR_Motor.setMode(0);
-    // FR_Motor.setDuty(0.01);
+    FR_Motor.setMode(2);
+    FR_Motor.setDuty(0.01);
 
     RL_Motor.setMotorDirection(true);
     RL_Motor.setMode(2);
-    // RL_Motor.setDuty(0.01);
+    RL_Motor.setDuty(0.01);
 
     RR_Motor.setMotorDirection(false);
-    RR_Motor.setMode(0);
-    // RR_Motor.setDuty(0.01);
+    RR_Motor.setMode(2);
+    RR_Motor.setDuty(0.01);
 
     while (1) {
-        float d = RL_Motor.getDuty();
-        if (d < 0) {
-            d = -d;
-        }
+        // float d = (FL_Motor.getDuty() + FR_Motor.getDuty() + RL_Motor.getDuty() + RR_Motor.getDuty()) / 4;
+        // if (d < 0) {
+        //     d = -d;
+        // }
 
-        float dd = 0;
-        for (int i = 9; -1 < i; i--) {
-            dd += 0.1;
-            if (dd > d) {
-                mcu.gpioSetValue(led[i], 1);
-            } else {
-                mcu.gpioSetValue(led[i], 0);
-            }
-        }
+        // float dd = 0;
+        // for (int i = 9; -1 < i; i--) {
+        //     dd += 0.1;
+        //     if (dd > d) {
+        //         mcu.gpioSetValue(led[i], 1);
+        //     } else {
+        //         mcu.gpioSetValue(led[i], 0);
+        //     }
+        // }
 
-        // cmd.update();
+        if (cmd_update_cnt > 10) {
+            cmd_update_cnt = 0;
+            cmd.update();
+        }
 
         if (log_mode == 0) {
             motor_mode = 0;
@@ -173,7 +187,10 @@ void app_main() {
                 break;
             case 1:
                 // RL_Motor.setVelocity(500);
-                RL_Motor.setCurrent(0.1);
+                FL_Motor.setCurrent(0.05);
+                FR_Motor.setCurrent(0.05);
+                RL_Motor.setCurrent(0.05);
+                RR_Motor.setCurrent(0.05);
                 //  RL_Motor.setDuty(0.01);
                 if (motor_debug_cnt > 10 * 2000) {
                     motor_debug_cnt = 0;
@@ -183,7 +200,10 @@ void app_main() {
 
             case 2:
                 // RL_Motor.setVelocity(300);
-                RL_Motor.setCurrent(-0.1);
+                FL_Motor.setCurrent(0.09);
+                FR_Motor.setCurrent(0.09);
+                RL_Motor.setCurrent(0.09);
+                RR_Motor.setCurrent(0.09);
                 //  RL_Motor.setDuty(-0.01);
                 if (motor_debug_cnt > 10 * 2000) {
                     motor_debug_cnt = 0;
@@ -198,49 +218,51 @@ void app_main() {
                 break;
         }
 
-        // if (led_cnt > 70 * 10) {
-        //     led_cnt = 0;
-        //     if (led_mode == 0) {
-        //         led_index++;
-        //         if (led_index >= 10) {
-        //             led_index = 9;
-        //             led_mode = 1;
-        //         }
-        //     } else {
-        //         led_index--;
-        //         if (led_index <= -1) {
-        //             led_index = 0;
-        //             led_mode = 0;
-        //         }
-        //     }
-        // }
+        if (led_cnt > 70 * 10) {
+            led_cnt = 0;
+            if (led_mode == 0) {
+                led_index++;
+                if (led_index >= 10) {
+                    led_index = 9;
+                    led_mode = 1;
+                }
+            } else {
+                led_index--;
+                if (led_index <= -1) {
+                    led_index = 0;
+                    led_mode = 0;
+                }
+            }
+        }
 
-        // mcu.gpioSetValue(led[led_index], 0);
+        mcu.gpioSetValue(led[led_index], 0);
 
-        // for (unsigned int i = 0; i < 10; i++) {
-        //     if (mcu.gpioGetValue(led[i]) == 0 && i != led_index) {
-        //         mcu.gpioSetValue(led[i], 1);
-        //     }
-        // }
+        for (unsigned int i = 0; i < 10; i++) {
+            if (mcu.gpioGetValue(led[i]) == 0 && i != led_index) {
+                mcu.gpioSetValue(led[i], 1);
+            }
+        }
 
         if (debug_cnt > 100 * 10) {
             debug_cnt = 0;
-            printf("mode: %d bus_voltage: %f duty: %f t_current: %f o_current: %f t_velocity: %f o_velocity: %f\r\n", motor_mode, batt_voltage.getVoltage(), RL_Motor.getDuty(), RL_Motor.getTargetCurrent(), RL_Motor.getCurrent(), RL_Motor.getTargetVelocity(), RL_Motor.getVelocity());
-            // printf("duty: %f t_current: %f o_current: %f t_velocity: %f o_velocity: %f\r\n", debug_log[log_cnt][0], debug_log[log_cnt][1], debug_log[log_cnt][2], debug_log[log_cnt][3], debug_log[log_cnt][4]);
+            // printf("fld: %f frd: %f rld: %f rrd: %f\r\n", FL_Motor.getDuty(), FR_Motor.getDuty(), RL_Motor.getDuty(), RR_Motor.getDuty());
+            // printf("mode: %d bus_voltage: %f duty: %f t_current: %f o_current: %f t_velocity: %f o_velocity: %f\r\n", motor_mode, batt_voltage.getVoltage(), FL_Motor.getDuty(), FL_Motor.getTargetCurrent(), FL_Motor.getCurrent(), FL_Motor.getTargetVelocity(), FL_Motor.getVelocity());
+            //  printf("duty: %f t_current: %f o_current: %f t_velocity: %f o_velocity: %f\r\n", debug_log[log_cnt][0], debug_log[log_cnt][1], debug_log[log_cnt][2], debug_log[log_cnt][3], debug_log[log_cnt][4]);
         }
     }
 }
 
 unsigned int update1ms_cnt = 0;
 
-void app_interrupt_100us() {
+void app_interrupt_50us() {
     update1ms_cnt++;
-    if (update1ms_cnt > 10) {
+    if (update1ms_cnt > 20) {
         update1ms_cnt = 0;
         fl_encoder.update();
         fr_encoder.update();
         rl_encoder.update();
         rr_encoder.update();
+        cmd_update_cnt++;
     }
     MotorController::update(&FL_Motor);
     MotorController::update(&FR_Motor);

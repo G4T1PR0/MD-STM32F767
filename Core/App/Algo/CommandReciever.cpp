@@ -7,6 +7,9 @@
 
 #include <Algo/CommandReciever.hpp>
 #include <cstring>
+#include "stdio.h"
+
+uint8_t CommandReciever::_tx_buffer[CMD_BUFFER_SIZE] = {0};
 
 CommandReciever::CommandReciever(baseMcuAbstractionLayer* mcu, std::vector<MotorController*> mcs) {
     _mcu = mcu;
@@ -19,7 +22,7 @@ void CommandReciever::init() {
     }
 }
 
-void CommandReciever::update() {
+volatile void CommandReciever::update() {
     unsigned int i = 0;
 
     _tx_buffer[0] = 0xFF;
@@ -83,5 +86,35 @@ void CommandReciever::update() {
         i++;
     }
 
+    //    printf("TX: ");
+    //    for (int i = 0; i < _tx_buffer_index; i++) {
+    //        printf("%02X ", _tx_buffer[i]);
+    //    }
+    //    printf("\r\n");
+
+    // union aa {
+    //     mode1_feedback_data_t data;
+    //     uint8_t bytes[sizeof(mode2_feedback_data_t)];
+    // };
+
+    // aa lklk;
+
+    // for (int i = 0; i < 5; i++) {
+    //     printf("N %d: ", i);
+    //     lklk.data = _feedback_data[i].mode1_feedback_data;
+
+    //     for (int i = 0; i < sizeof(mode1_feedback_data_t); i++) {
+    //         printf("%d ", lklk.bytes[i]);
+    //     }
+    //     printf("\r\n");
+    // }
+
+    // printf("DEC TX: ");
+    // for (int i = 0; i < _tx_buffer_index; i++) {
+    //     printf("%d ", _tx_buffer[i]);
+    // }
+    // printf("\r\n");
+
+    _mcu->uartWriteViaBuffer(MAL::P_UART::Controller, _tx_buffer, _tx_buffer_index);
     _mcu->uartReadViaBuffer(MAL::P_UART::Controller, _rx_buffer, CMD_BUFFER_SIZE);
 }
