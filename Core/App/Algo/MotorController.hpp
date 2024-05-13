@@ -28,6 +28,7 @@ class MotorController {
     void setDuty(float duty);
     float getDuty();
 
+    void setCurrentPID(float p, float i, float d);
     void setCurrent(float current);
     float getCurrent();
     float getTargetCurrent();

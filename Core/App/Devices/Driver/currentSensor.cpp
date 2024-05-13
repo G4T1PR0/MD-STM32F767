@@ -7,6 +7,8 @@
 
 #include <Devices/Driver/currentSensor.hpp>
 
+#define LP_FILTER(value, sample, filter_constant) (value -= (filter_constant) * ((value) - (sample)))
+
 currentSensor::currentSensor(MAL* mcu, MAL::P_ADC p) {
     _mcu = mcu;
     _p = p;
@@ -19,8 +21,12 @@ void currentSensor::update() {
 
 #define ADC_BUFFER_SIZE 50
 float currentSensor::getCurrent() {
-    _filter.push(_mcu->adcGetValue(_p));
-    return (_filter.get() * _raw2voltage - 1.65) / _voltage2current;
+    LP_FILTER(_temp_filter_value, (float)_mcu->adcGetValue(_p), 0.01f);
+    return (_temp_filter_value * _raw2voltage - 1.65) / _voltage2current;
+
+    // _filter.push(_mcu->adcGetValue(_p));
+    // return (_filter.get() * _raw2voltage - 1.65) / _voltage2current;
+
     // return (_mcu->adcGetValue(_p) * _raw2voltage - 1.65) / _voltage2current;
     // uint16_t buffer[ADC_BUFFER_SIZE];
     // _mcu->adcGetBufferValue(_p, buffer, ADC_BUFFER_SIZE);

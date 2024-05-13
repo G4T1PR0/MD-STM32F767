@@ -149,6 +149,10 @@ float MotorController::getDuty() {
     }
 }
 
+void MotorController::setCurrentPID(float p, float i, float d) {
+    _current_pid.setPID(p, i, d);
+}
+
 void MotorController::setCurrent(float current) {
     if (_isMotorDirectionReversed) {
         _targetCurrent = -current;
