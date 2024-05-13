@@ -107,17 +107,36 @@ void inline MotorController::_update(void) {
             _motorInputDuty = _current_pid.update(_pidTargetCurrent, _observedCurrent);
             _driver->setDuty(_motorInputDuty);
             break;
+
+        case 10:  // beep
+            _beep_cnt++;
+
+            if (_beep_cnt >= _beep_time * 20) {
+                _beep_cnt = 0;
+                _mode = 0;
+            } else {
+                if (_beep_cnt % (20 / _beep_freq) == 0) {
+                    _beep_flag = !_beep_flag;
+                }
+
+                if (_beep_flag) {
+                    _driver->setDuty(0.1);
+                } else {
+                    _driver->setDuty(-0.1);
+                }
+            }
+            break;
     }
 }
 
 void MotorController::setMode(int mode) {
-    if (mode < 0 || mode > 4) {
+    if ((mode < 0 || mode > 4) && mode != 10) {
         _mode = 0;
         return;
     }
 
     if (_isSteer) {
-        if (mode == 3) {
+        if (mode == 3 || mode == 10) {
             _mode = 0;
         } else {
             _mode = mode;
@@ -219,4 +238,12 @@ void MotorController::setMotorConnectionReversed(bool isReversed) {
 
 void MotorController::setMotorDirection(bool d) {
     _isMotorDirectionReversed = d;
+}
+
+void MotorController::setBeepTime(int time) {
+    _beep_time = time;
+}
+
+void MotorController::setBeepFreqKhz(int freq) {
+    _beep_freq = freq;
 }

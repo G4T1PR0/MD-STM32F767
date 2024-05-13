@@ -44,6 +44,9 @@ class MotorController {
     void setMotorConnectionReversed(bool isReversed);
     void setMotorDirection(bool d);
 
+    void setBeepTime(int time);
+    void setBeepFreqKhz(int freq);
+
    private:
     baseMotorDriver* _driver;
     baseCurrentSensor* _current;
@@ -73,6 +76,12 @@ class MotorController {
 
     bool _isMotorConnectionReversed = 0;
     bool _isMotorDirectionReversed = 0;
+
+    unsigned int _beep_time = 0;
+    unsigned int _beep_freq = 0;
+
+    unsigned int _beep_cnt = 0;
+    bool _beep_flag = 0;
 };
 
 #endif /* APP_ALGO_MOTORCONTROLLER_HPP_ */

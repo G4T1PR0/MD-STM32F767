@@ -118,10 +118,6 @@ MAL::P_GPIO led[]{
 void app_main() {
     app_init();
 
-    for (unsigned int i = 0; i < 10; i++) {
-        mcu.gpioSetValue(led[i], 1);
-    }
-
     unsigned int led_mode = 0;
 
     unsigned int motor_mode = 1;
@@ -145,29 +141,44 @@ void app_main() {
     FR_Motor.setDuty(0.01);
 
     RL_Motor.setMotorDirection(true);
-    RL_Motor.setMode(2);
+    RL_Motor.setMode(0);
     RL_Motor.setDuty(0.1);
 
     RR_Motor.setMotorDirection(false);
     RR_Motor.setMode(0);
     RR_Motor.setDuty(0.01);
 
+    RL_Motor.setBeepTime(250);
+    RL_Motor.setBeepFreqKhz(5);
+    RL_Motor.setMode(10);
+    mcu.waitMs(400);
+
+    RL_Motor.setBeepTime(100);
+    RL_Motor.setBeepFreqKhz(5);
+    RL_Motor.setMode(10);
+    mcu.waitMs(150);
+    RL_Motor.setMode(10);
+
+    for (unsigned int i = 0; i < 10; i++) {
+        mcu.gpioSetValue(led[i], 1);
+    }
+
     while (1) {
         // float d = (FL_Motor.getDuty() + FR_Motor.getDuty() + RL_Motor.getDuty() + RR_Motor.getDuty()) / 4;
-        float d = RL_Motor.getDuty();
-        if (d < 0) {
-            d = -d;
-        }
+        // float d = RL_Motor.getDuty();
+        // if (d < 0) {
+        //     d = -d;
+        // }
 
-        float dd = 0;
-        for (int i = 9; -1 < i; i--) {
-            dd += 0.1;
-            if (dd > d) {
-                mcu.gpioSetValue(led[i], 1);
-            } else {
-                mcu.gpioSetValue(led[i], 0);
-            }
-        }
+        // float dd = 0;
+        // for (int i = 9; -1 < i; i--) {
+        //     dd += 0.1;
+        //     if (dd > d) {
+        //         mcu.gpioSetValue(led[i], 1);
+        //     } else {
+        //         mcu.gpioSetValue(led[i], 0);
+        //     }
+        // }
 
         if (cmd_update_cnt > 10) {
             cmd_update_cnt = 0;
@@ -194,7 +205,7 @@ void app_main() {
                 FL_Motor.setCurrent(0.01);
                 FR_Motor.setCurrent(0.05);
                 ST_Motor.setCurrent(0.05);
-                RL_Motor.setCurrent(2);
+                RL_Motor.setCurrent(0.1);
                 RR_Motor.setCurrent(2);
                 //  RL_Motor.setDuty(0.01);
                 if (motor_debug_cnt > 10 * 2000) {
@@ -208,7 +219,7 @@ void app_main() {
                 FL_Motor.setCurrent(0.01);
                 FR_Motor.setCurrent(0.09);
                 ST_Motor.setCurrent(-0.05);
-                RL_Motor.setCurrent(-2);
+                RL_Motor.setCurrent(-0.1);
                 RR_Motor.setCurrent(-2);
                 //  RL_Motor.setDuty(-0.01);
                 if (motor_debug_cnt > 10 * 2000) {
@@ -224,30 +235,30 @@ void app_main() {
                 break;
         }
 
-        // if (led_cnt > 70 * 10) {
-        //     led_cnt = 0;
-        //     if (led_mode == 0) {
-        //         led_index++;
-        //         if (led_index >= 10) {
-        //             led_index = 9;
-        //             led_mode = 1;
-        //         }
-        //     } else {
-        //         led_index--;
-        //         if (led_index <= -1) {
-        //             led_index = 0;
-        //             led_mode = 0;
-        //         }
-        //     }
-        // }
+        if (led_cnt > 70 * 10) {
+            led_cnt = 0;
+            if (led_mode == 0) {
+                led_index++;
+                if (led_index >= 10) {
+                    led_index = 9;
+                    led_mode = 1;
+                }
+            } else {
+                led_index--;
+                if (led_index <= -1) {
+                    led_index = 0;
+                    led_mode = 0;
+                }
+            }
+        }
 
-        // mcu.gpioSetValue(led[led_index], 0);
+        mcu.gpioSetValue(led[led_index], 0);
 
-        // for (unsigned int i = 0; i < 10; i++) {
-        //     if (mcu.gpioGetValue(led[i]) == 0 && i != led_index) {
-        //         mcu.gpioSetValue(led[i], 1);
-        //     }
-        // }
+        for (unsigned int i = 0; i < 10; i++) {
+            if (mcu.gpioGetValue(led[i]) == 0 && i != led_index) {
+                mcu.gpioSetValue(led[i], 1);
+            }
+        }
 
         if (debug_cnt > 100 * 10) {
             debug_cnt = 0;
