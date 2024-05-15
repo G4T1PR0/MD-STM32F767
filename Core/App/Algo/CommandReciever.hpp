@@ -32,35 +32,35 @@ class CommandReciever {
 
     struct mode1_feedback_data_t {
         uint8_t mode;
-        uint16_t duty;
-        uint16_t current;
-        uint16_t velocity;
+        int16_t duty;
+        int16_t current;
+        int16_t velocity;
     } __attribute__((packed));
 
     struct mode2_feedback_data_t {
         uint8_t mode;
-        uint16_t duty;
-        uint16_t target_current;
-        uint16_t current;
-        uint16_t velocity;
+        int16_t duty;
+        int16_t target_current;
+        int16_t current;
+        int16_t velocity;
     } __attribute__((packed));
 
     struct mode3_feedback_data_t {
         uint8_t mode;
-        uint16_t duty;
-        uint16_t target_current;
-        uint16_t current;
-        uint16_t target_velocity;
-        uint16_t velocity;
+        int16_t duty;
+        int16_t target_current;
+        int16_t current;
+        int16_t target_velocity;
+        int16_t velocity;
     } __attribute__((packed));
 
     struct mode4_feedback_data_t {
         uint8_t mode;
-        uint16_t duty;
-        uint16_t target_current;
-        uint16_t current;
-        uint16_t target_angle;
-        uint16_t angle;
+        int16_t duty;
+        int16_t target_current;
+        int16_t current;
+        int16_t target_angle;
+        int16_t angle;
     } __attribute__((packed));
 
     struct feedback_data_t {
@@ -76,7 +76,13 @@ class CommandReciever {
         uint8_t u8[2];
     };
 
+    union int16_to_uint8_t {
+        int16_t i16;
+        uint8_t u8[2];
+    };
+
     uint16_to_uint8_t _uint16_to_uint8;
+    int16_to_uint8_t _int16_to_uint8;
 
     std::vector<feedback_data_t>
         _feedback_data;
