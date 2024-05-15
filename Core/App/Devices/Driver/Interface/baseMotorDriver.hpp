@@ -14,6 +14,7 @@ class baseMotorDriver {
    public:
     virtual void init() = 0;
     virtual void setDuty(float duty) = 0;
+    virtual void setBrakeEnabled(bool enabled) = 0;
 };
 
 #endif /* APP_DEVICES_DRIVER_INTERFACE_BASEMOTORDRIVER_HPP_ */

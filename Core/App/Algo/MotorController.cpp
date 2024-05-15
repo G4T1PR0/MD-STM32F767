@@ -19,6 +19,7 @@ MotorController::MotorController(baseMotorDriver* driver, baseCurrentSensor* cur
     _current = currentSensor;
     _steerAngle = steerAngleSensor;
     _isSteer = true;
+    _driver->setBrakeEnabled(true);
 }
 
 void MotorController::init(void) {
@@ -104,17 +105,25 @@ void inline MotorController::_update(void) {
             break;
 
         case 4:  // Motor Angle Control
-            _pidTargetCurrent = -_angle_pid.update(_targetAngle, _observedAngle);
-            _motorInputDuty = _current_pid.update(_pidTargetCurrent, _observedCurrent);
+            _pidTargetCurrent = _angle_pid.update(_targetAngle, _observedAngle);
+            // _motorInputDuty = _current_pid.update(_pidTargetCurrent, _observedCurrent);
 
-            if (_pidTargetCurrent > 0) {
-                if (_motorInputDuty < 0)
-                    _motorInputDuty = 0;
-            } else if (_pidTargetCurrent < 0) {
-                if (_motorInputDuty > 0)
-                    _motorInputDuty = 0;
-            } else if (_pidTargetCurrent == 0) {
-                _motorInputDuty = 0;
+            // if (_pidTargetCurrent > 0) {
+            //     if (_motorInputDuty < 0)
+            //         _motorInputDuty = 0;
+            // } else if (_pidTargetCurrent < 0) {
+            //     if (_motorInputDuty > 0)
+            //         _motorInputDuty = 0;
+            // } else if (_pidTargetCurrent == 0) {
+            //     _motorInputDuty = 0;
+            //}
+
+            _motorInputDuty = _pidTargetCurrent;
+
+            if (_motorInputDuty > 0.5) {
+                _motorInputDuty = 0.5;
+            } else if (_motorInputDuty < -0.5) {
+                _motorInputDuty = -0.5;
             }
 
             _driver->setDuty(_motorInputDuty);
@@ -237,6 +246,11 @@ void MotorController::setAnglePID(float p, float i, float d) {
 }
 
 void MotorController::setAngle(float angle) {
+    if (angle >= 50) {
+        angle = 50;
+    } else if (angle <= -50) {
+        angle = -50;
+    }
     _targetAngle = angle;
 }
 

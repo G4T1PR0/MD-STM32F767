@@ -15,6 +15,7 @@ class baseSteerAngleSensor {
     virtual void init() = 0;
     virtual void update() = 0;
     virtual float getAngle() = 0;
+    virtual float getRawAngle() = 0;
 };
 
 #endif /* APP_DEVICES_DRIVER_INTERFACE_BASESTEERANGLESENSOR_HPP_ */

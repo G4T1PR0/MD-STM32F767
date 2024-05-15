@@ -18,11 +18,14 @@ class steerAngleSensor : public baseSteerAngleSensor {
     virtual void init();
     virtual void update();
     virtual float getAngle();
+    virtual float getRawAngle();
 
    private:
     MAL* _mcu;
     MAL::P_ADC _p;
-    const float _raw2angle = 0.1;
+    const float _raw2angle = 90.0f / 2257.0f;
+
+    float _temp_filter_value = 0;
 };
 
 #endif /* APP_DEVICES_DRIVER_STEERANGLESENSOR_HPP_ */

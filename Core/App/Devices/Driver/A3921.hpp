@@ -16,10 +16,12 @@ class A3921 : public baseMotorDriver {
     A3921(MAL* mcu, MAL::P_PWM pwm, MAL::P_GPIO phase, MAL::P_GPIO sr);
     virtual void init();
     virtual void setDuty(float duty);
+    virtual void setBrakeEnabled(bool enabled);
 
    private:
     MAL* _mcu;
     float _previousDuty;
+    bool _brakeEnabled = 0;
 
     MAL::P_PWM _pwm;
     MAL::P_GPIO _phase;
