@@ -22,7 +22,148 @@ void CommandReciever::init() {
     }
 }
 
-volatile void CommandReciever::update() {
+void CommandReciever::update() {
+    // printf("rx size: %d\n", _mcu->uartGetRxDataSize(MAL::P_UART::Controller));
+    for (int i = 0; i < CMD_BUFFER_SIZE; i++) {
+        _rx_buffer[i] = 0;
+    }
+    unsigned int data_size = _mcu->uartGetRxDataSize(MAL::P_UART::Controller);
+    _mcu->uartReadViaBuffer(MAL::P_UART::Controller, _rx_buffer, data_size);
+
+    bool is_rx = false;
+
+    for (int i = 0; i < data_size; i++) {
+        is_rx = true;
+        printf("%d ", _rx_buffer[i]);
+        switch (_rx_mode) {
+            case 0:
+                if (_rx_buffer[i] == 0xFF) {
+                    _rx_mode = 1;
+                } else {
+                    _rx_mode = 0;
+                }
+                break;
+
+            case 1:
+                if (_rx_buffer[i] == 0xFF) {
+                    _rx_mode = 2;
+                } else {
+                    _rx_mode = 0;
+                }
+                break;
+
+            case 2:
+                if (_rx_buffer[i] == 0xFD) {
+                    _rx_mode = 3;
+                } else {
+                    _rx_mode = 0;
+                }
+                break;
+
+            case 3:
+                if (_rx_buffer[i] == 0x00) {
+                    _rx_mode = 4;
+                } else {
+                    _rx_mode = 0;
+                }
+                break;
+
+            case 4:
+                printf("CMD RX: %d\n", _rx_buffer[i]);
+                switch (_rx_buffer[i]) {
+                    case 0:
+                        _rx_mode = 0;
+                        break;
+
+                    case 1:
+                        _rx_mode = 10;  // set motor mode
+                        _rx_set_mode_temp = 0;
+                        break;
+
+                    case 2:
+                        _rx_mode = 20;  // set motor target
+                        _rx_set_target_temp = 0;
+                        break;
+
+                    default:
+                        break;
+                }
+                break;
+
+            case 10:  // set mode
+                _mcs[_rx_set_mode_temp++]->setMode(_rx_buffer[i]);
+                if (_rx_buffer[i] > 4) {
+                    printf("ERROR: set mode: %d\n", _rx_buffer[i]);
+                }
+                if (_rx_set_mode_temp >= _mcs.size()) {
+                    _rx_mode = 4;
+                }
+                break;
+
+            case 20:  // set target
+                switch (_mcs[_rx_set_target_temp]->getMode()) {
+                    case 0:
+                        _rx_cnt++;
+                        if (_rx_cnt == 2) {
+                            _rx_cnt = 0;
+                            _rx_set_target_temp++;
+                        }
+                        break;
+
+                    case 1:
+                        _uint16_to_uint8.u8[_rx_cnt++] = _rx_buffer[i];
+                        if (_rx_cnt == 2) {
+                            printf("set duty: %d %f\n", _uint16_to_uint8.u16, _uint16_to_uint8.u16 / (float)65535);
+                            _mcs[_rx_set_target_temp]->setDuty(_uint16_to_uint8.u16 / (float)65535);
+                            _rx_cnt = 0;
+                            _rx_set_target_temp++;
+                        }
+                        break;
+
+                    case 2:
+                        _uint16_to_uint8.u8[_rx_cnt++] = _rx_buffer[i];
+                        if (_rx_cnt == 2) {
+                            _mcs[_rx_set_target_temp]->setCurrent(_uint16_to_uint8.u16 / (float)3276.75);
+                            _rx_cnt = 0;
+                            _rx_set_target_temp++;
+                        }
+                        break;
+
+                    case 3:
+                        _uint16_to_uint8.u8[_rx_cnt++] = _rx_buffer[i];
+                        if (_rx_cnt == 2) {
+                            _mcs[_rx_set_target_temp]->setVelocity(_uint16_to_uint8.u16);
+                            _rx_cnt = 0;
+                            _rx_set_target_temp++;
+                        }
+                        break;
+
+                    case 4:
+                        _uint16_to_uint8.u8[_rx_cnt++] = _rx_buffer[i];
+                        if (_rx_cnt == 2) {
+                            _mcs[_rx_set_target_temp]->setAngle(_uint16_to_uint8.u16 / (float)655.35);
+                            _rx_cnt = 0;
+                            _rx_set_target_temp++;
+                        }
+                        break;
+                }
+                if (_rx_set_target_temp >= _mcs.size()) {
+                    _rx_mode = 4;
+                    // printf("return mode: %d\n", _rx_mode);
+                }
+                break;
+
+            default:
+                _rx_mode = 0;
+                break;
+        }
+    }
+    if (is_rx) {
+        printf("\n");
+    }
+}
+
+void CommandReciever::send() {
     unsigned int i = 0;
 
     _tx_buffer[0] = 0xFF;
@@ -42,7 +183,7 @@ volatile void CommandReciever::update() {
             case 1:
                 _feedback_data[i].mode1_feedback_data.mode = mc->getMode();
                 _feedback_data[i].mode1_feedback_data.duty = mc->getDuty() * 65535;
-                _feedback_data[i].mode1_feedback_data.current = mc->getCurrent();
+                _feedback_data[i].mode1_feedback_data.current = mc->getCurrent() * 3276.75;
                 _feedback_data[i].mode1_feedback_data.velocity = mc->getVelocity();
                 memcpy(&_tx_buffer[_tx_buffer_index], &_feedback_data[i].mode1_feedback_data, sizeof(mode1_feedback_data_t));
                 _tx_buffer_index += sizeof(mode1_feedback_data_t);
@@ -116,5 +257,4 @@ volatile void CommandReciever::update() {
     // printf("\r\n");
 
     _mcu->uartWriteViaBuffer(MAL::P_UART::Controller, _tx_buffer, _tx_buffer_index);
-    _mcu->uartReadViaBuffer(MAL::P_UART::Controller, _rx_buffer, CMD_BUFFER_SIZE);
 }

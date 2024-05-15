@@ -37,6 +37,7 @@ class MotorController {
     float getVelocity();
     float getTargetVelocity();
 
+    void setAnglePID(float p, float i, float d);
     void setAngle(float angle);
     float getAngle();
     float getTargetAngle();

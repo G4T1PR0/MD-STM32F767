@@ -58,7 +58,7 @@ unsigned int debug_cnt = 0;
 
 unsigned int motor_debug_cnt = 0;
 
-unsigned int cmd_update_cnt = 0;
+unsigned int cmd_send_cnt = 0;
 
 #define DEBUG_LOG_NUM 10000
 
@@ -122,31 +122,7 @@ void app_main() {
 
     unsigned int motor_mode = 1;
 
-    // mcu.pwmSetFrequency(MAL::P_PWM::FR_PWM, 100000);
-    // mcu.pwmSetFrequency(MAL::P_PWM::RR_PWM, 100000);
-
     log_mode = 1;
-    FL_Motor.setMotorDirection(false);
-    FL_Motor.setMode(0);
-    FL_Motor.setDuty(0.01);
-
-    ST_Motor.setMotorDirection(false);
-    ST_Motor.setCurrentPID(2, 0, 0);
-    ST_Motor.setMode(0);
-    // ST_Motor.setDuty(0.01);
-    // ST_Motor.setCurrent(0.2);
-
-    FR_Motor.setMotorDirection(true);
-    FR_Motor.setMode(0);
-    FR_Motor.setDuty(0.01);
-
-    RL_Motor.setMotorDirection(true);
-    RL_Motor.setMode(0);
-    RL_Motor.setDuty(0.1);
-
-    RR_Motor.setMotorDirection(false);
-    RR_Motor.setMode(0);
-    RR_Motor.setDuty(0.01);
 
     RL_Motor.setBeepTime(250);
     RL_Motor.setBeepFreqKhz(5);
@@ -162,6 +138,28 @@ void app_main() {
     for (unsigned int i = 0; i < 10; i++) {
         mcu.gpioSetValue(led[i], 1);
     }
+
+    FL_Motor.setMotorDirection(false);
+    FL_Motor.setMode(0);
+    FL_Motor.setDuty(0.01);
+
+    ST_Motor.setMotorDirection(false);
+    ST_Motor.setCurrentPID(2, 0, 0);
+    ST_Motor.setAnglePID(0.8, 0, 0);
+    ST_Motor.setAngle(180);
+    ST_Motor.setMode(0);
+
+    FR_Motor.setMotorDirection(true);
+    FR_Motor.setMode(0);
+    FR_Motor.setDuty(0.01);
+
+    RL_Motor.setMotorDirection(true);
+    RL_Motor.setMode(0);
+    RL_Motor.setDuty(0.1);
+
+    RR_Motor.setMotorDirection(false);
+    RR_Motor.setMode(0);
+    RR_Motor.setDuty(0.01);
 
     while (1) {
         // float d = (FL_Motor.getDuty() + FR_Motor.getDuty() + RL_Motor.getDuty() + RR_Motor.getDuty()) / 4;
@@ -180,10 +178,12 @@ void app_main() {
         //     }
         // }
 
-        if (cmd_update_cnt > 10) {
-            cmd_update_cnt = 0;
-            cmd.update();
-        }
+        // if (cmd_send_cnt > 10) {  // 10ms
+        //     cmd_send_cnt = 0;
+        //     cmd.send();  // Send Feedback
+        // }
+
+        // cmd.update();  // Parse Command
 
         if (log_mode == 0) {
             motor_mode = 0;
@@ -204,8 +204,9 @@ void app_main() {
                 // RL_Motor.setVelocity(500);
                 FL_Motor.setCurrent(0.01);
                 FR_Motor.setCurrent(0.05);
-                ST_Motor.setCurrent(0.05);
-                RL_Motor.setCurrent(0.1);
+                // ST_Motor.setCurrent(0.05);
+                ST_Motor.setAngle(250);
+                RL_Motor.setCurrent(0.5);
                 RR_Motor.setCurrent(2);
                 //  RL_Motor.setDuty(0.01);
                 if (motor_debug_cnt > 10 * 2000) {
@@ -218,8 +219,9 @@ void app_main() {
                 // RL_Motor.setVelocity(300);
                 FL_Motor.setCurrent(0.01);
                 FR_Motor.setCurrent(0.09);
-                ST_Motor.setCurrent(-0.05);
-                RL_Motor.setCurrent(-0.1);
+                // ST_Motor.setCurrent(-0.05);
+                ST_Motor.setAngle(40);
+                RL_Motor.setCurrent(-0.5);
                 RR_Motor.setCurrent(-2);
                 //  RL_Motor.setDuty(-0.01);
                 if (motor_debug_cnt > 10 * 2000) {
@@ -263,8 +265,9 @@ void app_main() {
         if (debug_cnt > 100 * 10) {
             debug_cnt = 0;
             // printf("fld: %f frd: %f rld: %f rrd: %f\r\n", FL_Motor.getDuty(), FR_Motor.getDuty(), RL_Motor.getDuty(), RR_Motor.getDuty());
-            printf("mode: %d bus_voltage: %f duty: %f t_current: %f o_current: %f t_velocity: %f o_velocity: %f\r\n", motor_mode, batt_voltage.getVoltage(), RL_Motor.getDuty(), RL_Motor.getTargetCurrent(), RL_Motor.getCurrent(), RL_Motor.getTargetVelocity(), RL_Motor.getVelocity());
+            // printf("mode: %d bus_voltage: %f duty: %f t_current: %f o_current: %f t_velocity: %f o_velocity: %f\r\n", motor_mode, batt_voltage.getVoltage(), RL_Motor.getDuty(), RL_Motor.getTargetCurrent(), RL_Motor.getCurrent(), RL_Motor.getTargetVelocity(), RL_Motor.getVelocity());
             //  printf("duty: %f t_current: %f o_current: %f t_velocity: %f o_velocity: %f\r\n", debug_log[log_cnt][0], debug_log[log_cnt][1], debug_log[log_cnt][2], debug_log[log_cnt][3], debug_log[log_cnt][4]);
+            printf("angle: %f duty: %f t_current: %f o_current: %f \n", ST_Motor.getAngle(), ST_Motor.getDuty(), ST_Motor.getTargetCurrent(), ST_Motor.getCurrent());
         }
     }
 }
@@ -279,7 +282,7 @@ void app_interrupt_50us() {
         fr_encoder.update();
         rl_encoder.update();
         rr_encoder.update();
-        cmd_update_cnt++;
+        cmd_send_cnt++;
     }
     MotorController::update(&FL_Motor);
     MotorController::update(&FR_Motor);

@@ -23,8 +23,9 @@ MotorController::MotorController(baseMotorDriver* driver, baseCurrentSensor* cur
 
 void MotorController::init(void) {
     _mode = 0;
-    _current_pid.setPID(2, 0, 0);
-    _velocity_pid.setPID(0.01, 0, 0);
+    _current_pid.setPID(0, 0, 0);
+    _velocity_pid.setPID(0, 0, 0);
+    _angle_pid.setPID(0, 0, 0);
 }
 
 void MotorController::update(MotorController* instance) {
@@ -103,8 +104,19 @@ void inline MotorController::_update(void) {
             break;
 
         case 4:  // Motor Angle Control
-            _pidTargetCurrent = _angle_pid.update(_targetAngle, _observedAngle);
+            _pidTargetCurrent = -_angle_pid.update(_targetAngle, _observedAngle);
             _motorInputDuty = _current_pid.update(_pidTargetCurrent, _observedCurrent);
+
+            if (_pidTargetCurrent > 0) {
+                if (_motorInputDuty < 0)
+                    _motorInputDuty = 0;
+            } else if (_pidTargetCurrent < 0) {
+                if (_motorInputDuty > 0)
+                    _motorInputDuty = 0;
+            } else if (_pidTargetCurrent == 0) {
+                _motorInputDuty = 0;
+            }
+
             _driver->setDuty(_motorInputDuty);
             break;
 
@@ -220,6 +232,10 @@ float MotorController::getTargetVelocity() {
     }
 }
 
+void MotorController::setAnglePID(float p, float i, float d) {
+    _angle_pid.setPID(p, i, d);
+}
+
 void MotorController::setAngle(float angle) {
     _targetAngle = angle;
 }
@@ -241,9 +257,19 @@ void MotorController::setMotorDirection(bool d) {
 }
 
 void MotorController::setBeepTime(int time) {
-    _beep_time = time;
+    if (time < 0) {
+        _beep_time = 0;
+    } else {
+        _beep_time = time;
+    }
 }
 
 void MotorController::setBeepFreqKhz(int freq) {
-    _beep_freq = freq;
+    if (freq <= 0) {
+        _beep_freq = 1;
+    } else if (freq >= 20) {
+        _beep_freq = 20;
+    } else {
+        _beep_freq = freq;
+    }
 }

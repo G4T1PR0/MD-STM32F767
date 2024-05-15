@@ -19,7 +19,8 @@ class CommandReciever {
     CommandReciever(baseMcuAbstractionLayer* mcu, std::vector<MotorController*> mcs);
 
     void init();
-    volatile void update();
+    void update();
+    void send();
 
    private:
     baseMcuAbstractionLayer* _mcu;
@@ -70,13 +71,25 @@ class CommandReciever {
         mode4_feedback_data_t mode4_feedback_data;
     };
 
-    std::vector<feedback_data_t> _feedback_data;
+    union uint16_to_uint8_t {
+        uint16_t u16;
+        uint8_t u8[2];
+    };
+
+    uint16_to_uint8_t _uint16_to_uint8;
+
+    std::vector<feedback_data_t>
+        _feedback_data;
 
     static uint8_t _tx_buffer[CMD_BUFFER_SIZE];
     unsigned int _tx_buffer_index = 0;
 
     uint8_t _rx_buffer[CMD_BUFFER_SIZE] = {0};
-    unsigned int _rx_buffer_index = 0;
+
+    unsigned int _rx_mode = 0;
+    unsigned int _rx_cnt = 0;
+    unsigned int _rx_set_mode_temp = 0;
+    unsigned int _rx_set_target_temp = 0;
 };
 
 #endif /* APP_ALGO_COMMANDRECIEVER_HPP_ */
