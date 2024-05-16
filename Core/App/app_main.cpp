@@ -135,13 +135,14 @@ void app_init() {
     FL_Motor.setMode(0);
     FL_Motor.setCurrentPID(1, 0, 0);
     FL_Motor.setDuty(0.01);
-    FL_Motor.setCurrent(9);
+    FL_Motor.setCurrent(0);
 
     ST_Motor.setMotorDirection(false);
     ST_Motor.setCurrentPID(2, 0, 0);
-    ST_Motor.setAnglePID(0.06, 0, 0);
+    ST_Motor.setAnglePID(0.07, 0, 0);
     ST_Motor.setAngle(0);
     ST_Motor.setMode(4);
+    ST_Motor.setCurrentLimit(5);
 
     FR_Motor.setMotorDirection(true);
     FR_Motor.setMode(0);
@@ -187,7 +188,7 @@ void app_main() {
             }
         }
 
-        if (batt_voltage.getVoltage() < 6) {
+        if (batt_voltage.getVoltage() < 6 || FL_Motor.OC || FR_Motor.OC || ST_Motor.OC || RL_Motor.OC || RR_Motor.OC) {
             for (const auto& i : mcs) {
                 i->setMode(100);
             }
@@ -204,12 +205,12 @@ void app_main() {
             mcu.waitMs(150);
         }
 
-        // if (cmd_send_cnt > 10) {  // 10ms
-        //     cmd_send_cnt = 0;
-        //     cmd.send();  // Send Feedback
-        // }
+        if (cmd_send_cnt > 10) {  // 10ms
+            cmd_send_cnt = 0;
+            cmd.send();  // Send Feedback
+        }
 
-        // cmd.update();  // Parse Command
+        cmd.update();  // Parse Command
 
         // if (log_mode == 0) {
         //     motor_mode = 0;

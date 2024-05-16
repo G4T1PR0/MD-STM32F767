@@ -30,6 +30,7 @@ class MotorController {
 
     void setCurrentPID(float p, float i, float d);
     void setCurrent(float current);
+    void setCurrentLimit(float limit);
     float getCurrent();
     float getTargetCurrent();
 
@@ -47,6 +48,8 @@ class MotorController {
 
     void setBeepTime(int time);
     void setBeepFreqKhz(int freq);
+
+    bool OC = false;
 
    private:
     baseMotorDriver* _driver;
@@ -76,6 +79,9 @@ class MotorController {
     float _targetCurrent;
     float _targetVelocity;
     float _targetAngle;
+
+    float _currentLimit;
+    float _maxiumCurrentLimit;
 
     bool _isMotorConnectionReversed = 0;
     bool _isMotorDirectionReversed = 0;

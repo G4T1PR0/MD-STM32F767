@@ -27,6 +27,8 @@ void MotorController::init(void) {
     _current_pid.setPID(0, 0, 0);
     _velocity_pid.setPID(0, 0, 0);
     _angle_pid.setPID(0, 0, 0);
+    _currentLimit = 10;
+    _maxiumCurrentLimit = 10;
 }
 
 void MotorController::update(MotorController* instance) {
@@ -35,6 +37,15 @@ void MotorController::update(MotorController* instance) {
 
 void inline MotorController::_update(void) {
     _observedCurrent = _current->getCurrent();
+
+    if (_observedCurrent > _maxiumCurrentLimit) {
+        this->OC = true;
+    } else if (_observedCurrent < -_maxiumCurrentLimit) {
+        this->OC = true;
+    } else {
+        this->OC = false;
+    }
+
     if (_isSteer) {
         _observedAngle = _steerAngle->getAngle();
     } else {
@@ -51,6 +62,12 @@ void inline MotorController::_update(void) {
 
         case 1:  // Motor PWM Control
             _motorInputDuty = _targetDuty;
+
+            if (_observedCurrent > _currentLimit) {
+                _motorInputDuty = 0;
+            } else if (_observedCurrent < -_currentLimit) {
+                _motorInputDuty = 0;
+            }
 
             _driver->setDuty(_motorInputDuty);
             break;
@@ -71,6 +88,12 @@ void inline MotorController::_update(void) {
             // if (_pidTargetCurrent < 0.001 && _pidTargetCurrent > -0.001) {
             //     _motorInputDuty = 0;
             // }
+
+            if (_observedCurrent > _currentLimit) {
+                _motorInputDuty = 0;
+            } else if (_observedCurrent < -_currentLimit) {
+                _motorInputDuty = 0;
+            }
 
             _driver->setDuty(_motorInputDuty);
             break;
@@ -101,6 +124,12 @@ void inline MotorController::_update(void) {
             //     _motorInputDuty = 0;
             // }
 
+            if (_observedCurrent > _currentLimit) {
+                _motorInputDuty = 0;
+            } else if (_observedCurrent < -_currentLimit) {
+                _motorInputDuty = 0;
+            }
+
             _driver->setDuty(_motorInputDuty);
             break;
 
@@ -124,6 +153,12 @@ void inline MotorController::_update(void) {
                 _motorInputDuty = 0.5;
             } else if (_motorInputDuty < -0.5) {
                 _motorInputDuty = -0.5;
+            }
+
+            if (_observedCurrent > _currentLimit) {
+                _motorInputDuty = 0;
+            } else if (_observedCurrent < -_currentLimit) {
+                _motorInputDuty = 0;
             }
 
             _driver->setDuty(_motorInputDuty);
@@ -216,6 +251,10 @@ void MotorController::setCurrent(float current) {
     } else {
         _targetCurrent = current;
     }
+}
+
+void MotorController::setCurrentLimit(float limit) {
+    _currentLimit = limit;
 }
 
 float MotorController::getCurrent() {
