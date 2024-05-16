@@ -63,6 +63,8 @@ class MotorController {
     bool _isSteer;
     int _mode;
 
+    bool _isMotorShutDown = 0;
+
     float _motorInputDuty;
     float _pidTargetCurrent;
 

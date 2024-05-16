@@ -134,7 +134,11 @@ void inline MotorController::_update(void) {
 
             if (_beep_cnt >= _beep_time * 20) {
                 _beep_cnt = 0;
-                _mode = 0;
+                if (_isMotorShutDown) {
+                    _mode = 100;
+                } else {
+                    _mode = 0;
+                }
             } else {
                 if (_beep_cnt % (20 / _beep_freq) == 0) {
                     _beep_flag = !_beep_flag;
@@ -147,25 +151,38 @@ void inline MotorController::_update(void) {
                 }
             }
             break;
+
+        case 100:  // Motor Shutdown
+            _driver->setDuty(0);
+            break;
     }
 }
 
 void MotorController::setMode(int mode) {
-    if ((mode < 0 || mode > 4) && mode != 10) {
-        _mode = 0;
-        return;
-    }
+    if (_mode == 100) {
+        if (mode == 10) {
+            _mode = 10;
+        }
+    } else {
+        if ((mode < 0 || mode > 4) && (mode != 10 && mode != 100)) {
+            _mode = 0;
+            return;
+        }
 
-    if (_isSteer) {
-        if (mode == 3 || mode == 10) {
+        if (_isSteer) {
+            if (mode == 3 || mode == 10) {
+                _mode = 0;
+            } else {
+                _mode = mode;
+            }
+        } else if (mode == 4) {
             _mode = 0;
         } else {
+            if (mode == 100) {
+                _isMotorShutDown = true;
+            }
             _mode = mode;
         }
-    } else if (mode == 4) {
-        _mode = 0;
-    } else {
-        _mode = mode;
     }
 }
 

@@ -25,6 +25,8 @@ class batteryVoltageSensor : public baseBatteryVoltageSensor {
 
     const float _raw2voltage = 3.3f / (1 << 12);
     const float _voltage2batt = 16 / 3.3;
+
+    float _temp_filter_value;
 };
 
 #endif /* APP_DEVICES_DRIVER_BATTERY_VOLTAGE_SENSOR_HPP_ */

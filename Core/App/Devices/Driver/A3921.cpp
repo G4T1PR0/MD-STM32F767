@@ -16,6 +16,7 @@ A3921::A3921(MAL* mcu, MAL::P_PWM pwm, MAL::P_GPIO phase, MAL::P_GPIO sr) {
 
 void A3921::init() {
     _previousDuty = 0;
+    _mcu->gpioSetValue(_sr, 0);
 }
 
 void A3921::setDuty(float duty) {
@@ -39,11 +40,11 @@ void A3921::setDuty(float duty) {
         }
 
         _mcu->pwmSetDuty(_pwm, duty);
-        _mcu->gpioSetValue(_sr, _brakeEnabled);
         // _mcu->gpioSetValue(_sr, 1);
     }
 }
 
 void A3921::setBrakeEnabled(bool enabled) {
     _brakeEnabled = enabled;
+    _mcu->gpioSetValue(_sr, _brakeEnabled);
 }
