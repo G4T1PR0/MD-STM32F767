@@ -132,9 +132,8 @@ void app_init() {
     }
 
     FL_Motor.setMotorDirection(false);
-    FL_Motor.setMode(0);
+    FL_Motor.setMode(2);
     FL_Motor.setCurrentPID(1, 0, 0);
-    FL_Motor.setDuty(0.01);
     FL_Motor.setCurrent(0);
 
     ST_Motor.setMotorDirection(false);
@@ -146,19 +145,18 @@ void app_init() {
 
     FR_Motor.setMotorDirection(true);
     FR_Motor.setMode(2);
-    FR_Motor.setCurrentPID(1000, 0, 0);  // TODO: debug
-    FR_Motor.setCurrent(0.01);
-    FR_Motor.setDuty(0.05);
+    FR_Motor.setCurrentPID(1, 0, 0);
+    FR_Motor.setCurrent(0);
 
     RL_Motor.setMotorDirection(true);
-    RL_Motor.setMode(0);
+    RL_Motor.setMode(2);
     RL_Motor.setCurrentPID(1, 0, 0);
-    RL_Motor.setDuty(0.01);
+    FR_Motor.setCurrent(0);
 
     RR_Motor.setMotorDirection(false);
-    RR_Motor.setMode(0);
+    RR_Motor.setMode(2);
     RR_Motor.setCurrentPID(1, 0, 0);
-    RR_Motor.setDuty(0.01);
+    FR_Motor.setCurrent(0);
 
     printf("\x1b[32m[Main Thread]\x1b[39m Initialization Complete\n");
 }
@@ -296,7 +294,7 @@ void app_main() {
             debug_cnt = 0;
             // printf("fld: %f frd: %f rld: %f rrd: %f\r\n", FL_Motor.getDuty(), FR_Motor.getDuty(), RL_Motor.getDuty(), RR_Motor.getDuty());
             // printf("mode: %d bus_voltage: %f duty: %f t_current: %f o_current: %f dt: %f dt_avg %f\r\n", FR_Motor.getMode(), batt_voltage.getVoltage(), FR_Motor.getDuty(), FR_Motor.getTargetCurrent(), FR_Motor.getCurrent(), FR_Motor.D_dt, FR_Motor.D_dtdt);
-            printf("std: %f std_dt: %f std_dt_avg: %f\r\n", ST_Motor.getDuty(), ST_Motor.D_dt, (float)ST_Motor.D_dt_avg);
+            // printf("std: %f std_dt: %f std_dt_avg: %f\r\n", FL_Motor.getDuty(), FL_Motor.D_dt, (float)FL_Motor.D_dt_avg);
             // printf("flc: %f frc: %f stc: %f rlc: %f rrc: %f\r\n", FL_Motor.getCurrent(), FR_Motor.getCurrent(), ST_Motor.getCurrent(), RL_Motor.getCurrent(), RR_Motor.getCurrent());
             //  printf("duty: %f t_current: %f o_current: %f t_velocity: %f o_velocity: %f\r\n", debug_log[log_cnt][0], debug_log[log_cnt][1], debug_log[log_cnt][2], debug_log[log_cnt][3], debug_log[log_cnt][4]);
             // printf("mode: %d raw_angle: %f angle: %f duty: %f t_current: %f o_current: %f \n", motor_mode, steer_angle.getRawAngle(), ST_Motor.getAngle(), ST_Motor.getDuty(), ST_Motor.getTargetCurrent(), ST_Motor.getCurrent());

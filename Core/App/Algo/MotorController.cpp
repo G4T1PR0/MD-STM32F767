@@ -14,6 +14,7 @@ MotorController::MotorController(baseMotorDriver* driver, baseCurrentSensor* cur
     _current = currentSensor;
     _encoder = encoder;
     _isSteer = false;
+    _dutyDtffLimit = 200;
 }
 
 MotorController::MotorController(baseMotorDriver* driver, baseCurrentSensor* currentSensor, baseSteerAngleSensor* steerAngleSensor) {
@@ -21,6 +22,7 @@ MotorController::MotorController(baseMotorDriver* driver, baseCurrentSensor* cur
     _current = currentSensor;
     _steerAngle = steerAngleSensor;
     _isSteer = true;
+    _dutyDtffLimit = 600;
     _driver->setBrakeEnabled(true);
 }
 
@@ -64,7 +66,7 @@ void inline MotorController::_update(void) {
     _duty_dt_filter.push(ABS(D_dt * 1024));
     D_dt_avg = _duty_dt_filter.get();
 
-    if (D_dt_avg > 600) {
+    if (D_dt_avg > _dutyDtffLimit) {
         CE = true;
     } else {
         CE = false;

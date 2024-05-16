@@ -54,9 +54,9 @@ class MotorController {
     bool CE = false;
 
     float D_dt = 0;
-    float D_dt_avg = 0;
+    uint32_t D_dt_avg = 0;
 
-    uint32_t prev_D_dt = 0;
+    float prev_D_dt = 0;
 
    private:
     baseMotorDriver* _driver;
@@ -91,6 +91,7 @@ class MotorController {
 
     float _currentLimit;
     float _maxiumCurrentLimit;
+    uint32_t _dutyDtffLimit = 2000;
 
     bool _isMotorConnectionReversed = 0;
     bool _isMotorDirectionReversed = 0;
