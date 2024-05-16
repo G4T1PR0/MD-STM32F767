@@ -7,6 +7,8 @@
 
 #include <Algo/MotorController.hpp>
 
+#define ABS(a) (((a) < 0) ? -(a) : (a))
+
 MotorController::MotorController(baseMotorDriver* driver, baseCurrentSensor* currentSensor, baseEncoder* encoder) {
     _driver = driver;
     _current = currentSensor;
@@ -55,6 +57,19 @@ void inline MotorController::_update(void) {
             _observedVelocity = _encoder->getCount();
         }
     }
+
+    D_dt = _motorInputDuty - prev_D_dt;
+    prev_D_dt = _motorInputDuty;
+
+    _duty_dt_filter.push(ABS(D_dt * 1024));
+    D_dt_avg = _duty_dt_filter.get();
+
+    if (D_dt_avg > 600) {
+        CE = true;
+    } else {
+        CE = false;
+    }
+
     switch (_mode) {
         case 0:  // Motor OFF
             _driver->setDuty(0);
@@ -70,6 +85,7 @@ void inline MotorController::_update(void) {
             }
 
             _driver->setDuty(_motorInputDuty);
+            //_driver->setDuty(0);
             break;
 
         case 2:  // Motor Current Control
@@ -85,9 +101,6 @@ void inline MotorController::_update(void) {
             } else if (_pidTargetCurrent == 0) {
                 _motorInputDuty = 0;
             }
-            // if (_pidTargetCurrent < 0.001 && _pidTargetCurrent > -0.001) {
-            //     _motorInputDuty = 0;
-            // }
 
             if (_observedCurrent > _currentLimit) {
                 _motorInputDuty = 0;
@@ -96,6 +109,7 @@ void inline MotorController::_update(void) {
             }
 
             _driver->setDuty(_motorInputDuty);
+            //_driver->setDuty(0);
             break;
 
         case 3:  // Motor Velocity Control
@@ -131,6 +145,7 @@ void inline MotorController::_update(void) {
             }
 
             _driver->setDuty(_motorInputDuty);
+            //_driver->setDuty(0);
             break;
 
         case 4:  // Motor Angle Control
@@ -162,6 +177,7 @@ void inline MotorController::_update(void) {
             }
 
             _driver->setDuty(_motorInputDuty);
+            //_driver->setDuty(0);
             break;
 
         case 10:  // beep

@@ -12,6 +12,7 @@
 #include <Devices/Driver/Interface/baseEncoder.hpp>
 #include <Devices/Driver/Interface/baseMotorDriver.hpp>
 #include <Devices/Driver/Interface/baseSteerAngleSensor.hpp>
+#include <Lib/MovingAverageFilter.hpp>
 #include <Lib/pid.hpp>
 
 class MotorController {
@@ -50,6 +51,12 @@ class MotorController {
     void setBeepFreqKhz(int freq);
 
     bool OC = false;
+    bool CE = false;
+
+    float D_dt = 0;
+    float D_dt_avg = 0;
+
+    uint32_t prev_D_dt = 0;
 
    private:
     baseMotorDriver* _driver;
@@ -60,6 +67,8 @@ class MotorController {
     PID<float> _current_pid;
     PID<float> _velocity_pid;
     PID<float> _angle_pid;
+
+    MovingAverageFilter<uint32_t, 8> _duty_dt_filter;
 
     void _update(void);
 
