@@ -260,6 +260,24 @@ float MotorController::getDuty() {
 }
 
 void MotorController::setCurrentPID(float p, float i, float d) {
+    if (p < 0) {
+        p = 0;
+    } else if (p > 3) {
+        p = 0
+    }
+
+    if (i < 0) {
+        i = 0;
+    } else if (i > 3) {
+        i = 0
+    }
+
+    if (d < 0) {
+        d = 0;
+    } else if (d > 3) {
+        d = 0
+    }
+
     _current_pid.setPID(p, i, d);
 }
 
@@ -316,6 +334,24 @@ float MotorController::getTargetVelocity() {
 }
 
 void MotorController::setAnglePID(float p, float i, float d) {
+    if (p < 0) {
+        p = 0;
+    } else if (p > 1) {
+        p = 0
+    }
+
+    if (i < 0) {
+        i = 0;
+    } else if (i > 1) {
+        i = 0
+    }
+
+    if (d < 0) {
+        d = 0;
+    } else if (d > 1) {
+        d = 0
+    }
+
     _angle_pid.setPID(p, i, d);
 }
 

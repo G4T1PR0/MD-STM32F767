@@ -146,7 +146,7 @@ void app_init() {
     FR_Motor.setMotorDirection(true);
     FR_Motor.setMode(2);
     FR_Motor.setCurrentPID(1, 0, 0);
-    FR_Motor.setCurrent(0);
+    FR_Motor.setCurrent(0.01);
 
     RL_Motor.setMotorDirection(true);
     RL_Motor.setMode(2);
