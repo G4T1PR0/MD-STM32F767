@@ -138,7 +138,7 @@ void app_init() {
 
     ST_Motor.setMotorDirection(false);
     ST_Motor.setCurrentPID(2, 0, 0);
-    ST_Motor.setAnglePID(0.07, 0, 0);
+    ST_Motor.setAnglePID(0.03, 0, 0);
     ST_Motor.setAngle(0);
     ST_Motor.setMode(4);
     ST_Motor.setCurrentLimit(5);
@@ -208,7 +208,7 @@ void app_main() {
 
         if (cmd_send_cnt > 10) {  // 10ms
             cmd_send_cnt = 0;
-            cmd.send();  // Send Feedback
+            // cmd.send();  // Send Feedback
         }
 
         cmd.update();  // Parse Command

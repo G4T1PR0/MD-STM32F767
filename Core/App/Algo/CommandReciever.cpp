@@ -34,7 +34,7 @@ void CommandReciever::update() {
 
     for (int i = 0; i < data_size; i++) {
         is_rx = true;
-        printf("\nrx: %d \n", _rx_buffer[i]);
+        // printf("\nrx: %d \n", _rx_buffer[i]);
         switch (_rx_mode) {
             case 0:
                 if (_rx_buffer[i] == 0xFF) {
@@ -69,7 +69,7 @@ void CommandReciever::update() {
                 break;
 
             case 4:
-                printf("\nCMD RX: %d\n", _rx_buffer[i]);
+                // printf("\nCMD RX: %d\n", _rx_buffer[i]);
                 switch (_rx_buffer[i]) {
                     case 0:
                         _rx_mode = 0;
@@ -91,10 +91,10 @@ void CommandReciever::update() {
                 break;
 
             case 10:  // set mode
-                printf("motor_id: %d set mode: %d\n", _rx_set_mode_temp, _rx_buffer[i]);
+                // printf("motor_id: %d set mode: %d\n", _rx_set_mode_temp, _rx_buffer[i]);
                 _mcs[_rx_set_mode_temp++]->setMode(_rx_buffer[i]);
                 if (_rx_buffer[i] > 4) {
-                    printf("ERROR: set mode: %d\n", _rx_buffer[i]);
+                    // printf("ERROR: set mode: %d\n", _rx_buffer[i]);
                 }
                 if (_rx_set_mode_temp >= _mcs.size()) {
                     _rx_mode = 4;
@@ -114,7 +114,7 @@ void CommandReciever::update() {
                     case 1:
                         _int16_to_uint8.u8[_rx_cnt++] = _rx_buffer[i];
                         if (_rx_cnt == 2) {
-                            printf("\nmotor_id: %d set duty: %d %f\n", _rx_set_target_temp, _int16_to_uint8.i16, _int16_to_uint8.i16 / (float)32767);
+                            // printf("\nmotor_id: %d set duty: %d %f\n", _rx_set_target_temp, _int16_to_uint8.i16, _int16_to_uint8.i16 / (float)32767);
                             _mcs[_rx_set_target_temp]->setDuty(_int16_to_uint8.i16 / (float)32767);
                             _rx_cnt = 0;
                             _rx_set_target_temp++;
@@ -124,7 +124,7 @@ void CommandReciever::update() {
                     case 2:
                         _int16_to_uint8.u8[_rx_cnt++] = _rx_buffer[i];
                         if (_rx_cnt == 2) {
-                            printf("\nmotor_id: %d set current: %d %f\n", _rx_set_target_temp, _int16_to_uint8.i16, _int16_to_uint8.i16 / (float)1638);
+                            // printf("\nmotor_id: %d set current: %d %f\n", _rx_set_target_temp, _int16_to_uint8.i16, _int16_to_uint8.i16 / (float)1638);
                             _mcs[_rx_set_target_temp]->setCurrent(_int16_to_uint8.i16 / (float)1638);
                             _rx_cnt = 0;
                             _rx_set_target_temp++;
@@ -143,8 +143,8 @@ void CommandReciever::update() {
                     case 4:
                         _int16_to_uint8.u8[_rx_cnt++] = _rx_buffer[i];
                         if (_rx_cnt == 2) {
-                            printf("\nmotor_id: %d set angle: %d %f\n", _rx_set_target_temp, _int16_to_uint8.i16, _int16_to_uint8.i16 / (float)728);
-                            _mcs[_rx_set_target_temp]->setAngle(_int16_to_uint8.i16 / (float)728);
+                            // printf("\nmotor_id: %d set angle: %d %f\n", _rx_set_target_temp, _int16_to_uint8.i16, _int16_to_uint8.i16 / (float)655);
+                            _mcs[_rx_set_target_temp]->setAngle(_int16_to_uint8.i16 / (float)655);
                             _rx_cnt = 0;
                             _rx_set_target_temp++;
                         }
@@ -152,7 +152,7 @@ void CommandReciever::update() {
                 }
                 if (_rx_set_target_temp >= _mcs.size()) {
                     _rx_mode = 4;
-                    printf("return mode: %d\n", _rx_mode);
+                    // printf("return mode: %d\n", _rx_mode);
                 }
                 break;
 
@@ -163,7 +163,7 @@ void CommandReciever::update() {
     }
     if (is_rx) {
         is_rx = false;
-        printf("/////////////////////////////////////////////////\n");
+        // printf("/////////////////////////////////////////////////\n");
     }
 }
 
@@ -219,8 +219,8 @@ void CommandReciever::send() {
                 _feedback_data[i].mode4_feedback_data.duty = mc->getDuty() * 32767;
                 _feedback_data[i].mode4_feedback_data.target_current = mc->getTargetCurrent() * 1638;
                 _feedback_data[i].mode4_feedback_data.current = mc->getCurrent() * 1638;
-                _feedback_data[i].mode4_feedback_data.target_angle = mc->getTargetAngle() * 728;
-                _feedback_data[i].mode4_feedback_data.angle = mc->getAngle() * 728;
+                _feedback_data[i].mode4_feedback_data.target_angle = mc->getTargetAngle() * 655;
+                _feedback_data[i].mode4_feedback_data.angle = mc->getAngle() * 655;
                 memcpy(&_tx_buffer[_tx_buffer_index], &_feedback_data[i].mode4_feedback_data, sizeof(mode4_feedback_data_t));
                 _tx_buffer_index += sizeof(mode4_feedback_data_t);
                 break;

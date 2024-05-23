@@ -151,20 +151,7 @@ void inline MotorController::_update(void) {
             break;
 
         case 4:  // Motor Angle Control
-            _pidTargetCurrent = _angle_pid.update(_targetAngle, _observedAngle);
-            // _motorInputDuty = _current_pid.update(_pidTargetCurrent, _observedCurrent);
-
-            // if (_pidTargetCurrent > 0) {
-            //     if (_motorInputDuty < 0)
-            //         _motorInputDuty = 0;
-            // } else if (_pidTargetCurrent < 0) {
-            //     if (_motorInputDuty > 0)
-            //         _motorInputDuty = 0;
-            // } else if (_pidTargetCurrent == 0) {
-            //     _motorInputDuty = 0;
-            //}
-
-            _motorInputDuty = _pidTargetCurrent;
+            _motorInputDuty = _angle_pid.update(_targetAngle, _observedAngle);
 
             if (_motorInputDuty > 0.5) {
                 _motorInputDuty = 0.5;
@@ -263,19 +250,19 @@ void MotorController::setCurrentPID(float p, float i, float d) {
     if (p < 0) {
         p = 0;
     } else if (p > 3) {
-        p = 0
+        p = 0;
     }
 
     if (i < 0) {
         i = 0;
     } else if (i > 3) {
-        i = 0
+        i = 0;
     }
 
     if (d < 0) {
         d = 0;
     } else if (d > 3) {
-        d = 0
+        d = 0;
     }
 
     _current_pid.setPID(p, i, d);
@@ -337,19 +324,19 @@ void MotorController::setAnglePID(float p, float i, float d) {
     if (p < 0) {
         p = 0;
     } else if (p > 1) {
-        p = 0
+        p = 0;
     }
 
     if (i < 0) {
         i = 0;
     } else if (i > 1) {
-        i = 0
+        i = 0;
     }
 
     if (d < 0) {
         d = 0;
     } else if (d > 1) {
-        d = 0
+        d = 0;
     }
 
     _angle_pid.setPID(p, i, d);

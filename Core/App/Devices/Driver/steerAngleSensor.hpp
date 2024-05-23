@@ -23,7 +23,7 @@ class steerAngleSensor : public baseSteerAngleSensor {
    private:
     MAL* _mcu;
     MAL::P_ADC _p;
-    const float _raw2angle = 90.0f / 2257.0f;
+    const float _raw2angle = 90.0f / 3355.0f;
 
     float _temp_filter_value = 0;
 };
