@@ -40,6 +40,7 @@ void A3921::setDuty(float duty) {
         }
 
         _mcu->pwmSetDuty(_pwm, duty);
+        //_mcu->pwmSetDuty(_pwm, 0);
         // _mcu->gpioSetValue(_sr, 1);
     }
 }

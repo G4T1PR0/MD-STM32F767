@@ -11,7 +11,7 @@
 #include <Devices/McuAbstractionLayer/RingBuffer.hpp>
 #include <Devices/McuAbstractionLayer/baseMcuAbstractionLayer.hpp>
 
-#define UART_BUFFER_SIZE 256
+#define UART_BUFFER_SIZE 512
 #define ADC_BUFFER_SIZE 50
 
 class stm32halAbstractionLayer : public baseMcuAbstractionLayer {

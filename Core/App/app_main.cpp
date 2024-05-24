@@ -208,7 +208,7 @@ void app_main() {
 
         if (cmd_send_cnt > 10) {  // 10ms
             cmd_send_cnt = 0;
-            // cmd.send();  // Send Feedback
+            cmd.send();  // Send Feedback
         }
 
         cmd.update();  // Parse Command

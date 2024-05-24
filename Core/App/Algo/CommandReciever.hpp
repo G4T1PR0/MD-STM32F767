@@ -12,7 +12,7 @@
 #include <Devices/McuAbstractionLayer/baseMcuAbstractionLayer.hpp>
 #include <vector>
 
-#define CMD_BUFFER_SIZE 256
+#define CMD_BUFFER_SIZE 512
 
 class CommandReciever {
    public:

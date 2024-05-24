@@ -85,7 +85,12 @@ void CommandReciever::update() {
                         _rx_set_target_temp = 0;
                         break;
 
+                    case 0xFE:
+                        _rx_mode = 0;
+                        break;
+
                     default:
+                        _rx_mode = 0;
                         break;
                 }
                 break;

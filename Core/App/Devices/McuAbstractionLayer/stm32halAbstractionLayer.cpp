@@ -403,6 +403,11 @@ void stm32halAbstractionLayer::uartReadViaBuffer(P_UART p, uint8_t* data, uint32
         _uartRxBuffer[p].setWritePos(_uartGetRxBufferDmaWriteAddress(p));
         _uartRxBuffer[p].pop(data, size);
     }
+
+    if (HAL_UART_GetState(PAL.UART[p]) == HAL_UART_STATE_READY) {
+        HAL_UART_DMAStop(PAL.UART[p]);
+        HAL_UART_Receive_DMA(PAL.UART[p], _uartRxBuffer[p].Buffer, UART_BUFFER_SIZE);
+    }
 }
 
 uint32_t stm32halAbstractionLayer::uartGetRxDataSize(P_UART p) {
