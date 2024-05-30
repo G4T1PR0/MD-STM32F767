@@ -32,6 +32,11 @@ class baseMcuAbstractionLayer {
         End_P,
     };
 
+    enum P_IPWM {
+        ST_IPWM,
+        End_IP,
+    };
+
     enum P_Encoder {
         FL_Encoder,
         FR_Encoder,
@@ -84,6 +89,10 @@ class baseMcuAbstractionLayer {
     // PWM
     virtual void pwmSetDuty(P_PWM p, float duty) = 0;
     virtual void pwmSetFrequency(P_PWM p, uint32_t frequency) = 0;
+
+    // Input PWM
+    virtual float inputPwmGetDuty(P_IPWM p) = 0;
+    virtual float inputPwmGetFrequency(P_IPWM p) = 0;
 
     // Encoder
     virtual void encoderSetCnt(P_Encoder p, uint32_t cnt) = 0;

@@ -6,6 +6,7 @@
  */
 
 #include <Algo/MotorController.hpp>
+#include "stdio.h"
 
 #define ABS(a) (((a) < 0) ? -(a) : (a))
 
@@ -86,8 +87,16 @@ void inline MotorController::_update(void) {
                 _motorInputDuty = 0;
             }
 
+            if (_observedAngle > 40) {
+                if (_motorInputDuty > 0)
+                    _motorInputDuty = 0;
+            } else if (_observedAngle < -40) {
+                if (_motorInputDuty < 0)
+                    _motorInputDuty = 0;
+            }
+
             _driver->setDuty(_motorInputDuty);
-            //_driver->setDuty(0);
+            // _driver->setDuty(0);
             break;
 
         case 2:  // Motor Current Control
@@ -343,12 +352,18 @@ void MotorController::setAnglePID(float p, float i, float d) {
 }
 
 void MotorController::setAngle(float angle) {
-    if (angle >= 50) {
-        angle = 50;
-    } else if (angle <= -50) {
-        angle = -50;
+    if (angle >= 40) {
+        angle = 40;
+    } else if (angle <= -40) {
+        angle = -40;
     }
     _targetAngle = angle;
+
+    // if (ABS(_targetAngle - _d_prev_angle) > 5) {
+    //     printf("angle: %f diff: %f\n", _targetAngle, _targetAngle - _d_prev_angle);
+    // }
+
+    // _d_prev_angle = _targetAngle;
 }
 
 float MotorController::getAngle() {

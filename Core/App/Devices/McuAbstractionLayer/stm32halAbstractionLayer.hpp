@@ -27,6 +27,14 @@ class stm32halAbstractionLayer : public baseMcuAbstractionLayer {
     virtual void pwmSetDuty(P_PWM p, float duty);
     virtual void pwmSetFrequency(P_PWM p, uint32_t frequency);
 
+    // Input PWM
+
+    virtual float inputPwmGetDuty(P_IPWM p);
+    virtual float inputPwmGetFrequency(P_IPWM p);
+
+    static float _input_pwm_duty[P_IPWM::End_IP];
+    static float _input_pwm_freq[P_IPWM::End_IP];
+
     // Encoder
     virtual void encoderSetCnt(P_Encoder p, uint32_t cnt);
     virtual uint32_t encoderGetCnt(P_Encoder p);
@@ -56,12 +64,15 @@ class stm32halAbstractionLayer : public baseMcuAbstractionLayer {
 
     static uint16_t _data[3][3 * ADC_BUFFER_SIZE];
 
-    // Timer Encoder
-    void _initEncoder();
-
     // Timer PWM
     void _initPWM();
     unsigned int _current_pwm_hz[P_PWM::End_P] = {0};
+
+    // Timer Input PWM
+    void _initInputPWM();
+
+    // Timer Encoder
+    void _initEncoder();
 
     // UART
     void _initUART();

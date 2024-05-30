@@ -27,6 +27,9 @@ struct PeripheralAllocation {
     uint32_t PWM_CH[MAL::P_PWM::End_P];
     TIM_HandleTypeDef* MASTER_TIM;
 
+    TIM_HandleTypeDef* InputPWM_TIM[MAL::P_IPWM::End_IP];
+    uint32_t InputPWM_TIM_CLOCK[MAL::P_IPWM::End_IP];
+
     TIM_HandleTypeDef* Encoder_TIM[MAL::P_Encoder::End_E];
 
     GPIO_TypeDef* GPIO_PORT[MAL::P_GPIO::End_G];
@@ -78,6 +81,10 @@ stm32halAbstractionLayer::stm32halAbstractionLayer() {
     PAL.PWM_CH[MAL::P_PWM::RR_PWM] = TIM_CHANNEL_1;
 
     PAL.MASTER_TIM = &htim5;
+
+    // Input PWM
+    PAL.InputPWM_TIM[MAL::P_IPWM::ST_IPWM] = &htim9;
+    PAL.InputPWM_TIM_CLOCK[MAL::P_IPWM::ST_IPWM] = 216000000;
 
     // Encoder
     PAL.Encoder_TIM[MAL::P_Encoder::FL_Encoder] = &htim3;
@@ -161,6 +168,7 @@ void stm32halAbstractionLayer::init() {
     _initPWM();
     _initUART();
     _initTimerInterrupt();
+    _initInputPWM();
 }
 
 // ADC
@@ -243,28 +251,6 @@ void stm32halAbstractionLayer::adcGetBufferValue(P_ADC p, uint16_t* buffer, uint
     }
 }
 
-// Encoder
-
-void stm32halAbstractionLayer::_initEncoder() {
-    HAL_TIM_Encoder_Start(PAL.Encoder_TIM[MAL::P_Encoder::FL_Encoder], TIM_CHANNEL_ALL);
-    HAL_TIM_Encoder_Start(PAL.Encoder_TIM[MAL::P_Encoder::FR_Encoder], TIM_CHANNEL_ALL);
-    HAL_TIM_Encoder_Start(PAL.Encoder_TIM[MAL::P_Encoder::RL_Encoder], TIM_CHANNEL_ALL);
-    HAL_TIM_Encoder_Start(PAL.Encoder_TIM[MAL::P_Encoder::RR_Encoder], TIM_CHANNEL_ALL);
-}
-
-void stm32halAbstractionLayer::encoderSetCnt(P_Encoder p, uint32_t cnt) {
-    if (p != P_Encoder::End_E) {
-        __HAL_TIM_SET_COUNTER(PAL.Encoder_TIM[p], cnt);
-    }
-}
-
-uint32_t stm32halAbstractionLayer::encoderGetCnt(P_Encoder p) {
-    if (p != P_Encoder::End_E) {
-        return __HAL_TIM_GET_COUNTER(PAL.Encoder_TIM[p]);
-    }
-    return 0;
-}
-
 // PWM
 
 void stm32halAbstractionLayer::_initPWM() {
@@ -335,6 +321,62 @@ void stm32halAbstractionLayer::pwmSetFrequency(P_PWM p, uint32_t frequency) {
             }
         }
     }
+}
+
+// Timer Input PWM
+
+float stm32halAbstractionLayer::_input_pwm_duty[P_IPWM::End_IP] = {0};
+float stm32halAbstractionLayer::_input_pwm_freq[P_IPWM::End_IP] = {0};
+
+void stm32halAbstractionLayer::_initInputPWM() {
+    HAL_TIM_IC_Start_IT(PAL.InputPWM_TIM[MAL::P_IPWM::ST_IPWM], TIM_CHANNEL_1);
+    HAL_TIM_IC_Start(PAL.InputPWM_TIM[MAL::P_IPWM::ST_IPWM], TIM_CHANNEL_2);
+}
+
+float stm32halAbstractionLayer::inputPwmGetDuty(P_IPWM p) {
+    if (p != P_IPWM::End_IP) {
+        return _input_pwm_duty[p];
+    }
+    return 0;
+}
+
+float stm32halAbstractionLayer::inputPwmGetFrequency(P_IPWM p) {
+    if (p != P_IPWM::End_IP) {
+        return _input_pwm_freq[p];
+    }
+    return 0;
+}
+
+void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef* htim) {
+    if (htim == PAL.InputPWM_TIM[MAL::P_IPWM::ST_IPWM]) {
+        uint32_t cl = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
+        uint32_t ch = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_2);
+
+        stm32halAbstractionLayer::_input_pwm_freq[MAL::P_IPWM::ST_IPWM] = (float)PAL.InputPWM_TIM_CLOCK[MAL::P_IPWM::ST_IPWM] / (cl + 1);
+        stm32halAbstractionLayer::_input_pwm_duty[MAL::P_IPWM::ST_IPWM] = (float)100 * ch / cl;
+    }
+}
+
+// Encoder
+
+void stm32halAbstractionLayer::_initEncoder() {
+    HAL_TIM_Encoder_Start(PAL.Encoder_TIM[MAL::P_Encoder::FL_Encoder], TIM_CHANNEL_ALL);
+    HAL_TIM_Encoder_Start(PAL.Encoder_TIM[MAL::P_Encoder::FR_Encoder], TIM_CHANNEL_ALL);
+    HAL_TIM_Encoder_Start(PAL.Encoder_TIM[MAL::P_Encoder::RL_Encoder], TIM_CHANNEL_ALL);
+    HAL_TIM_Encoder_Start(PAL.Encoder_TIM[MAL::P_Encoder::RR_Encoder], TIM_CHANNEL_ALL);
+}
+
+void stm32halAbstractionLayer::encoderSetCnt(P_Encoder p, uint32_t cnt) {
+    if (p != P_Encoder::End_E) {
+        __HAL_TIM_SET_COUNTER(PAL.Encoder_TIM[p], cnt);
+    }
+}
+
+uint32_t stm32halAbstractionLayer::encoderGetCnt(P_Encoder p) {
+    if (p != P_Encoder::End_E) {
+        return __HAL_TIM_GET_COUNTER(PAL.Encoder_TIM[p]);
+    }
+    return 0;
 }
 
 // GPIO

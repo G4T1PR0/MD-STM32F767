@@ -18,6 +18,8 @@
 #include <Algo/CommandReciever.hpp>
 #include <Algo/MotorController.hpp>
 
+#define ABS(a) (((a) < 0) ? -(a) : (a))
+
 stm32halAbstractionLayer mcu;
 
 currentSensor fl_current(&mcu, MAL::P_ADC::FL_Current);
@@ -65,6 +67,35 @@ unsigned int cmd_send_cnt = 0;
 static volatile float debug_log[DEBUG_LOG_NUM][5] = {0};
 unsigned int log_mode = 0;
 unsigned int log_cnt = 0;
+
+struct md_error_t {
+    enum Error_Code {
+        BATT_VOLTAGE_ERROR = 0,
+        FL_CURRENT_ERROR = 1,
+        FR_CURRENT_ERROR = 2,
+        ST_CURRENT_ERROR = 3,
+        RL_CURRENT_ERROR = 4,
+        RR_CURRENT_ERROR = 5,
+
+        FL_CONTROLL_ERROR = 6,
+        FR_CONTROLL_ERROR = 7,
+        ST_CONTROLL_ERROR = 8,
+        RL_CONTROLL_ERROR = 9,
+        RR_CONTROLL_ERROR = 10,
+
+        Error_End = 11,
+    };
+
+    bool Error[Error_Code::Error_End];
+
+} __attribute__((packed));
+
+union md_error_union {
+    md_error_t s;
+    uint32_t raw;
+};
+
+md_error_union md_error;
 
 MAL::P_GPIO led[]{
     MAL::P_GPIO::LED_1,
@@ -138,10 +169,10 @@ void app_init() {
 
     ST_Motor.setMotorDirection(false);
     ST_Motor.setCurrentPID(2, 0, 0);
-    ST_Motor.setAnglePID(0.03, 0, 0);
+    ST_Motor.setAnglePID(0.04, 0, 0);
     ST_Motor.setAngle(0);
-    ST_Motor.setMode(4);
-    ST_Motor.setCurrentLimit(5);
+    ST_Motor.setMode(0);
+    ST_Motor.setCurrentLimit(8);
 
     FR_Motor.setMotorDirection(true);
     FR_Motor.setMode(2);
@@ -187,7 +218,21 @@ void app_main() {
             }
         }
 
-        if (batt_voltage.getVoltage() < 6 || FL_Motor.OC || FR_Motor.OC || ST_Motor.OC || RL_Motor.OC || RR_Motor.OC || FL_Motor.CE || FR_Motor.CE || ST_Motor.CE || RL_Motor.CE || RR_Motor.CE) {
+        md_error.s.Error[md_error.s.BATT_VOLTAGE_ERROR] = batt_voltage.getVoltage() < 6;
+
+        md_error.s.Error[md_error.s.FL_CURRENT_ERROR] = FL_Motor.OC;
+        md_error.s.Error[md_error.s.FR_CURRENT_ERROR] = FR_Motor.OC;
+        md_error.s.Error[md_error.s.ST_CURRENT_ERROR] = ST_Motor.OC;
+        md_error.s.Error[md_error.s.RL_CURRENT_ERROR] = RL_Motor.OC;
+        md_error.s.Error[md_error.s.RR_CURRENT_ERROR] = RR_Motor.OC;
+
+        md_error.s.Error[md_error.s.FL_CONTROLL_ERROR] = FL_Motor.CE;
+        md_error.s.Error[md_error.s.FR_CONTROLL_ERROR] = FR_Motor.CE;
+        md_error.s.Error[md_error.s.ST_CONTROLL_ERROR] = ST_Motor.CE;
+        md_error.s.Error[md_error.s.RL_CONTROLL_ERROR] = RL_Motor.CE;
+        md_error.s.Error[md_error.s.RR_CONTROLL_ERROR] = RR_Motor.CE;
+
+        if (md_error.raw != 0) {
             for (const auto& i : mcs) {
                 i->setMode(100);
             }
@@ -203,6 +248,12 @@ void app_main() {
             RL_Motor.setMode(10);
             mcu.waitMs(150);
             while (1) {
+                printf("\x1b[31m[Main Thread]\x1b[39m Error: %u Bit: ", md_error.raw);
+                for (int i = 0; i < md_error.s.Error_End; i++) {
+                    printf("%u ", md_error.s.Error[i]);
+                }
+                printf("\n");
+                mcu.waitMs(1000);
             }
         }
 
@@ -292,6 +343,7 @@ void app_main() {
 
         if (debug_cnt > 100 * 10) {
             debug_cnt = 0;
+            // printf("input duty: %f freq: %f\r\n", (mcu.inputPwmGetDuty(MAL::P_IPWM::ST_IPWM) - 50), mcu.inputPwmGetFrequency(MAL::P_IPWM::ST_IPWM));
             // printf("fld: %f frd: %f rld: %f rrd: %f\r\n", FL_Motor.getDuty(), FR_Motor.getDuty(), RL_Motor.getDuty(), RR_Motor.getDuty());
             // printf("mode: %d bus_voltage: %f duty: %f t_current: %f o_current: %f dt: %f dt_avg %f\r\n", FR_Motor.getMode(), batt_voltage.getVoltage(), FR_Motor.getDuty(), FR_Motor.getTargetCurrent(), FR_Motor.getCurrent(), FR_Motor.D_dt, FR_Motor.D_dtdt);
             // printf("std: %f std_dt: %f std_dt_avg: %f\r\n", FL_Motor.getDuty(), FL_Motor.D_dt, (float)FL_Motor.D_dt_avg);
@@ -307,6 +359,17 @@ unsigned int update1ms_cnt = 0;
 
 void app_interrupt_50us() {
     update1ms_cnt++;
+    if (ABS(20000 - mcu.inputPwmGetFrequency(MAL::P_IPWM::ST_IPWM)) < 100) {
+        /// ST_Motor.setAngle(mcu.inputPwmGetDuty(MAL::P_IPWM::ST_IPWM) - 50);
+
+        float duty = (mcu.inputPwmGetDuty(MAL::P_IPWM::ST_IPWM) - 50);
+        if (duty > 0.2) {
+            duty = 0.2;
+        } else if (duty < -0.2) {
+            duty = -0.2;
+        }
+        ST_Motor.setDuty(duty);
+    }
     if (update1ms_cnt > 20) {
         update1ms_cnt = 0;
         fl_encoder.update();

@@ -101,6 +101,10 @@ class MotorController {
 
     unsigned int _beep_cnt = 0;
     bool _beep_flag = 0;
+
+    // DEBUG
+
+    float _d_prev_angle = 0;
 };
 
 #endif /* APP_ALGO_MOTORCONTROLLER_HPP_ */

@@ -120,7 +120,7 @@ void CommandReciever::update() {
                         _int16_to_uint8.u8[_rx_cnt++] = _rx_buffer[i];
                         if (_rx_cnt == 2) {
                             // printf("\nmotor_id: %d set duty: %d %f\n", _rx_set_target_temp, _int16_to_uint8.i16, _int16_to_uint8.i16 / (float)32767);
-                            _mcs[_rx_set_target_temp]->setDuty(_int16_to_uint8.i16 / (float)32767);
+                            //_mcs[_rx_set_target_temp]->setDuty(_int16_to_uint8.i16 / (float)32767);
                             _rx_cnt = 0;
                             _rx_set_target_temp++;
                         }
@@ -149,7 +149,7 @@ void CommandReciever::update() {
                         _int16_to_uint8.u8[_rx_cnt++] = _rx_buffer[i];
                         if (_rx_cnt == 2) {
                             // printf("\nmotor_id: %d set angle: %d %f\n", _rx_set_target_temp, _int16_to_uint8.i16, _int16_to_uint8.i16 / (float)655);
-                            _mcs[_rx_set_target_temp]->setAngle(_int16_to_uint8.i16 / (float)655);
+                            // _mcs[_rx_set_target_temp]->setAngle(_int16_to_uint8.i16 / (float)655);
                             _rx_cnt = 0;
                             _rx_set_target_temp++;
                         }
