@@ -113,6 +113,16 @@ MAL::P_GPIO led[]{
 void app_init() {
     mcu.init();
 
+    mcu.waitMs(100);
+
+    fl_current.init();
+    fr_current.init();
+    st_current.init();
+    rl_current.init();
+    rr_current.init();
+
+    mcu.waitMs(100);
+
     fl_encoder.init();
     fr_encoder.init();
     rl_encoder.init();
@@ -163,7 +173,7 @@ void app_init() {
     }
 
     FL_Motor.setMotorDirection(false);
-    FL_Motor.setMode(2);
+    FL_Motor.setMode(0);
     FL_Motor.setCurrentPID(1, 0, 0);
     FL_Motor.setCurrent(0);
 
@@ -175,17 +185,17 @@ void app_init() {
     ST_Motor.setCurrentLimit(8);
 
     FR_Motor.setMotorDirection(true);
-    FR_Motor.setMode(2);
+    FR_Motor.setMode(0);
     FR_Motor.setCurrentPID(1, 0, 0);
-    FR_Motor.setCurrent(0.01);
+    FR_Motor.setCurrent(0);
 
     RL_Motor.setMotorDirection(true);
-    RL_Motor.setMode(2);
+    RL_Motor.setMode(0);
     RL_Motor.setCurrentPID(1, 0, 0);
     FR_Motor.setCurrent(0);
 
     RR_Motor.setMotorDirection(false);
-    RR_Motor.setMode(2);
+    RR_Motor.setMode(0);
     RR_Motor.setCurrentPID(1, 0, 0);
     FR_Motor.setCurrent(0);
 
@@ -201,9 +211,18 @@ void app_main() {
 
     log_mode = 1;
 
+    // FL_Motor.setMode(2);
+    // FL_Motor.setCurrent(0.6);
+    // FR_Motor.setMode(2);
+    // FR_Motor.setCurrent(0.6);
+    // RL_Motor.setMode(2);
+    // RL_Motor.setCurrent(0.6);
+    // RR_Motor.setMode(2);
+    // RR_Motor.setCurrent(0.6);
+
     while (1) {
-        // float d = (FL_Motor.getDuty() + FR_Motor.getDuty() + RL_Motor.getDuty() + RR_Motor.getDuty()) / 4;
-        float d = ST_Motor.getDuty();
+        float d = (FL_Motor.getDuty() + FR_Motor.getDuty() + ST_Motor.getDuty() + RL_Motor.getDuty() + RR_Motor.getDuty()) / 5;
+        // float d = ST_Motor.getDuty();
         if (d < 0) {
             d = -d;
         }
@@ -345,7 +364,7 @@ void app_main() {
             debug_cnt = 0;
             // printf("input duty: %f freq: %f\r\n", (mcu.inputPwmGetDuty(MAL::P_IPWM::ST_IPWM) - 50), mcu.inputPwmGetFrequency(MAL::P_IPWM::ST_IPWM));
             // printf("fld: %f frd: %f rld: %f rrd: %f\r\n", FL_Motor.getDuty(), FR_Motor.getDuty(), RL_Motor.getDuty(), RR_Motor.getDuty());
-            // printf("mode: %d bus_voltage: %f duty: %f t_current: %f o_current: %f dt: %f dt_avg %f\r\n", FR_Motor.getMode(), batt_voltage.getVoltage(), FR_Motor.getDuty(), FR_Motor.getTargetCurrent(), FR_Motor.getCurrent(), FR_Motor.D_dt, FR_Motor.D_dtdt);
+            // printf("mode: %d bus_voltage: %f duty: %f t_current: %f o_current: %f dt: %f dt_avg %f\r\n", FR_Motor.getMode(), batt_voltage.getVoltage(), FR_Motor.getDuty(), FR_Motor.getTargetCurrent(), FR_Motor.getCurrent(), FR_Motor.D_dt, FR_Motor.D_dt_avg);
             // printf("std: %f std_dt: %f std_dt_avg: %f\r\n", FL_Motor.getDuty(), FL_Motor.D_dt, (float)FL_Motor.D_dt_avg);
             // printf("flc: %f frc: %f stc: %f rlc: %f rrc: %f\r\n", FL_Motor.getCurrent(), FR_Motor.getCurrent(), ST_Motor.getCurrent(), RL_Motor.getCurrent(), RR_Motor.getCurrent());
             //  printf("duty: %f t_current: %f o_current: %f t_velocity: %f o_velocity: %f\r\n", debug_log[log_cnt][0], debug_log[log_cnt][1], debug_log[log_cnt][2], debug_log[log_cnt][3], debug_log[log_cnt][4]);

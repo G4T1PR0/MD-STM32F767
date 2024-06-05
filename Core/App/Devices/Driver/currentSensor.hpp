@@ -24,6 +24,8 @@ class currentSensor : public baseCurrentSensor {
     MAL::P_ADC _p;
     MovingAverageFilter<uint16_t, 10> _filter;
 
+    float _offset = 0;
+
     float _temp_filter_value = 0;
 
     const float _raw2voltage = 3.3f / (1 << 12);
