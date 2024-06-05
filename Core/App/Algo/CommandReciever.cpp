@@ -87,6 +87,7 @@ void CommandReciever::update() {
 
                     case 0xFE:
                         _rx_mode = 0;
+                        cnt1ms = 0;
                         break;
 
                     default:
@@ -169,6 +170,15 @@ void CommandReciever::update() {
     if (is_rx) {
         is_rx = false;
         // printf("/////////////////////////////////////////////////\n");
+    }
+
+    if (cnt1ms > 100) {
+        for (auto mc : _mcs) {
+            mc->setMode(0);
+        }
+        isConnectionLost = true;
+    } else {
+        isConnectionLost = false;
     }
 }
 

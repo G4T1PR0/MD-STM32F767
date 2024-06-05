@@ -221,19 +221,32 @@ void app_main() {
     // RR_Motor.setCurrent(0.6);
 
     while (1) {
-        float d = (FL_Motor.getDuty() + FR_Motor.getDuty() + ST_Motor.getDuty() + RL_Motor.getDuty() + RR_Motor.getDuty()) / 5;
-        // float d = ST_Motor.getDuty();
-        if (d < 0) {
-            d = -d;
-        }
-
-        float dd = 0;
-        for (int i = 9; -1 < i; i--) {
-            dd += 0.1;
-            if (dd > d) {
+        if (cmd.isConnectionLost) {
+            for (unsigned int i = 0; i < 10; i++) {
                 mcu.gpioSetValue(led[i], 1);
-            } else {
-                mcu.gpioSetValue(led[i], 0);
+            }
+
+            mcu.gpioSetValue(MAL::P_GPIO::LED_1, 0);
+            mcu.gpioSetValue(MAL::P_GPIO::LED_2, 0);
+            mcu.gpioSetValue(MAL::P_GPIO::LED_3, 0);
+            mcu.gpioSetValue(MAL::P_GPIO::LED_4, 0);
+            mcu.gpioSetValue(MAL::P_GPIO::LED_5, 0);
+
+        } else {
+            float d = (FL_Motor.getDuty() + FR_Motor.getDuty() + ST_Motor.getDuty() + RL_Motor.getDuty() + RR_Motor.getDuty()) / 5;
+            // float d = ST_Motor.getDuty();
+            if (d < 0) {
+                d = -d;
+            }
+
+            float dd = 0;
+            for (int i = 9; -1 < i; i--) {
+                dd += 0.1;
+                if (dd > d) {
+                    mcu.gpioSetValue(led[i], 1);
+                } else {
+                    mcu.gpioSetValue(led[i], 0);
+                }
             }
         }
 
@@ -396,6 +409,7 @@ void app_interrupt_50us() {
         rl_encoder.update();
         rr_encoder.update();
         cmd_send_cnt++;
+        cmd.cnt1ms++;
     }
     MotorController::update(&FL_Motor);
     MotorController::update(&FR_Motor);

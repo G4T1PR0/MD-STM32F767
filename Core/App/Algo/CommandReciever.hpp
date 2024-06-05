@@ -22,6 +22,10 @@ class CommandReciever {
     void update();
     void send();
 
+    unsigned int cnt1ms = 0;
+
+    bool isConnectionLost = false;
+
    private:
     baseMcuAbstractionLayer* _mcu;
     std::vector<MotorController*> _mcs;
