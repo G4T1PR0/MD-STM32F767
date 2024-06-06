@@ -373,7 +373,7 @@ void app_main() {
 
         if (debug_cnt > 100 * 10) {
             debug_cnt = 0;
-            // printf("input duty: %f freq: %f\r\n", (mcu.inputPwmGetDuty(MAL::P_IPWM::ST_IPWM) - 50), mcu.inputPwmGetFrequency(MAL::P_IPWM::ST_IPWM));
+            // printf("input duty: %f freq: %f\r\n", (mcu.inputPwmGetDuty(MAL::P_IPWM::ST_IPWM)), mcu.inputPwmGetFrequency(MAL::P_IPWM::ST_IPWM));
             // printf("fld: %f frd: %f rld: %f rrd: %f\r\n", FL_Motor.getDuty(), FR_Motor.getDuty(), RL_Motor.getDuty(), RR_Motor.getDuty());
             // printf("mode: %d bus_voltage: %f duty: %f t_current: %f o_current: %f dt: %f dt_avg %f\r\n", FR_Motor.getMode(), batt_voltage.getVoltage(), FR_Motor.getDuty(), FR_Motor.getTargetCurrent(), FR_Motor.getCurrent(), FR_Motor.D_dt, FR_Motor.D_dt_avg);
             // printf("std: %f std_dt: %f std_dt_avg: %f\r\n", FL_Motor.getDuty(), FL_Motor.D_dt, (float)FL_Motor.D_dt_avg);

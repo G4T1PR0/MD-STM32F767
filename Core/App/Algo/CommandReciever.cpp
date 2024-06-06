@@ -313,7 +313,12 @@ void CommandReciever::parsePwm() {
                 break;
 
             case 5: {
-                float duty = (_mcu->inputPwmGetDuty(MAL::P_IPWM::ST_IPWM) - 50);
+                float duty = (_mcu->inputPwmGetDuty(MAL::P_IPWM::ST_IPWM) - 50) * 0.01;
+                if (duty > 0.5) {
+                    duty = 0.5;
+                } else if (duty < -0.5) {
+                    duty = -0.5;
+                }
                 _mcs[2]->setDuty(duty);
             } break;
 
