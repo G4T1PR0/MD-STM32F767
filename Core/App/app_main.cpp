@@ -230,9 +230,9 @@ void app_main() {
             mcu.gpioSetValue(MAL::P_GPIO::LED_4, 0);
             mcu.gpioSetValue(MAL::P_GPIO::LED_5, 0);
 
-        } else {
+        } else if (FL_Motor.getMode() != 0 || FR_Motor.getMode() != 0 || ST_Motor.getMode() != 0 || RL_Motor.getMode() != 0 || RR_Motor.getMode() != 0) {
             float d = (FL_Motor.getDuty() + FR_Motor.getDuty() + ST_Motor.getDuty() + RL_Motor.getDuty() + RR_Motor.getDuty()) / 5;
-            // float d = ST_Motor.getDuty();
+
             if (d < 0) {
                 d = -d;
             }
@@ -244,6 +244,31 @@ void app_main() {
                     mcu.gpioSetValue(led[i], 1);
                 } else {
                     mcu.gpioSetValue(led[i], 0);
+                }
+            }
+        } else {
+            if (led_cnt > 80 * 10) {
+                led_cnt = 0;
+                if (led_mode == 0) {
+                    led_index++;
+                    if (led_index >= 10) {
+                        led_index = 9;
+                        led_mode = 1;
+                    }
+                } else {
+                    led_index--;
+                    if (led_index <= -1) {
+                        led_index = 0;
+                        led_mode = 0;
+                    }
+                }
+            }
+
+            mcu.gpioSetValue(led[led_index], 0);
+
+            for (unsigned int i = 0; i < 10; i++) {
+                if (mcu.gpioGetValue(led[i]) == 0 && i != led_index) {
+                    mcu.gpioSetValue(led[i], 1);
                 }
             }
         }
@@ -344,31 +369,6 @@ void app_main() {
 
         //     default:
         //         break;
-        // }
-
-        // if (led_cnt > 70 * 10) {
-        //     led_cnt = 0;
-        //     if (led_mode == 0) {
-        //         led_index++;
-        //         if (led_index >= 10) {
-        //             led_index = 9;
-        //             led_mode = 1;
-        //         }
-        //     } else {
-        //         led_index--;
-        //         if (led_index <= -1) {
-        //             led_index = 0;
-        //             led_mode = 0;
-        //         }
-        //     }
-        // }
-
-        // mcu.gpioSetValue(led[led_index], 0);
-
-        // for (unsigned int i = 0; i < 10; i++) {
-        //     if (mcu.gpioGetValue(led[i]) == 0 && i != led_index) {
-        //         mcu.gpioSetValue(led[i], 1);
-        //     }
         // }
 
         if (debug_cnt > 100 * 10) {
