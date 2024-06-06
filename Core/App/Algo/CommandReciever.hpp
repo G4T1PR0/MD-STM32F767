@@ -21,6 +21,7 @@ class CommandReciever {
     void init();
     void update();
     void send();
+    void parsePwm();
 
     unsigned int cnt1ms = 0;
 
@@ -67,12 +68,20 @@ class CommandReciever {
         int16_t angle;
     } __attribute__((packed));
 
+    struct mode5_feedback_data_t {
+        uint8_t mode;
+        int16_t duty;
+        int16_t current;
+        int16_t angle;
+    } __attribute__((packed));
+
     struct feedback_data_t {
         mode0_feedback_data_t mode0_feedback_data;
         mode1_feedback_data_t mode1_feedback_data;
         mode2_feedback_data_t mode2_feedback_data;
         mode3_feedback_data_t mode3_feedback_data;
         mode4_feedback_data_t mode4_feedback_data;
+        mode5_feedback_data_t mode5_feedback_data;
     };
 
     union uint16_to_uint8_t {

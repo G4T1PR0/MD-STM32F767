@@ -18,8 +18,6 @@
 #include <Algo/CommandReciever.hpp>
 #include <Algo/MotorController.hpp>
 
-#define ABS(a) (((a) < 0) ? -(a) : (a))
-
 stm32halAbstractionLayer mcu;
 
 currentSensor fl_current(&mcu, MAL::P_ADC::FL_Current);
@@ -391,17 +389,9 @@ unsigned int update1ms_cnt = 0;
 
 void app_interrupt_50us() {
     update1ms_cnt++;
-    if (ABS(20000 - mcu.inputPwmGetFrequency(MAL::P_IPWM::ST_IPWM)) < 100) {
-        /// ST_Motor.setAngle(mcu.inputPwmGetDuty(MAL::P_IPWM::ST_IPWM) - 50);
 
-        float duty = (mcu.inputPwmGetDuty(MAL::P_IPWM::ST_IPWM) - 50);
-        if (duty > 0.2) {
-            duty = 0.2;
-        } else if (duty < -0.2) {
-            duty = -0.2;
-        }
-        ST_Motor.setDuty(duty);
-    }
+    cmd.parsePwm();
+
     if (update1ms_cnt > 20) {
         update1ms_cnt = 0;
         fl_encoder.update();

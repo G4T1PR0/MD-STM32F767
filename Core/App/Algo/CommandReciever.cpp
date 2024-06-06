@@ -9,6 +9,8 @@
 #include <cstring>
 #include "stdio.h"
 
+#define ABS(a) (((a) < 0) ? -(a) : (a))
+
 uint8_t CommandReciever::_tx_buffer[CMD_BUFFER_SIZE] = {0};
 
 CommandReciever::CommandReciever(baseMcuAbstractionLayer* mcu, std::vector<MotorController*> mcs) {
@@ -99,7 +101,7 @@ void CommandReciever::update() {
             case 10:  // set mode
                 // printf("motor_id: %d set mode: %d\n", _rx_set_mode_temp, _rx_buffer[i]);
                 _mcs[_rx_set_mode_temp++]->setMode(_rx_buffer[i]);
-                if (_rx_buffer[i] > 4) {
+                if (_rx_buffer[i] > 5) {
                     // printf("ERROR: set mode: %d\n", _rx_buffer[i]);
                 }
                 if (_rx_set_mode_temp >= _mcs.size()) {
@@ -121,7 +123,9 @@ void CommandReciever::update() {
                         _int16_to_uint8.u8[_rx_cnt++] = _rx_buffer[i];
                         if (_rx_cnt == 2) {
                             // printf("\nmotor_id: %d set duty: %d %f\n", _rx_set_target_temp, _int16_to_uint8.i16, _int16_to_uint8.i16 / (float)32767);
-                            //_mcs[_rx_set_target_temp]->setDuty(_int16_to_uint8.i16 / (float)32767);
+                            if (_rx_set_mode_temp != 2) {
+                                _mcs[_rx_set_target_temp]->setDuty(_int16_to_uint8.i16 / (float)32767);
+                            }
                             _rx_cnt = 0;
                             _rx_set_target_temp++;
                         }
@@ -131,7 +135,9 @@ void CommandReciever::update() {
                         _int16_to_uint8.u8[_rx_cnt++] = _rx_buffer[i];
                         if (_rx_cnt == 2) {
                             // printf("\nmotor_id: %d set current: %d %f\n", _rx_set_target_temp, _int16_to_uint8.i16, _int16_to_uint8.i16 / (float)1638);
-                            _mcs[_rx_set_target_temp]->setCurrent(_int16_to_uint8.i16 / (float)1638);
+                            if (_rx_set_mode_temp != 2) {
+                                _mcs[_rx_set_target_temp]->setCurrent(_int16_to_uint8.i16 / (float)1638);
+                            }
                             _rx_cnt = 0;
                             _rx_set_target_temp++;
                         }
@@ -140,7 +146,9 @@ void CommandReciever::update() {
                     case 3:
                         _int16_to_uint8.u8[_rx_cnt++] = _rx_buffer[i];
                         if (_rx_cnt == 2) {
-                            _mcs[_rx_set_target_temp]->setVelocity(_int16_to_uint8.i16);
+                            if (_rx_set_mode_temp != 2) {
+                                _mcs[_rx_set_target_temp]->setVelocity(_int16_to_uint8.i16);
+                            }
                             _rx_cnt = 0;
                             _rx_set_target_temp++;
                         }
@@ -150,7 +158,17 @@ void CommandReciever::update() {
                         _int16_to_uint8.u8[_rx_cnt++] = _rx_buffer[i];
                         if (_rx_cnt == 2) {
                             // printf("\nmotor_id: %d set angle: %d %f\n", _rx_set_target_temp, _int16_to_uint8.i16, _int16_to_uint8.i16 / (float)655);
-                            // _mcs[_rx_set_target_temp]->setAngle(_int16_to_uint8.i16 / (float)655);
+                            // if (_rx_set_mode_temp != 2) {
+                            //     _mcs[_rx_set_target_temp]->setAngle(_int16_to_uint8.i16 / (float)655);
+                            // }
+                            _rx_cnt = 0;
+                            _rx_set_target_temp++;
+                        }
+                        break;
+
+                    case 5:
+                        _rx_cnt++;
+                        if (_rx_cnt == 2) {
                             _rx_cnt = 0;
                             _rx_set_target_temp++;
                         }
@@ -240,6 +258,15 @@ void CommandReciever::send() {
                 _tx_buffer_index += sizeof(mode4_feedback_data_t);
                 break;
 
+            case 5:
+                _feedback_data[i].mode5_feedback_data.mode = mc->getMode();
+                _feedback_data[i].mode5_feedback_data.duty = mc->getDuty() * 32767;
+                _feedback_data[i].mode5_feedback_data.current = mc->getCurrent() * 1638;
+                _feedback_data[i].mode5_feedback_data.angle = mc->getAngle() * 655;
+                memcpy(&_tx_buffer[_tx_buffer_index], &_feedback_data[i].mode5_feedback_data, sizeof(mode5_feedback_data_t));
+                _tx_buffer_index += sizeof(mode5_feedback_data_t);
+                break;
+
             default:
                 break;
         };
@@ -276,4 +303,22 @@ void CommandReciever::send() {
     // printf("\r\n");
 
     _mcu->uartWriteViaBuffer(MAL::P_UART::Controller, _tx_buffer, _tx_buffer_index);
+}
+
+void CommandReciever::parsePwm() {
+    if (ABS(20000 - _mcu->inputPwmGetFrequency(MAL::P_IPWM::ST_IPWM)) < 100) {
+        switch (_mcs[2]->getMode()) {
+            case 4:
+                _mcs[2]->setAngle(_mcu->inputPwmGetDuty(MAL::P_IPWM::ST_IPWM) - 50);
+                break;
+
+            case 5: {
+                float duty = (_mcu->inputPwmGetDuty(MAL::P_IPWM::ST_IPWM) - 50);
+                _mcs[2]->setDuty(duty);
+            } break;
+
+            default:
+                break;
+        }
+    }
 }

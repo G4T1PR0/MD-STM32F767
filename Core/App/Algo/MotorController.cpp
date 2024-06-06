@@ -178,6 +178,33 @@ void inline MotorController::_update(void) {
             //_driver->setDuty(0);
             break;
 
+        case 5:  // Motor PWM Angle Control
+            _motorInputDuty = _targetDuty;
+
+            if (_observedCurrent > _currentLimit) {
+                _motorInputDuty = 0;
+            } else if (_observedCurrent < -_currentLimit) {
+                _motorInputDuty = 0;
+            }
+
+            if (_observedAngle > 40) {
+                if (_motorInputDuty > 0)
+                    _motorInputDuty = 0;
+            } else if (_observedAngle < -40) {
+                if (_motorInputDuty < 0)
+                    _motorInputDuty = 0;
+            }
+
+            if (_motorInputDuty > 0.5) {
+                _motorInputDuty = 0.5;
+            } else if (_motorInputDuty < -0.5) {
+                _motorInputDuty = -0.5;
+            }
+
+            _driver->setDuty(_motorInputDuty);
+            // _driver->setDuty(0);
+            break;
+
         case 10:  // beep
             _beep_cnt++;
 
@@ -213,7 +240,7 @@ void MotorController::setMode(int mode) {
             _mode = 10;
         }
     } else {
-        if ((mode < 0 || mode > 4) && (mode != 10 && mode != 100)) {
+        if ((mode < 0 || mode > 5) && (mode != 10 && mode != 100)) {
             _mode = 0;
             return;
         }
@@ -224,7 +251,7 @@ void MotorController::setMode(int mode) {
             } else {
                 _mode = mode;
             }
-        } else if (mode == 4) {
+        } else if (mode == 4 || mode == 5) {
             _mode = 0;
         } else {
             if (mode == 100) {
