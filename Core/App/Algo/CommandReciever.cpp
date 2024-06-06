@@ -101,9 +101,9 @@ void CommandReciever::update() {
             case 10:  // set mode
                 // printf("motor_id: %d set mode: %d\n", _rx_set_mode_temp, _rx_buffer[i]);
                 _mcs[_rx_set_mode_temp++]->setMode(_rx_buffer[i]);
-                if (_rx_buffer[i] > 5) {
-                    // printf("ERROR: set mode: %d\n", _rx_buffer[i]);
-                }
+                // if (_rx_buffer[i] > 5) {
+                // printf("ERROR: set mode: %d\n", _rx_buffer[i]);
+                //}
                 if (_rx_set_mode_temp >= _mcs.size()) {
                     _rx_mode = 4;
                 }

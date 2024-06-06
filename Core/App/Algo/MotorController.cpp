@@ -238,26 +238,54 @@ void MotorController::setMode(int mode) {
     if (_mode == 100) {
         if (mode == 10) {
             _mode = 10;
+        } else if (mode >= 20 && mode <= 29) {
+            _mode = mode;
         }
     } else {
-        if ((mode < 0 || mode > 5) && (mode != 10 && mode != 100)) {
-            _mode = 0;
-            return;
-        }
-
-        if (_isSteer) {
-            if (mode == 3 || mode == 10) {
+        if ((mode >= 0 && mode <= 5) || (mode >= 20 && mode <= 29) || (mode == 10 || mode == 100)) {
+            if (_isSteer) {
+                if (mode == 3 || mode == 10 || (mode >= 20 && mode <= 29)) {
+                    _mode = 0;
+                } else {
+                    _mode = mode;
+                }
+            } else if (mode == 4 || mode == 5) {
                 _mode = 0;
+            } else if (mode >= 20 && mode <= 29) {
+                switch (mode - 20) {
+                    case 0:
+                        this->setBeepTime(100);
+                        this->setBeepFreqKhz(6);
+                        this->setMode(10);
+                        break;
+
+                    case 1:
+                        this->setBeepTime(100);
+                        this->setBeepFreqKhz(5);
+                        this->setMode(10);
+                        break;
+
+                    case 2:
+                        this->setBeepTime(100);
+                        this->setBeepFreqKhz(4);
+                        this->setMode(10);
+                        break;
+
+                    default:
+                        this->setBeepTime(100);
+                        this->setBeepFreqKhz(6);
+                        this->setMode(10);
+                        break;
+                }
             } else {
+                if (mode == 100) {
+                    _isMotorShutDown = true;
+                }
                 _mode = mode;
             }
-        } else if (mode == 4 || mode == 5) {
-            _mode = 0;
         } else {
-            if (mode == 100) {
-                _isMotorShutDown = true;
-            }
-            _mode = mode;
+            _mode = 0;
+            return;
         }
     }
 }
