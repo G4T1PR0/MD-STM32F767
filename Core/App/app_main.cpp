@@ -67,6 +67,7 @@ static volatile float debug_log[DEBUG_LOG_NUM][5] = {0};
 unsigned int log_mode = 0;
 unsigned int log_cnt = 0;
 unsigned int error_cnt = 0;
+unsigned int low_voltage_cnt = 0;
 
 struct md_error_t {
     enum Error_Code {
@@ -275,7 +276,7 @@ void app_main() {
             }
         }
 
-        md_error.s.Error[md_error.s.BATT_VOLTAGE_ERROR] = batt_voltage.getVoltage() < 6;
+        md_error.s.Error[md_error.s.BATT_VOLTAGE_ERROR] = low_voltage_cnt > 100;
 
         md_error.s.Error[md_error.s.FL_CURRENT_ERROR] = FL_Motor.OC;
         md_error.s.Error[md_error.s.FR_CURRENT_ERROR] = FR_Motor.OC;
@@ -326,20 +327,20 @@ void app_main() {
                 } else if (error_cnt < 1000) {
                     mcu.gpioSetValue(MAL::P_GPIO::LED_2, 0);
 
-                    mcu.gpioSetValue(MAL::P_GPIO::LED_3, !md_error.s.Error[md_error.s.FL_CURRENT_ERROR]);
-                    mcu.gpioSetValue(MAL::P_GPIO::LED_4, !md_error.s.Error[md_error.s.FR_CURRENT_ERROR]);
-                    mcu.gpioSetValue(MAL::P_GPIO::LED_5, !md_error.s.Error[md_error.s.ST_CURRENT_ERROR]);
-                    mcu.gpioSetValue(MAL::P_GPIO::LED_6, !md_error.s.Error[md_error.s.RL_CURRENT_ERROR]);
-                    mcu.gpioSetValue(MAL::P_GPIO::LED_7, !md_error.s.Error[md_error.s.RR_CURRENT_ERROR]);
+                    mcu.gpioSetValue(MAL::P_GPIO::LED_6, !md_error.s.Error[md_error.s.FL_CURRENT_ERROR]);
+                    mcu.gpioSetValue(MAL::P_GPIO::LED_7, !md_error.s.Error[md_error.s.FR_CURRENT_ERROR]);
+                    mcu.gpioSetValue(MAL::P_GPIO::LED_8, !md_error.s.Error[md_error.s.ST_CURRENT_ERROR]);
+                    mcu.gpioSetValue(MAL::P_GPIO::LED_9, !md_error.s.Error[md_error.s.RL_CURRENT_ERROR]);
+                    mcu.gpioSetValue(MAL::P_GPIO::LED_10, !md_error.s.Error[md_error.s.RR_CURRENT_ERROR]);
 
                 } else if (error_cnt < 1500) {
                     mcu.gpioSetValue(MAL::P_GPIO::LED_3, 0);
 
-                    mcu.gpioSetValue(MAL::P_GPIO::LED_5, !md_error.s.Error[md_error.s.FL_CONTROLL_ERROR]);
-                    mcu.gpioSetValue(MAL::P_GPIO::LED_6, !md_error.s.Error[md_error.s.FR_CONTROLL_ERROR]);
-                    mcu.gpioSetValue(MAL::P_GPIO::LED_7, !md_error.s.Error[md_error.s.ST_CONTROLL_ERROR]);
-                    mcu.gpioSetValue(MAL::P_GPIO::LED_8, !md_error.s.Error[md_error.s.RL_CONTROLL_ERROR]);
-                    mcu.gpioSetValue(MAL::P_GPIO::LED_9, !md_error.s.Error[md_error.s.RR_CONTROLL_ERROR]);
+                    mcu.gpioSetValue(MAL::P_GPIO::LED_6, !md_error.s.Error[md_error.s.FL_CONTROLL_ERROR]);
+                    mcu.gpioSetValue(MAL::P_GPIO::LED_7, !md_error.s.Error[md_error.s.FR_CONTROLL_ERROR]);
+                    mcu.gpioSetValue(MAL::P_GPIO::LED_8, !md_error.s.Error[md_error.s.ST_CONTROLL_ERROR]);
+                    mcu.gpioSetValue(MAL::P_GPIO::LED_9, !md_error.s.Error[md_error.s.RL_CONTROLL_ERROR]);
+                    mcu.gpioSetValue(MAL::P_GPIO::LED_10, !md_error.s.Error[md_error.s.RR_CONTROLL_ERROR]);
 
                 } else {
                     error_cnt = 0;
@@ -417,6 +418,7 @@ void app_main() {
             //  printf("duty: %f t_current: %f o_current: %f t_velocity: %f o_velocity: %f\r\n", debug_log[log_cnt][0], debug_log[log_cnt][1], debug_log[log_cnt][2], debug_log[log_cnt][3], debug_log[log_cnt][4]);
             // printf("mode: %d raw_angle: %f angle: %f duty: %f t_current: %f o_current: %f \n", motor_mode, steer_angle.getRawAngle(), ST_Motor.getAngle(), ST_Motor.getDuty(), ST_Motor.getTargetCurrent(), ST_Motor.getCurrent());
             // printf("dt: %f dtdt %f\n", ST_Motor.D_dt, ST_Motor.D_dtdt);
+            // printf("bus_voltage: %f\n", batt_voltage.getVoltage());
         }
     }
 }
@@ -437,6 +439,11 @@ void app_interrupt_50us() {
         cmd_send_cnt++;
         cmd.cnt1ms++;
         error_cnt++;
+        if (batt_voltage.getVoltage() < 6) {
+            low_voltage_cnt++;
+        } else {
+            low_voltage_cnt = 0;
+        }
     }
     MotorController::update(&FL_Motor);
     MotorController::update(&FR_Motor);

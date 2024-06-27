@@ -21,6 +21,6 @@ void batteryVoltageSensor::update() {
 }
 
 float batteryVoltageSensor::getVoltage() {
-    LP_FILTER(_temp_filter_value, (float)_mcu->adcGetValue(_p), 0.5f);
+    LP_FILTER(_temp_filter_value, (float)_mcu->adcGetValue(_p), 0.005f);
     return _mcu->adcGetValue(_p) * _raw2voltage * _voltage2batt;
 }
