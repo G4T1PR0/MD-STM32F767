@@ -1,0 +1,11 @@
+Checks: "-*,\
+readability-*,\
+-readability-convert-member-functions-to-static,\
+-readability-uppercase-literal-suffix,\
+-readability-static-accessed-through-instance,\
+-bugprone-unsafe-functions,\
+"
+WarningsAsErrors: ''
+HeaderFilterRegex: 'source.*\.(hpp|h)'
+AnalyzeTemporaryDtors: false
+FormatStyle:     file

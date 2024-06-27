@@ -58,6 +58,9 @@ class stm32halAbstractionLayer : public baseMcuAbstractionLayer {
     // Wait
     virtual void waitMs(uint32_t ms);
 
+    // Watchdog
+    virtual void idwgResetCnt(void);
+
    private:
     // ADC
     void _initADC();

@@ -8,6 +8,7 @@
 #include <Devices/McuAbstractionLayer/stm32halAbstractionLayer.hpp>
 #include <cstring>
 #include "adc.h"
+#include "iwdg.h"
 #include "tim.h"
 #include "usart.h"
 
@@ -487,4 +488,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim) {
 
 void stm32halAbstractionLayer::waitMs(uint32_t ms) {
     HAL_Delay(ms);
+}
+
+// Watchdog
+void stm32halAbstractionLayer::idwgResetCnt(void) {
+    HAL_IWDG_Refresh(&hiwdg);
 }

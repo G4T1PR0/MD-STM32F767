@@ -196,7 +196,6 @@
 		<project id="MD.null.70367901" name="MD"/>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
-	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
 	<storageModule moduleId="scannerConfiguration">
 		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		<scannerConfigBuildInfo instanceId="com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.release.714527057;com.st.stm32cube.ide.mcu.gnu.managedbuild.config.exe.release.714527057.;com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.compiler.1788013308;com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.cpp.compiler.input.cpp.27954851">
@@ -219,5 +218,17 @@
 		<configuration configurationName="Release">
 			<resource resourceType="PROJECT" workspacePath="/STM_MD"/>
 		</configuration>
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets">
+		<buildTargets>
+			<target name="compile_command" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+				<buildCommand>compiledb</buildCommand>
+				<buildArguments>make all</buildArguments>
+				<buildTarget>all</buildTarget>
+				<stopOnError>true</stopOnError>
+				<useDefaultCommand>false</useDefaultCommand>
+				<runAllBuilders>false</runAllBuilders>
+			</target>
+		</buildTargets>
 	</storageModule>
 </cproject>

@@ -114,6 +114,9 @@ class baseMcuAbstractionLayer {
 
     // Wait
     virtual void waitMs(uint32_t ms) = 0;
+
+    // Watchdog
+    virtual void idwgResetCnt(void) = 0;
 };
 
 typedef baseMcuAbstractionLayer MAL;

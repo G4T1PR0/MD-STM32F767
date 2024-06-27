@@ -6,6 +6,7 @@
  */
 
 #include <app_main.h>
+#include <cstdint>
 #include <vector>
 
 #include <Devices/Driver/A3921.hpp>
@@ -65,6 +66,7 @@ unsigned int cmd_send_cnt = 0;
 static volatile float debug_log[DEBUG_LOG_NUM][5] = {0};
 unsigned int log_mode = 0;
 unsigned int log_cnt = 0;
+unsigned int error_cnt = 0;
 
 struct md_error_t {
     enum Error_Code {
@@ -219,6 +221,7 @@ void app_main() {
     // RR_Motor.setCurrent(0.6);
 
     while (1) {
+        mcu.idwgResetCnt();
         if (cmd.isConnectionLost) {
             for (unsigned int i = 0; i < 10; i++) {
                 mcu.gpioSetValue(led[i], 1);
@@ -229,7 +232,6 @@ void app_main() {
             mcu.gpioSetValue(MAL::P_GPIO::LED_3, 0);
             mcu.gpioSetValue(MAL::P_GPIO::LED_4, 0);
             mcu.gpioSetValue(MAL::P_GPIO::LED_5, 0);
-
         } else if (FL_Motor.getMode() != 0 || FR_Motor.getMode() != 0 || ST_Motor.getMode() != 0 || RL_Motor.getMode() != 0 || RR_Motor.getMode() != 0) {
             float d = (FL_Motor.getDuty() + FR_Motor.getDuty() + ST_Motor.getDuty() + RL_Motor.getDuty() + RR_Motor.getDuty()) / 5;
 
@@ -302,13 +304,47 @@ void app_main() {
             mcu.waitMs(150);
             RL_Motor.setMode(10);
             mcu.waitMs(150);
+
             while (1) {
+                mcu.idwgResetCnt();
                 printf("\x1b[31m[Main Thread]\x1b[39m Error: %u Bit: ", md_error.raw);
                 for (int i = 0; i < md_error.s.Error_End; i++) {
                     printf("%u ", md_error.s.Error[i]);
                 }
                 printf("\n");
-                mcu.waitMs(1000);
+
+                for (unsigned int i = 0; i < 10; i++) {
+                    mcu.gpioSetValue(led[i], 1);
+                }
+
+                if (error_cnt < 500) {
+                    mcu.gpioSetValue(MAL::P_GPIO::LED_1, 0);
+
+                    if (md_error.s.Error[md_error.s.BATT_VOLTAGE_ERROR]) {
+                        mcu.gpioSetValue(MAL::P_GPIO::LED_4, 0);
+                    }
+                } else if (error_cnt < 1000) {
+                    mcu.gpioSetValue(MAL::P_GPIO::LED_2, 0);
+
+                    mcu.gpioSetValue(MAL::P_GPIO::LED_3, !md_error.s.Error[md_error.s.FL_CURRENT_ERROR]);
+                    mcu.gpioSetValue(MAL::P_GPIO::LED_4, !md_error.s.Error[md_error.s.FR_CURRENT_ERROR]);
+                    mcu.gpioSetValue(MAL::P_GPIO::LED_5, !md_error.s.Error[md_error.s.ST_CURRENT_ERROR]);
+                    mcu.gpioSetValue(MAL::P_GPIO::LED_6, !md_error.s.Error[md_error.s.RL_CURRENT_ERROR]);
+                    mcu.gpioSetValue(MAL::P_GPIO::LED_7, !md_error.s.Error[md_error.s.RR_CURRENT_ERROR]);
+
+                } else if (error_cnt < 1500) {
+                    mcu.gpioSetValue(MAL::P_GPIO::LED_3, 0);
+
+                    mcu.gpioSetValue(MAL::P_GPIO::LED_5, !md_error.s.Error[md_error.s.FL_CONTROLL_ERROR]);
+                    mcu.gpioSetValue(MAL::P_GPIO::LED_6, !md_error.s.Error[md_error.s.FR_CONTROLL_ERROR]);
+                    mcu.gpioSetValue(MAL::P_GPIO::LED_7, !md_error.s.Error[md_error.s.ST_CONTROLL_ERROR]);
+                    mcu.gpioSetValue(MAL::P_GPIO::LED_8, !md_error.s.Error[md_error.s.RL_CONTROLL_ERROR]);
+                    mcu.gpioSetValue(MAL::P_GPIO::LED_9, !md_error.s.Error[md_error.s.RR_CONTROLL_ERROR]);
+
+                } else {
+                    error_cnt = 0;
+                }
+                // mcu.waitMs(500);
             }
         }
 
@@ -400,6 +436,7 @@ void app_interrupt_50us() {
         rr_encoder.update();
         cmd_send_cnt++;
         cmd.cnt1ms++;
+        error_cnt++;
     }
     MotorController::update(&FL_Motor);
     MotorController::update(&FR_Motor);
