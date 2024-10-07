@@ -21,7 +21,7 @@ void steerAngleSensor::update() {
 }
 float steerAngleSensor::getAngle() {
     // LP_FILTER(_temp_filter_value, (float)_mcu->adcGetValue(_p), 0.99f);
-    return (2000 - _mcu->adcGetValue(_p)) * _raw2angle;
+    return (2090 - _mcu->adcGetValue(_p)) * _raw2angle;
     // return (2000 - _temp_filter_value) * _raw2angle;
     //  return 45 - (((float)_mcu->adcGetValue(_p) - 654) * _raw2angle);
     //   return (float)_mcu->adcGetValue(_p);
