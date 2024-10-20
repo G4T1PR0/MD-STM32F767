@@ -176,7 +176,6 @@ void app_init() {
     FL_Motor.setMotorDirection(false);
     FL_Motor.setMode(0);
     FL_Motor.setCurrentPID(1, 0, 0);
-    FL_Motor.setCurrent(0);
 
     ST_Motor.setMotorDirection(false);
     ST_Motor.setCurrentPID(2, 0, 0);
@@ -188,17 +187,14 @@ void app_init() {
     FR_Motor.setMotorDirection(true);
     FR_Motor.setMode(0);
     FR_Motor.setCurrentPID(1, 0, 0);
-    FR_Motor.setCurrent(0);
 
     RL_Motor.setMotorDirection(true);
     RL_Motor.setMode(0);
     RL_Motor.setCurrentPID(1, 0, 0);
-    FR_Motor.setCurrent(0);
 
     RR_Motor.setMotorDirection(false);
     RR_Motor.setMode(0);
     RR_Motor.setCurrentPID(1, 0, 0);
-    FR_Motor.setCurrent(0);
 
     printf("\x1b[32m[Main Thread]\x1b[39m Initialization Complete\n");
 }

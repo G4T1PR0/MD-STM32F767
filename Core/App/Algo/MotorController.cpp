@@ -32,8 +32,8 @@ void MotorController::init(void) {
     _current_pid.setPID(0, 0, 0);
     _velocity_pid.setPID(0, 0, 0);
     _angle_pid.setPID(0, 0, 0);
-    _currentLimit = 10;
-    _maxiumCurrentLimit = 10;
+    _currentLimit = 13;
+    _maxiumCurrentLimit = 15;
 }
 
 void MotorController::update(MotorController* instance) {

@@ -72,25 +72,25 @@ class MotorController {
 
     void _update(void);
 
-    bool _isSteer;
-    int _mode;
+    bool _isSteer = 0;
+    int _mode = 0;
 
     bool _isMotorShutDown = 0;
 
-    float _motorInputDuty;
-    float _pidTargetCurrent;
+    float _motorInputDuty = 0;
+    float _pidTargetCurrent = 0;
 
     float _observedCurrent = 0;
     float _observedVelocity = 0;
     float _observedAngle = 0;
 
-    float _targetDuty;
-    float _targetCurrent;
-    float _targetVelocity;
-    float _targetAngle;
+    float _targetDuty = 0;
+    float _targetCurrent = 0;
+    float _targetVelocity = 0;
+    float _targetAngle = 0;
 
-    float _currentLimit;
-    float _maxiumCurrentLimit;
+    float _currentLimit = 13;
+    float _maxiumCurrentLimit = 15;
     uint32_t _dutyDtffLimit = 2000;
 
     bool _isMotorConnectionReversed = 0;
