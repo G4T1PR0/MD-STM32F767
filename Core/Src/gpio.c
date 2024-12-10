@@ -94,31 +94,31 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PBPin PBPin PBPin */
+  /*Configure GPIO pins : LED6_Pin LED7_Pin LED5_Pin */
   GPIO_InitStruct.Pin = LED6_Pin|LED7_Pin|LED5_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PEPin PEPin PEPin */
+  /*Configure GPIO pins : LED8_Pin LED9_Pin LED10_Pin */
   GPIO_InitStruct.Pin = LED8_Pin|LED9_Pin|LED10_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PEPin PEPin PEPin PEPin
-                           PEPin */
+  /*Configure GPIO pins : YOBI4_Pin YOBI3_Pin YOBI2_Pin YOBI1_Pin
+                           ST_Direction_in_Pin */
   GPIO_InitStruct.Pin = YOBI4_Pin|YOBI3_Pin|YOBI2_Pin|YOBI1_Pin
                           |ST_Direction_in_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PDPin PDPin PDPin PDPin
-                           PDPin PDPin PDPin PDPin
-                           PDPin PDPin PDPin PDPin */
+  /*Configure GPIO pins : LED4_Pin LED3_Pin LED2_Pin LED1_Pin
+                           Motor_RR_SR_Pin Motor_RR_PHASE_Pin Motor_FR_SR_Pin Motor_FR_PHASE_Pin
+                           Motor_ST_SR_Pin Motor_ST_PHASE_Pin Motor_FL_SR_Pin Motor_FL_PHASE_Pin */
   GPIO_InitStruct.Pin = LED4_Pin|LED3_Pin|LED2_Pin|LED1_Pin
                           |Motor_RR_SR_Pin|Motor_RR_PHASE_Pin|Motor_FR_SR_Pin|Motor_FR_PHASE_Pin
                           |Motor_ST_SR_Pin|Motor_ST_PHASE_Pin|Motor_FL_SR_Pin|Motor_FL_PHASE_Pin;
@@ -127,7 +127,7 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PCPin PCPin */
+  /*Configure GPIO pins : Motor_RL_SR_Pin Motor_RL_PHASE_Pin */
   GPIO_InitStruct.Pin = Motor_RL_SR_Pin|Motor_RL_PHASE_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;

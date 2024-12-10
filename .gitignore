@@ -2,10 +2,7 @@
 /Release
 build
 /.settings
-/.mxproject
 /*.launch
-
-/.vscode
 
 .DS_Store
 .cache
