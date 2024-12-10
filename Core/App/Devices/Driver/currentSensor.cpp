@@ -28,7 +28,7 @@ void currentSensor::update() {
 
 #define ADC_BUFFER_SIZE 50
 float currentSensor::getCurrent() {
-    LP_FILTER(_temp_filter_value, (float)_mcu->adcGetValue(_p), 0.01f);
+    LP_FILTER(_temp_filter_value, (float)_mcu->adcGetValue(_p), 0.05f);
     return ((_temp_filter_value - _offset) * _raw2voltage) / _voltage2current;
 
     // _filter.push(_mcu->adcGetValue(_p));

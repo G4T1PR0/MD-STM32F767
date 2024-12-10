@@ -210,13 +210,15 @@ void app_main() {
     log_mode = 1;
 
     // FL_Motor.setMode(2);
-    // FL_Motor.setCurrent(0.6);
+    // FL_Motor.setCurrent(0.4);
+    // ST_Motor.setMode(2);
+    // ST_Motor.setCurrent(0.1);
     // FR_Motor.setMode(2);
-    // FR_Motor.setCurrent(0.6);
+    // FR_Motor.setCurrent(0.4);
     // RL_Motor.setMode(2);
-    // RL_Motor.setCurrent(0.6);
+    // RL_Motor.setCurrent(0.4);
     // RR_Motor.setMode(2);
-    // RR_Motor.setCurrent(0.6);
+    // RR_Motor.setCurrent(0.4);
 
     while (1) {
         mcu.idwgResetCnt();
@@ -343,7 +345,7 @@ void app_interrupt_50us() {
 }
 
 void LedUiControl() {
-    if (cmd.isConnectionLost && false) {
+    if (cmd.isConnectionLost) {
         for (unsigned int i = 0; i < 10; i++) {
             mcu.gpioSetValue(led[i], 1);
         }
