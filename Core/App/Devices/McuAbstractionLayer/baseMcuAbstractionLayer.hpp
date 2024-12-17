@@ -80,6 +80,11 @@ class baseMcuAbstractionLayer {
         End_T
     };
 
+    enum P_TimerCnt {
+        C1,
+        End_C
+    };
+
     virtual void init(void) = 0;
 
     // ADC
@@ -117,6 +122,10 @@ class baseMcuAbstractionLayer {
 
     // Watchdog
     virtual void idwgResetCnt(void) = 0;
+
+    // Timer Counter
+    virtual void timerSetCnt(P_TimerCnt p, uint32_t cnt) = 0;
+    virtual uint32_t timerGetCnt(P_TimerCnt p) = 0;
 };
 
 typedef baseMcuAbstractionLayer MAL;

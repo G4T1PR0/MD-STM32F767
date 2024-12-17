@@ -61,6 +61,11 @@ class stm32halAbstractionLayer : public baseMcuAbstractionLayer {
     // Watchdog
     virtual void idwgResetCnt(void);
 
+    // Timer Counter
+    virtual void timerSetCnt(P_TimerCnt p, uint32_t cnt);
+    virtual uint32_t timerGetCnt(P_TimerCnt p);
+    static inline unsigned int _interrupt_cnt[P_TimerCnt::End_C] = {0};
+
    private:
     // ADC
     void _initADC();
@@ -85,6 +90,9 @@ class stm32halAbstractionLayer : public baseMcuAbstractionLayer {
 
     // Interrupt
     void _initTimerInterrupt();
+
+    // Timer Counter
+    void _initTimerCounter();
 };
 
 #endif /* APP_DEVICES_STM32HALABSTRACTIONLAYER_STM32HALABSTRACTIONLAYER_HPP_ */

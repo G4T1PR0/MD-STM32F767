@@ -39,6 +39,8 @@ struct PeripheralAllocation {
     UART_HandleTypeDef* UART[MAL::P_UART::End_U];
 
     TIM_HandleTypeDef* TimerInterrupt_TIM[MAL::P_Interrupt::End_T];
+
+    TIM_HandleTypeDef* Cnt_Timer[MAL::P_TimerCnt::End_C];
 };
 
 static PeripheralAllocation PAL;
@@ -161,6 +163,9 @@ stm32halAbstractionLayer::stm32halAbstractionLayer() {
 
     // Timer Interrupt
     PAL.TimerInterrupt_TIM[MAL::P_Interrupt::T50us] = &htim14;
+
+    // Timer Counter
+    PAL.Cnt_Timer[MAL::P_TimerCnt::C1] = &htim6;
 }
 
 void stm32halAbstractionLayer::init() {
@@ -170,6 +175,7 @@ void stm32halAbstractionLayer::init() {
     _initUART();
     _initTimerInterrupt();
     _initInputPWM();
+    _initTimerCounter();
 }
 
 // ADC
@@ -493,4 +499,24 @@ void stm32halAbstractionLayer::waitMs(uint32_t ms) {
 // Watchdog
 void stm32halAbstractionLayer::idwgResetCnt(void) {
     HAL_IWDG_Refresh(&hiwdg);
+}
+
+// Timer Counter
+
+void stm32halAbstractionLayer::_initTimerCounter() {
+    HAL_TIM_Base_Start(PAL.Cnt_Timer[MAL::P_TimerCnt::C1]);
+}
+
+void stm32halAbstractionLayer::timerSetCnt(P_TimerCnt p, uint32_t cnt) {
+    if (p != P_TimerCnt::End_C) {
+        __HAL_TIM_SET_COUNTER(PAL.Cnt_Timer[p], cnt);
+        _interrupt_cnt[p] = 0;
+    }
+}
+
+uint32_t stm32halAbstractionLayer::timerGetCnt(P_TimerCnt p) {
+    if (p != P_TimerCnt::End_C) {
+        return __HAL_TIM_GET_COUNTER(PAL.Cnt_Timer[p]) + _interrupt_cnt[p] * 65535;
+    }
+    return 0;
 }
