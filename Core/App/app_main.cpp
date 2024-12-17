@@ -72,6 +72,8 @@ unsigned int log_cnt = 0;
 unsigned int error_cnt = 0;
 unsigned int low_voltage_cnt = 0;
 
+float interrupt_process_time = 0;
+
 struct md_error_t {
     enum Error_Code {
         BATT_VOLTAGE_ERROR = 0,
@@ -284,8 +286,9 @@ void app_main() {
         //         break;
         // }
 
-        if (debug_cnt > 100 * 10) {
+        if (debug_cnt > 100) {
             debug_cnt = 0;
+            printf("\x1b[32m[Main Thread]\x1b[39m p_time: %fus\r\n", interrupt_process_time * 1 / 108);
             // printf("input duty: %f freq: %f\r\n", (mcu.inputPwmGetDuty(MAL::P_IPWM::ST_IPWM)), mcu.inputPwmGetFrequency(MAL::P_IPWM::ST_IPWM));
             // printf("fld: %f frd: %f rld: %f rrd: %f\r\n", FL_Motor.getDuty(), FR_Motor.getDuty(), RL_Motor.getDuty(), RR_Motor.getDuty());
             // printf("mode: %d bus_voltage: %f duty: %f t_current: %f o_current: %f dt: %f dt_avg %f\r\n", FR_Motor.getMode(), batt_voltage.getVoltage(), FR_Motor.getDuty(), FR_Motor.getTargetCurrent(), FR_Motor.getCurrent(), FR_Motor.D_dt, FR_Motor.D_dt_avg);
@@ -302,6 +305,7 @@ void app_main() {
 unsigned int update1ms_cnt = 0;
 
 void app_interrupt_50us() {
+    mcu.timerSetCnt(MAL::P_TimerCnt::C1, 0);
     update1ms_cnt++;
 
     cmd.parsePwm();
@@ -315,6 +319,7 @@ void app_interrupt_50us() {
         cmd_send_cnt++;
         cmd.cnt1ms++;
         error_cnt++;
+        debug_cnt++;
         if (batt_voltage.getVoltage() < 6) {
             low_voltage_cnt++;
         } else {
@@ -339,9 +344,9 @@ void app_interrupt_50us() {
     //     }
     // }
 
-    debug_cnt++;
     motor_debug_cnt++;
     led_cnt++;
+    interrupt_process_time = float(mcu.timerGetCnt(MAL::P_TimerCnt::C1));
 }
 
 void LedUiControl() {
