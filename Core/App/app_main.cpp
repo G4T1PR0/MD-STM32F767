@@ -419,7 +419,13 @@ void AnomalyDetection() {
     md_error.s.Error[md_error.s.RL_CONTROLL_ERROR] = RL_Motor.CE;
     md_error.s.Error[md_error.s.RR_CONTROLL_ERROR] = RR_Motor.CE;
 
-    if (md_error.raw != 0) {
+    // raw only overlaps Error[0..3]. CONTROLL_ERROR also fires on normal command steps, so it stays out until CE is redesigned (A154)
+    bool is_error = false;
+    for (int i = 0; i <= md_error.s.RR_CURRENT_ERROR; i++) {
+        is_error |= md_error.s.Error[i];
+    }
+
+    if (is_error) {
         for (const auto& i : mcs) {
             i->setMode(100);
         }

@@ -103,6 +103,12 @@ void inline MotorController::_update(void) {
             _pidTargetCurrent = _targetCurrent;
 
             _motorInputDuty = _current_pid.update(_pidTargetCurrent, _observedCurrent);
+            if (_motorInputDuty > 1) {
+                _motorInputDuty = 1;
+            } else if (_motorInputDuty < -1) {
+                _motorInputDuty = -1;
+            }
+
             if (_pidTargetCurrent > 0) {
                 if (_motorInputDuty < 0)
                     _motorInputDuty = 0;
@@ -136,6 +142,12 @@ void inline MotorController::_update(void) {
             }
 
             _motorInputDuty = _current_pid.update(_pidTargetCurrent, _observedCurrent);
+            if (_motorInputDuty > 1) {
+                _motorInputDuty = 1;
+            } else if (_motorInputDuty < -1) {
+                _motorInputDuty = -1;
+            }
+
             if (_pidTargetCurrent > 0) {
                 if (_motorInputDuty < 0)
                     _motorInputDuty = 0;
