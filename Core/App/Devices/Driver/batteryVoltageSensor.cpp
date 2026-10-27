@@ -15,12 +15,14 @@ batteryVoltageSensor::batteryVoltageSensor(MAL* mcu, MAL::P_ADC p) {
 }
 
 void batteryVoltageSensor::init() {
+    _temp_filter_value = _mcu->adcGetValue(_p);
 }
 
+// Called every 1ms: time constant about 10ms
 void batteryVoltageSensor::update() {
+    LP_FILTER(_temp_filter_value, (float)_mcu->adcGetValue(_p), 0.1f);
 }
 
 float batteryVoltageSensor::getVoltage() {
-    LP_FILTER(_temp_filter_value, (float)_mcu->adcGetValue(_p), 0.005f);
-    return _mcu->adcGetValue(_p) * _raw2voltage * _voltage2batt;
+    return _temp_filter_value * _raw2voltage * _voltage2batt;
 }

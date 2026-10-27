@@ -127,6 +127,8 @@ void app_init() {
     rl_current.init();
     rr_current.init();
 
+    batt_voltage.init();
+
     mcu.waitMs(100);
 
     fl_encoder.init();
@@ -227,9 +229,9 @@ void app_main() {
         LedUiControl();
         AnomalyDetection();
 
-        if (cmd_send_cnt > 10) {  // 10ms
+        if (cmd_send_cnt >= 10) {  // 10ms
             cmd_send_cnt = 0;
-            cmd.send();  // Send Feedback
+            cmd.send(batt_voltage.getVoltage());  // Send Feedback
         }
 
         cmd.update();  // Parse Command
@@ -310,7 +312,7 @@ void app_interrupt_50us() {
 
     cmd.parsePwm();
 
-    if (update1ms_cnt > 20) {
+    if (update1ms_cnt >= 20) {  // 20 * 50us = 1ms
         update1ms_cnt = 0;
         fl_encoder.update();
         fr_encoder.update();
@@ -318,8 +320,10 @@ void app_interrupt_50us() {
         rr_encoder.update();
         cmd_send_cnt++;
         cmd.cnt1ms++;
+        cmd.checkConnection();
         error_cnt++;
         debug_cnt++;
+        batt_voltage.update();
         if (batt_voltage.getVoltage() < 6) {
             low_voltage_cnt++;
         } else {

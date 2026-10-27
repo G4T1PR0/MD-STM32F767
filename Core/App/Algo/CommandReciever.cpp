@@ -189,10 +189,16 @@ void CommandReciever::update() {
         is_rx = false;
         // printf("/////////////////////////////////////////////////\n");
     }
+}
 
+// Called every 1ms from the timer interrupt, so the motors stop even if the main loop hangs
+void CommandReciever::checkConnection() {
     if (cnt1ms > 100) {
         for (auto mc : _mcs) {
-            mc->setMode(0);
+            // Leave beep (10) and shutdown (100) alone: this also runs during app_init and the error loop
+            if (mc->getMode() >= 1 && mc->getMode() <= 5) {
+                mc->setMode(0);
+            }
         }
         isConnectionLost = true;
     } else {
@@ -200,7 +206,7 @@ void CommandReciever::update() {
     }
 }
 
-void CommandReciever::send() {
+void CommandReciever::send(float battery_voltage) {
     unsigned int i = 0;
 
     _tx_buffer[0] = 0xFF;
@@ -272,6 +278,12 @@ void CommandReciever::send() {
         };
         i++;
     }
+
+    // Battery voltage [mV] after the motors: 0x10, uint16. G4's current parser resets on any byte after the 5th motor, so it skips this
+    uint16_t battery_mv = battery_voltage * 1000;
+    _tx_buffer[_tx_buffer_index++] = 0x10;
+    memcpy(&_tx_buffer[_tx_buffer_index], &battery_mv, sizeof(battery_mv));
+    _tx_buffer_index += sizeof(battery_mv);
 
     //    printf("TX: ");
     //    for (int i = 0; i < _tx_buffer_index; i++) {

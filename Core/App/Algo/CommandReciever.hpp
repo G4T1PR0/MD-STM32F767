@@ -20,7 +20,8 @@ class CommandReciever {
 
     void init();
     void update();
-    void send();
+    void checkConnection();
+    void send(float battery_voltage);
     void parsePwm();
 
     unsigned int cnt1ms = 0;
